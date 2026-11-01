@@ -1,53 +1,141 @@
-כדי למצוא את המיקום המדויק בקובץ `index.html`:
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>דיווח נוכחות פלוגתי</title>
+  <style>
+    :root {
+      --primary: #2d5a27;
+      --primary-hover: #1e3d1a;
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --border: #dcdfe4;
+      --text: #222;
+      --danger: #d9534f;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      color: var(--primary);
+      text-align: center;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+    select, input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      margin-bottom: 14px;
+      background: #fff;
+    }
+    .soldier-row {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: #fafbfc;
+    }
+    .soldier-name {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .radio-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: normal;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+    button.submit-btn {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button.submit-btn:disabled {
+      background: #a0a0a0;
+    }
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .alert-success { background: #d4edda; color: #155724; }
+    .alert-error { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
 
-1. פתח את הקובץ `index.html` בעורך שלך ולחץ על `Ctrl + F` (חיפוש).
-2. חפש את המילים:
-```javascript
-window.addEventListener('DOMContentLoaded'
+<div class="container">
+  <div class="card">
+    <h1>דיווח נוכחות יומי</h1>
+    
+    <label for="reportDate">תאריך תוקף הדוח:</label>
+    <input type="date" id="reportDate" required>
 
-```
+    <label for="frameworkSelect">בחר מסגרת:</label>
+    <select id="frameworkSelect" onchange="filterSoldiers()">
+      <option value="">-- בחר מסגרת --</option>
+      <option value="מחלקה 1">מחלקה 1</option>
+      <option value="מחלקה 2">מחלקה 2</option>
+      <option value="מחלקה 3">מחלקה 3</option>
+      <option value="חפ&quot;ק">חפ"ק</option>
+      <option value="מפל&quot;ג">מפל"ג</option>
+      <option value="חמ&quot;ל">חמ"ל</option>
+    </select>
 
+    <label for="reporterName">שם המפקד המדווח:</label>
+    <input type="text" id="reporterName" placeholder="לדוגמה: יוסי כהן - מ&quot;כ 1" required>
+  </div>
 
-3. תראה את הבלוק הבא:
-```javascript
-window.addEventListener('DOMContentLoaded', async () => {
-  if (SCRIPT_URL === "YOUR_APPS_SCRIPT_URL_HERE") {
-    showMessage("שגיאה: טרם הוגדרה כתובת ה-Apps Script בקוד.", "error");
-    return;
-  }
-  try {
-    const res = await fetch(SCRIPT_URL);
-    const data = await res.json();
-    allSoldiers = data.soldiers || [];
-  } catch (e) {
-    showMessage("שגיאה בטעינת החיילים מהגיליון.", "error");
-  }
-});
+  <div id="soldiersContainer"></div>
 
-```
+  <div id="statusMessage"></div>
 
+  <button type="button" id="submitBtn" class="submit-btn hidden" onclick="submitReport()">שלח דיווח לגיליון</button>
+</div>
 
-4. הדבק את שורת התאריך ישירות בשורה הראשונה בתוך הבלוק הזה, כך שזה ייראה בדיוק כך:
-```javascript
-window.addEventListener('DOMContentLoaded', async () => {
-  // השורה החדשה:
-  document.getElementById("reportDate").value = new Date().toISOString().split('T')[0];
-
-  if (SCRIPT_URL === "https://script.google.com/macros/s/AKfycbx8tKGvcWETTDvgrbp2wyfmbX89Gb3JGyge0G7-45YIJM1JbYqTSwEUV3hDA4yHMS8s/exec") {
-    showMessage("שגיאה: טרם הוגדרה כתובת ה-Apps Script בקוד.", "error");
-    return;
-  }
-  try {
-    const res = await fetch(SCRIPT_URL);
-    const data = await res.json();
-    allSoldiers = data.soldiers || [];
-  } catch (e) {
-    showMessage("שגיאה בטעינת החיילים מהגיליון.", "error");
-  }
-});
-
-```
-
-
-
-האם מצאת את השורה והצלחת להגדיר את שדה התאריך, או שתרצה שאציג לך את כל קובץ ה-index.html המעודכן בשלמותו?
+<script>
+  const SCRIPT_URL = "
