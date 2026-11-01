@@ -287,4 +287,22 @@
 
   // אירועי טעינה והאזנה
   window.addEventListener('DOMContentLoaded', async () => {
-    //
+    // 1. הגדרת תאריך היום
+    document.getElementById("reportDate").value = new Date().toISOString().split('T')[0];
+
+    // 2. חיבור אירועים
+    document.getElementById("frameworkSelect").addEventListener("change", filterSoldiers);
+    document.getElementById("submitBtn").addEventListener("click", submitReport);
+
+    // 3. משיכת רשימת החיילים
+    try {
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
+      allSoldiers = data.soldiers || [];
+    } catch (e) {
+      showMessage("שגיאה בטעינת החיילים מהגיליון.", "error");
+    }
+  });
+</script>
+</body>
+</html>
