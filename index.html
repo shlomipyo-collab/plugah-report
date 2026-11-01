@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>דיווח נוכחות פלוגתי</title>
+  <style>
+    :root {
+      --primary: #2d5a27;
+      --primary-hover: #1e3d1a;
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --border: #dcdfe4;
+      --text: #222;
+      --danger: #d9534f;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      color: var(--primary);
+      text-align: center;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+    select, input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      margin-bottom: 14px;
+      background: #fff;
+    }
+    .soldier-row {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: #fafbfc;
+    }
+    .soldier-name {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .radio-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: normal;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+    button.submit-btn {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button.submit-btn:disabled {
+      background: #a0a0a0;
+    }
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .alert-success { background: #d4edda; color: #155724; }
+    .alert-error { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h1>דיווח נוכחות יומי</h1>
+    
+    <label for="frameworkSelect">בחר מסגרת:</label>
+    <select id="frameworkSelect" onchange="filterSoldiers()">
+      <option value="">-- בחר מסגרת --</option>
+      <option value="מחלקה 1">מחלקה 1</option>
+      <option value="מחלקה 2">מחלקה 2</option>
+      <option value="מחלקה 3">מחלקה 3</option>
+      <option value="חפ&quot;ק">חפ"ק</option>
+      <option value="מפל&quot;ג">מפל"ג</option>
+      <option value="חמ&quot;ל">חמ"ל</option>
+    </select>
+
+    <label for="reporterName">שם המפקד המדווח:</label>
+    <input type="text" id="reporterName" placeholder="לדוגמה: יוסי כהן - מ&quot;כ 1" required>
+  </div>
+
+  <div id="soldiersContainer"></div>
+
+  <div id="statusMessage"></div>
+
+  <button type="button" id="submitBtn" class="submit-btn hidden" onclick="submitReport()">שלח דיווח לגיליון</button>
+</div>
+
+<script>
+  // הדבק כאן את כתובת ה-Web App URL שקיבלת מה-Apps Script
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8tKGvcWETTDvgrbp2wyfmbX89Gb3JGyge0G7-45YIJM1JbYqTSwEUV3hDA4yHMS8s/exec";
+
+  let allSoldiers = [];
+
+  // טעינת רשימת החיילים בהפעלת הדף
+  window.addEventListener('DOMContentLoaded', async () => {
+    if (SCRIPT_URL === "YOUR_APPS_SCRIPT_URL_HERE") {
+      showMessage("שגיאה: טרם הוגדרה כתובת ה-Apps Script בקוד.", "error");
+      return;
+    }
+    try {
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
+      allSoldiers = data.soldiers || [];
+    } catch (e) {
+      showMessage("שגיאה בטעינת החיילים מהגיליון.", "error");
+    }
+  });
+
+  function filterSoldiers() {
+    const selectedFw = document.getElementById("frameworkSelect").value;
+    const container = document.getElementById("soldiersContainer");
+    const submitBtn = document.getElementById("submitBtn");
+    container.innerHTML = "";
+
+    if (!selectedFw) {
+      submitBtn.classList.add("hidden");
+      return;
+    }
+
+    const filtered = allSoldiers.filter(s => s.framework === selectedFw);
+
+    if (filtered.length === 0) {
+      container.innerHTML = `<div class="card" style="text-align:center;">לא נמצאו חיילים רשומים תחת מסגרת זו.</div>`;
+      submitBtn.classList.add("hidden");
+      return;
+    }
+
+    filtered.forEach((soldier, idx) => {
+      const card = document.createElement("div");
+      card.className = "soldier-row";
+      card.innerHTML = `
+        <div class="soldier-name">${soldier.name}</div>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="mainStatus_${idx}" value="נוכח" checked onchange="toggleSubMenu(${idx})">
+            נוכח
+          </label>
+          <label>
+            <input type="radio" name="mainStatus_${idx}" value="אינו נוכח" onchange="toggleSubMenu(${idx})">
+            אינו נוכח
+          </label>
+        </div>
+
+        <div id="presentMenu_${idx}">
+          <label>פירוט נוכחות:</label>
+          <select id="subStatusPresent_${idx}">
+            <option value="נוכחות מלאה">נוכחות מלאה</option>
+            <option value="מגיע היום">מגיע היום</option>
+            <option value="יוצא היום">יוצא היום</option>
+          </select>
+        </div>
+
+        <div id="absentMenu_${idx}" class="hidden">
+          <label>סיבת היעדרות:</label>
+          <select id="subStatusAbsent_${idx}" onchange="toggleNotesField(${idx})">
+            <option value="חופשה">חופשה</option>
+            <option value="ג' - רפואי">ג' - רפואי</option>
+            <option value="שוחרר">שוחרר</option>
+            <option value="אחר">אחר</option>
+          </select>
+          <div id="notesContainer_${idx}" class="hidden">
+            <label>פירוט (עבור "אחר"):</label>
+            <input type="text" id="notes_${idx}" placeholder="פרט כאן...">
+          </div>
+        </div>
+      `;
+      card.dataset.soldierName = soldier.name;
+      container.appendChild(card);
+    });
+
+    submitBtn.classList.remove("hidden");
+  }
+
+  function toggleSubMenu(idx) {
+    const isPresent = document.querySelector(`input[name="mainStatus_${idx}"]:checked`).value === "נוכח";
+    document.getElementById(`presentMenu_${idx}`).classList.toggle("hidden", !isPresent);
+    document.getElementById(`absentMenu_${idx}`).classList.toggle("hidden", isPresent);
+  }
+
+  function toggleNotesField(idx) {
+    const val = document.getElementById(`subStatusAbsent_${idx}`).value;
+    document.getElementById(`notesContainer_${idx}`).classList.toggle("hidden", val !== "אחר");
+  }
+
+  async function submitReport() {
+    const reporterName = document.getElementById("reporterName").value.trim();
+    const framework = document.getElementById("frameworkSelect").value;
+    if (!reporterName) {
+      alert("נא להזין את שם המפקד המדווח.");
+      return;
+    }
+
+    const cards = document.querySelectorAll(".soldier-row");
+    const records = [];
+
+    cards.forEach((card, idx) => {
+      const name = card.dataset.soldierName;
+      const isPresent = document.querySelector(`input[name="mainStatus_${idx}"]:checked`).value === "נוכח";
+      let mainStatus = isPresent ? "נוכח" : "אינו נוכח";
+      let subStatus = "";
+      let notes = "";
+
+      if (isPresent) {
+        subStatus = document.getElementById(`subStatusPresent_${idx}`).value;
+      } else {
+        subStatus = document.getElementById(`subStatusAbsent_${idx}`).value;
+        if (subStatus === "אחר") {
+          notes = document.getElementById(`notes_${idx}`).value.trim();
+        }
+      }
+
+      records.push({ name, mainStatus, subStatus, notes });
+    });
+
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.innerText = "שולח נתונים...";
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ framework, reporterName, records })
+      });
+
+      showMessage("הדיווח נקלט בהצלחה בגיליון הפלוגתי!", "success");
+      document.getElementById("soldiersContainer").innerHTML = "";
+      submitBtn.classList.add("hidden");
+      document.getElementById("frameworkSelect").value = "";
+    } catch (e) {
+      showMessage("שגיאה בשליחת הדיווח. נסה שוב.", "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerText = "שלח דיווח לגיליון";
+    }
+  }
+
+  function showMessage(text, type) {
+    const el = document.getElementById("statusMessage");
+    el.className = `alert alert-${type}`;
+    el.innerText = text;
+  }
+</script>
+
+</body>
+</html>
