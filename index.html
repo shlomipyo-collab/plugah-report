@@ -138,4 +138,165 @@
 </div>
 
 <script>
-  const SCRIPT_URL = "
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8tKGvcWETTDvgrbp2wyfmbX89Gb3JGyge0G7-45YIJM1JbYqTSwEUV3hDA4yHMS8s/exec";
+
+  let allSoldiers = [];
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById("reportDate").value = new Date().toISOString().split('T')[0];
+
+    try {
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
+      allSoldiers = data.soldiers || [];
+    } catch (e) {
+      showMessage("שגיאה בטעינת החיילים מהגיליון.", "error");
+    }
+  });
+
+  function filterSoldiers() {
+    const selectedFw = document.getElementById("frameworkSelect").value;
+    const container = document.getElementById("soldiersContainer");
+    const submitBtn = document.getElementById("submitBtn");
+    container.innerHTML = "";
+
+    if (!selectedFw) {
+      submitBtn.classList.add("hidden");
+      return;
+    }
+
+    const filtered = allSoldiers.filter(s => s.framework === selectedFw);
+
+    if (filtered.length === 0) {
+      container.innerHTML = `<div class="card" style="text-align:center;">לא נמצאו חיילים רשומים תחת מסגרת זו.</div>`;
+      submitBtn.classList.add("hidden");
+      return;
+    }
+
+    filtered.forEach((soldier, idx) => {
+      const card = document.createElement("div");
+      card.className = "soldier-row";
+      card.innerHTML = `
+        <div class="soldier-name">${soldier.name}</div>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="mainStatus_${idx}" value="נוכח" checked onchange="toggleSubMenu(${idx})">
+            נוכח
+          </label>
+          <label>
+            <input type="radio" name="mainStatus_${idx}" value="אינו נוכח" onchange="toggleSubMenu(${idx})">
+            אינו נוכח
+          </label>
+        </div>
+
+        <div id="presentMenu_${idx}">
+          <label>פירוט נוכחות:</label>
+          <select id="subStatusPresent_${idx}">
+            <option value="נוכחות מלאה">נוכחות מלאה</option>
+            <option value="מגיע היום">מגיע היום</option>
+            <option value="יוצא היום">יוצא היום</option>
+          </select>
+        </div>
+
+        <div id="absentMenu_${idx}" class="hidden">
+          <label>סיבת היעדרות:</label>
+          <select id="subStatusAbsent_${idx}" onchange="toggleNotesField(${idx})">
+            <option value="חופשה">חופשה</option>
+            <option value="ג' - רפואי">ג' - רפואי</option>
+            <option value="שוחרר">שוחרר</option>
+            <option value="אחר">אחר</option>
+          </select>
+          <div id="notesContainer_${idx}" class="hidden">
+            <label>פירוט (עבור "אחר"):</label>
+            <input type="text" id="notes_${idx}" placeholder="פרט כאן...">
+          </div>
+        </div>
+      `;
+      card.dataset.soldierName = soldier.name;
+      container.appendChild(card);
+    });
+
+    submitBtn.classList.remove("hidden");
+  }
+
+  function toggleSubMenu(idx) {
+    const isPresent = document.querySelector(`input[name="mainStatus_${idx}"]:checked`).value === "נוכח";
+    document.getElementById(`presentMenu_${idx}`).classList.toggle("hidden", !isPresent);
+    document.getElementById(`absentMenu_${idx}`).classList.toggle("hidden", isPresent);
+  }
+
+  function toggleNotesField(idx) {
+    const val = document.getElementById(`subStatusAbsent_${idx}`).value;
+    document.getElementById(`notesContainer_${idx}`).classList.toggle("hidden", val !== "אחר");
+  }
+
+  async function submitReport() {
+    const reporterName = document.getElementById("reporterName").value.trim();
+    const framework = document.getElementById("frameworkSelect").value;
+    const reportDate = document.getElementById("reportDate").value;
+
+    if (!reportDate) {
+      alert("נא לבחור תאריך תוקף לדוח.");
+      return;
+    }
+
+    if (!reporterName) {
+      alert("נא להזין את שם המפקד המדווח.");
+      return;
+    }
+
+    const cards = document.querySelectorAll(".soldier-row");
+    const records = [];
+
+    cards.forEach((card, idx) => {
+      const name = card.dataset.soldierName;
+      const isPresent = document.querySelector(`input[name="mainStatus_${idx}"]:checked`).value === "נוכח";
+      let mainStatus = isPresent ? "נוכח" : "אינו נוכח";
+      let subStatus = "";
+      let notes = "";
+
+      if (isPresent) {
+        subStatus = document.getElementById(`subStatusPresent_${idx}`).value;
+      } else {
+        subStatus = document.getElementById(`subStatusAbsent_${idx}`).value;
+        if (subStatus === "אחר") {
+          notes = document.getElementById(`notes_${idx}`).value.trim();
+        }
+      }
+
+      records.push({ name, mainStatus, subStatus, notes });
+    });
+
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.innerText = "שולח נתונים...";
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ framework, reporterName, reportDate, records })
+      });
+
+      showMessage("הדיווח נקלט בהצלחה בגיליון הפלוגתי!", "success");
+      document.getElementById("soldiersContainer").innerHTML = "";
+      submitBtn.classList.add("hidden");
+      document.getElementById("frameworkSelect").value = "";
+    } catch (e) {
+      showMessage("שגיאה בשליחת הדיווח. נסה שוב.", "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerText = "שלח דיווח לגיליון";
+    }
+  }
+
+  function showMessage(text, type) {
+    const el = document.getElementById("statusMessage");
+    el.className = `alert alert-${type}`;
+    el.innerText = text;
+  }
+</script>
+
+</body>
+</html>
