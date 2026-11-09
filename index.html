@@ -143,6 +143,15 @@
 
   let allSoldiers = [];
 
+  function escapeHtml(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
   function showMessage(text, type) {
     const el = document.getElementById("statusMessage");
     el.className = `alert alert-${type}`;
@@ -180,41 +189,54 @@
     }
 
     filtered.forEach((soldier, idx) => {
+      // שליפת הסטטוס האחרון מהשרת
+      const isPresent = (soldier.mainStatus || "נוכח") === "נוכח";
+      const rawSub = soldier.subStatus || (isPresent ? "נוכחות מלאה" : "חופשה");
+      const notes = soldier.notes || "";
+
+      // התאמת סטטוס גימלים
+      let absentSubVal = rawSub;
+      if (rawSub === "גימלים" || rawSub.includes("ג'")) {
+        absentSubVal = "ג' - רפואי";
+      }
+
+      const isOther = !isPresent && absentSubVal === "אחר";
+
       const card = document.createElement("div");
       card.className = "soldier-row";
       card.innerHTML = `
         <div class="soldier-name">${soldier.name}</div>
         <div class="radio-group">
           <label>
-            <input type="radio" name="mainStatus_${idx}" value="נוכח" checked onchange="toggleSubMenu(${idx})">
+            <input type="radio" name="mainStatus_${idx}" value="נוכח" ${isPresent ? "checked" : ""} onchange="toggleSubMenu(${idx})">
             נוכח
           </label>
           <label>
-            <input type="radio" name="mainStatus_${idx}" value="אינו נוכח" onchange="toggleSubMenu(${idx})">
+            <input type="radio" name="mainStatus_${idx}" value="אינו נוכח" ${!isPresent ? "checked" : ""} onchange="toggleSubMenu(${idx})">
             אינו נוכח
           </label>
         </div>
 
-        <div id="presentMenu_${idx}">
+        <div id="presentMenu_${idx}" class="${isPresent ? "" : "hidden"}">
           <label>פירוט נוכחות:</label>
           <select id="subStatusPresent_${idx}">
-            <option value="נוכחות מלאה">נוכחות מלאה</option>
-            <option value="מגיע היום">מגיע היום</option>
-            <option value="יוצא היום">יוצא היום</option>
+            <option value="נוכחות מלאה" ${rawSub === "נוכחות מלאה" ? "selected" : ""}>נוכחות מלאה</option>
+            <option value="מגיע היום" ${rawSub === "מגיע היום" ? "selected" : ""}>מגיע היום</option>
+            <option value="יוצא היום" ${rawSub === "יוצא היום" ? "selected" : ""}>יוצא היום</option>
           </select>
         </div>
 
-        <div id="absentMenu_${idx}" class="hidden">
+        <div id="absentMenu_${idx}" class="${!isPresent ? "" : "hidden"}">
           <label>סיבת היעדרות:</label>
           <select id="subStatusAbsent_${idx}" onchange="toggleNotesField(${idx})">
-            <option value="חופשה">חופשה</option>
-            <option value="ג' - רפואי">ג' - רפואי</option>
-            <option value="שוחרר">שוחרר</option>
-            <option value="אחר">אחר</option>
+            <option value="חופשה" ${absentSubVal === "חופשה" ? "selected" : ""}>חופשה</option>
+            <option value="ג' - רפואי" ${absentSubVal === "ג' - רפואי" ? "selected" : ""}>ג' - רפואי</option>
+            <option value="שוחרר" ${absentSubVal === "שוחרר" ? "selected" : ""}>שוחרר</option>
+            <option value="אחר" ${absentSubVal === "אחר" ? "selected" : ""}>אחר</option>
           </select>
-          <div id="notesContainer_${idx}" class="hidden">
+          <div id="notesContainer_${idx}" class="${isOther ? "" : "hidden"}">
             <label>פירוט (עבור "אחר"):</label>
-            <input type="text" id="notes_${idx}" placeholder="פרט כאן...">
+            <input type="text" id="notes_${idx}" placeholder="פרט כאן..." value="${escapeHtml(notes)}">
           </div>
         </div>
       `;
@@ -254,6 +276,9 @@
         subStatus = document.getElementById(`subStatusPresent_${idx}`).value;
       } else {
         subStatus = document.getElementById(`subStatusAbsent_${idx}`).value;
+        if (subStatus === "ג' - רפואי") {
+          subStatus = "גימלים";
+        }
         if (subStatus === "אחר") {
           notes = document.getElementById(`notes_${idx}`).value.trim();
         }
@@ -286,16 +311,12 @@
     }
   }
 
-  // אירועי טעינה והאזנה
   window.addEventListener('DOMContentLoaded', async () => {
-    // 1. הגדרת תאריך היום
     document.getElementById("reportDate").value = new Date().toISOString().split('T')[0];
 
-    // 2. חיבור אירועים
     document.getElementById("frameworkSelect").addEventListener("change", filterSoldiers);
     document.getElementById("submitBtn").addEventListener("click", submitReport);
 
-    // 3. משיכת רשימת החיילים
     try {
       const res = await fetch(SCRIPT_URL);
       const data = await res.json();
