@@ -54,6 +54,25 @@
       margin-bottom: 14px;
       background: #fff;
     }
+    .date-input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .date-input-group input[type="text"] {
+      margin-bottom: 0;
+      font-weight: bold;
+      font-size: 1.05rem;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+    .date-input-group input[type="date"] {
+      width: 52px;
+      padding: 10px;
+      margin-bottom: 0;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
     .soldier-row {
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -112,8 +131,11 @@
   <div class="card">
     <h1>דיווח נוכחות יומי</h1>
     
-    <label for="reportDate">תאריך תוקף הדוח:</label>
-    <input type="date" id="reportDate" required>
+    <label for="reportDate">תאריך תוקף הדוח (dd/mm/yyyy):</label>
+    <div class="date-input-group">
+      <input type="text" id="reportDate" placeholder="dd/mm/yyyy" required>
+      <input type="date" id="datePickerHelper" title="בחר תאריך מלוח שנה">
+    </div>
 
     <label for="frameworkSelect">בחר מסגרת:</label>
     <select id="frameworkSelect">
@@ -150,6 +172,31 @@
       .replace(/'/g, "&#39;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
+  }
+
+  function formatDateToEur(dateObj) {
+    const d = String(dateObj.getDate()).padStart(2, '0');
+    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const y = dateObj.getFullYear();
+    return `${d}/${m}/${y}`;
+  }
+
+  function isoToEur(isoStr) {
+    if (!isoStr) return "";
+    const parts = isoStr.split("-");
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return isoStr;
+  }
+
+  function eurToIso(eurStr) {
+    if (!eurStr) return "";
+    const parts = eurStr.split("/");
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+    return eurStr;
   }
 
   function showMessage(text, type) {
@@ -189,12 +236,10 @@
     }
 
     filtered.forEach((soldier, idx) => {
-      // שליפת הסטטוס האחרון מהשרת
       const isPresent = (soldier.mainStatus || "נוכח") === "נוכח";
       const rawSub = soldier.subStatus || (isPresent ? "נוכחות מלאה" : "חופשה");
       const notes = soldier.notes || "";
 
-      // התאמת סטטוס גימלים
       let absentSubVal = rawSub;
       if (rawSub === "גימלים" || rawSub.includes("ג'")) {
         absentSubVal = "ג' - רפואי";
@@ -250,12 +295,20 @@
   async function submitReport() {
     const reporterName = document.getElementById("reporterName").value.trim();
     const framework = document.getElementById("frameworkSelect").value;
-    const reportDate = document.getElementById("reportDate").value;
+    let reportDate = document.getElementById("reportDate").value.trim();
 
     if (!reportDate) {
-      alert("נא לבחור תאריך תוקף לדוח.");
+      alert("נא להזין תאריך תוקף לדוח.");
       return;
     }
+
+    // אימות פורמט dd/mm/yyyy
+    const m = reportDate.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+    if (!m) {
+      alert("נא להזין תאריך תקין במבנה dd/mm/yyyy (לדוגמה: 10/11/2026)");
+      return;
+    }
+    reportDate = `${m[1].padStart(2, '0')}/${m[2].padStart(2, '0')}/${m[3]}`;
 
     if (!reporterName) {
       alert("נא להזין את שם המפקד המדווח.");
@@ -312,11 +365,32 @@
   }
 
   window.addEventListener('DOMContentLoaded', async () => {
-    document.getElementById("reportDate").value = new Date().toISOString().split('T')[0];
+    // 1. אתחול תאריך נוכחי בפורמט dd/mm/yyyy
+    const now = new Date();
+    document.getElementById("reportDate").value = formatDateToEur(now);
+    
+    const helper = document.getElementById("datePickerHelper");
+    if (helper) {
+      helper.value = now.toISOString().split('T')[0];
+      helper.addEventListener("change", function() {
+        if (this.value) {
+          document.getElementById("reportDate").value = isoToEur(this.value);
+        }
+      });
+    }
 
+    document.getElementById("reportDate").addEventListener("change", function() {
+      const iso = eurToIso(this.value.trim());
+      if (iso && helper) {
+        helper.value = iso;
+      }
+    });
+
+    // 2. חיבור אירועים
     document.getElementById("frameworkSelect").addEventListener("change", filterSoldiers);
     document.getElementById("submitBtn").addEventListener("click", submitReport);
 
+    // 3. משיכת רשימת החיילים
     try {
       const res = await fetch(SCRIPT_URL);
       const data = await res.json();
