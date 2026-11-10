@@ -181,6 +181,13 @@
     return `${d}/${m}/${y}`;
   }
 
+  function formatDateToIso(dateObj) {
+    const d = String(dateObj.getDate()).padStart(2, '0');
+    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const y = dateObj.getFullYear();
+    return `${y}-${m}-${d}`;
+  }
+
   function isoToEur(isoStr) {
     if (!isoStr) return "";
     const parts = isoStr.split("-");
@@ -302,10 +309,9 @@
       return;
     }
 
-    // אימות פורמט dd/mm/yyyy
     const m = reportDate.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
     if (!m) {
-      alert("נא להזין תאריך תקין במבנה dd/mm/yyyy (לדוגמה: 10/11/2026)");
+      alert("נא להזין תאריך תקין במבנה dd/mm/yyyy (לדוגמה: 11/11/2026)");
       return;
     }
     reportDate = `${m[1].padStart(2, '0')}/${m[2].padStart(2, '0')}/${m[3]}`;
@@ -365,13 +371,15 @@
   }
 
   window.addEventListener('DOMContentLoaded', async () => {
-    // 1. אתחול תאריך נוכחי בפורמט dd/mm/yyyy
-    const now = new Date();
-    document.getElementById("reportDate").value = formatDateToEur(now);
+    // אתחול אוטומטי לתאריך של מחר (היום הנוכחי + 1)
+    const targetTomorrow = new Date();
+    targetTomorrow.setDate(targetTomorrow.getDate() + 1);
+
+    document.getElementById("reportDate").value = formatDateToEur(targetTomorrow);
     
     const helper = document.getElementById("datePickerHelper");
     if (helper) {
-      helper.value = now.toISOString().split('T')[0];
+      helper.value = formatDateToIso(targetTomorrow);
       helper.addEventListener("change", function() {
         if (this.value) {
           document.getElementById("reportDate").value = isoToEur(this.value);
@@ -386,11 +394,9 @@
       }
     });
 
-    // 2. חיבור אירועים
     document.getElementById("frameworkSelect").addEventListener("change", filterSoldiers);
     document.getElementById("submitBtn").addEventListener("click", submitReport);
 
-    // 3. משיכת רשימת החיילים
     try {
       const res = await fetch(SCRIPT_URL);
       const data = await res.json();
