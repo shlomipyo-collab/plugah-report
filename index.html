@@ -2,409 +2,1636 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>דיווח נוכחות פלוגתי</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>מסייעת 8109 - פורטל פלוגתי</title>
   <style>
     :root {
-      --primary: #2d5a27;
-      --primary-hover: #1e3d1a;
-      --bg: #f4f6f8;
-      --card: #ffffff;
-      --border: #dcdfe4;
-      --text: #222;
-      --danger: #d9534f;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #d97706;
     }
+    * { box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
-      margin: 0;
-      padding: 16px;
-    }
-    .container {
-      max-width: 600px;
       margin: 0 auto;
+      padding: 14px;
+      max-width: 560px;
     }
+    .brand-header {
+      text-align: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+    }
+    .brand-header img {
+      max-width: 120px;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      margin-bottom: 6px;
+      border: 1px solid #475569;
+    }
+    .brand-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #f8fafc;
+    }
+    .brand-line {
+      height: 3px;
+      width: 60px;
+      background: #38bdf8;
+      margin: 6px auto 0;
+      border-radius: 2px;
+    }
+    .top-user-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e293b;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      border: 1px solid #475569;
+      font-size: 0.9rem;
+    }
+    .top-bar-actions { display: flex; gap: 6px; }
+    .btn-mini {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #cbd5e1;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-mini.danger { border-color: #dc2626; color: #fca5a5; }
     .card {
       background: var(--card);
       border-radius: 12px;
-      padding: 20px;
+      padding: 18px;
       margin-bottom: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
     }
-    h1 {
-      margin-top: 0;
-      font-size: 1.4rem;
-      color: var(--primary);
-      text-align: center;
-    }
+    h2 { margin: 0 0 12px; font-size: 1.2rem; color: #38bdf8; }
     label {
       display: block;
-      font-weight: 600;
-      margin-bottom: 6px;
-      font-size: 0.95rem;
+      font-weight: bold;
+      margin: 8px 0 5px;
+      font-size: 0.9rem;
+      color: #cbd5e1;
     }
-    select, input, textarea {
+    input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea {
       width: 100%;
-      padding: 12px;
-      border: 1px solid var(--border);
+      padding: 11px;
+      margin-bottom: 12px;
+      border: 1px solid #475569;
       border-radius: 8px;
       font-size: 1rem;
-      box-sizing: border-box;
-      margin-bottom: 14px;
-      background: #fff;
+      background: #0f172a;
+      color: #fff;
+      font-family: inherit;
     }
-    .date-input-group {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .date-input-group input[type="text"] {
-      margin-bottom: 0;
-      font-weight: bold;
-      font-size: 1.05rem;
-      text-align: center;
-      letter-spacing: 0.5px;
-    }
-    .date-input-group input[type="date"] {
-      width: 52px;
-      padding: 10px;
-      margin-bottom: 0;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .soldier-row {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px;
-      margin-bottom: 12px;
-      background: #fafbfc;
-    }
-    .soldier-name {
-      font-weight: bold;
-      font-size: 1.1rem;
-      margin-bottom: 10px;
-      color: #333;
-    }
-    .radio-group {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-    .radio-group label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: normal;
-      cursor: pointer;
-    }
-    .hidden {
-      display: none;
-    }
-    button.submit-btn {
+    textarea { resize: vertical; }
+    .btn-action {
       width: 100%;
-      background: var(--primary);
-      color: white;
       border: none;
-      padding: 16px;
-      font-size: 1.1rem;
+      padding: 13px;
+      font-size: 1rem;
       font-weight: bold;
       border-radius: 8px;
       cursor: pointer;
+      color: #fff;
+      margin-top: 4px;
     }
-    button.submit-btn:disabled {
-      background: #a0a0a0;
+    .btn-primary { background: var(--primary); }
+    .btn-success { background: var(--success); }
+    .btn-danger { background: var(--danger); }
+    .btn-warning { background: var(--warning); }
+    .btn-purple { background: #8b5cf6; }
+    .btn-wa { background: #25D366; }
+    .btn-action:disabled { background: #475569; cursor: not-allowed; }
+    .btn-add-line {
+      background: transparent;
+      border: 1px dashed #38bdf8;
+      color: #38bdf8;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 12px;
     }
-    .alert {
+    .btn-tab-container { display: flex; gap: 8px; margin-bottom: 16px; }
+    .btn-tab {
+      flex: 1;
+      padding: 11px 6px;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      background: #1e293b;
+      color: #94a3b8;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .btn-tab.active { background: #0284c7; color: #fff; border-color: #0284c7; }
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .role-tile {
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      padding: 20px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .role-tile:hover, .role-tile:active {
+      border-color: #38bdf8;
+      background: #172554;
+    }
+    .role-icon { font-size: 2rem; margin-bottom: 8px; }
+    .role-label { font-weight: bold; font-size: 1.05rem; color: #f8fafc; }
+    .role-sub { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+    .status-box {
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: none;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .status-ok { background: #064e3b; color: #a7f3d0; border: 1px solid #059669; }
+    .status-err { background: #7f1d1d; color: #fecaca; border: 1px solid #dc2626; }
+    .item-box {
+      background: #0f172a;
       padding: 12px;
       border-radius: 8px;
-      margin-bottom: 12px;
-      text-align: center;
+      margin-bottom: 10px;
+      border: 1px solid #334155;
     }
-    .alert-success { background: #d4edda; color: #155724; }
-    .alert-error { background: #f8d7da; color: #721c24; }
+    .hidden { display: none !important; }
+    .date-input-group { display: flex; gap: 8px; margin-bottom: 12px; }
+    .date-input-group input[type="text"] { margin-bottom: 0; font-weight: bold; text-align: center; }
+    .date-input-group input[type="date"] { width: 52px; padding: 10px; margin-bottom: 0; flex-shrink: 0; }
+    .radio-group { display: flex; gap: 8px; margin-bottom: 10px; }
+    .radio-card {
+      flex: 1; text-align: center; padding: 10px 4px; border: 1px solid #334155;
+      border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: #0f172a; user-select: none;
+    }
+    .radio-card input { display: none; }
+    .radio-card.active-green { background: #166534; border-color: #22c55e; color: #fff; font-weight: bold; }
+    .radio-card.active-red { background: #991b1b; border-color: #ef4444; color: #fff; font-weight: bold; }
+    .radio-card.active-amber { background: #92400e; border-color: #f59e0b; color: #fff; font-weight: bold; }
+    .badge-tag { font-size: 0.75rem; padding: 2px 7px; border-radius: 6px; margin-right: 4px; }
+    .badge-inactive { background: #7f1d1d; color: #fecaca; border: 1px solid #dc2626; }
+    .badge-reported { background: #0369a1; color: #e0f2fe; border: 1px solid #38bdf8; }
+    .badge-extra { background: #14532d; color: #bbf7d0; border: 1px solid #16a34a; }
+    .wp-kit-container { display: none; margin-top: 10px; padding: 12px; background: #1e293b; border-radius: 8px; border: 1px solid #475569; }
+    .kit-check, .return-check { display: flex; align-items: center; gap: 8px; margin-top: 8px; cursor: pointer; font-size: 0.95rem; }
+    .return-check { color: #f87171; font-weight: bold; }
+    .checkbox-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .checkbox-row input { width: 20px; height: 20px; margin: 0; }
+    .btn-row { display: flex; gap: 8px; margin-top: 8px; }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="card">
-    <h1>דיווח נוכחות יומי</h1>
-    
-    <label for="reportDate">תאריך תוקף הדוח (dd/mm/yyyy):</label>
-    <div class="date-input-group">
-      <input type="text" id="reportDate" placeholder="dd/mm/yyyy" required>
-      <input type="date" id="datePickerHelper" title="בחר תאריך מלוח שנה">
-    </div>
-
-    <label for="frameworkSelect">בחר מסגרת:</label>
-    <select id="frameworkSelect">
-      <option value="">-- בחר מסגרת --</option>
-      <option value="מחלקה 1">מחלקה 1</option>
-      <option value="מחלקה 2">מחלקה 2</option>
-      <option value="מחלקה 3">מחלקה 3</option>
-      <option value="חפ&quot;ק">חפ"ק</option>
-      <option value="מפל&quot;ג">מפל"ג</option>
-      <option value="חמ&quot;ל">חמ"ל</option>
-      <option value="מסופחים">מסופחים</option>
-    </select>
-
-    <label for="reporterName">שם המפקד המדווח:</label>
-    <input type="text" id="reporterName" placeholder="לדוגמה: יוסי כהן - מ&quot;כ 1" required>
+  <div class="brand-header">
+    <img src="https://drive.google.com/thumbnail?id=1Suw_VFwFdSaiBw1-zRJ8sBzTTINynRvm&sz=w600" alt="מסייעת 8109">
+    <div class="brand-title">מסייעת 8109</div>
+    <div class="brand-line"></div>
   </div>
 
-  <div id="soldiersContainer"></div>
+  <!-- סרגל משתמש מחובר -->
+  <div id="topUserBar" class="top-user-bar hidden">
+    <div>
+      <span style="font-weight:bold;color:#38bdf8;" id="barUserName"></span>
+      <span style="color:#94a3b8;font-size:0.8rem;" id="barUserRole"></span>
+    </div>
+    <div class="top-bar-actions">
+      <button type="button" id="btnSwitchRole" class="btn-mini hidden" onclick="showRoleSelector()">🔄 החלף תפקיד</button>
+      <button type="button" class="btn-mini danger" onclick="logoutUser()">יציאה</button>
+    </div>
+  </div>
 
-  <div id="statusMessage"></div>
+  <!-- ========================================== -->
+  <!-- מסך 1: הזדהות ראשית (מ"א + סיסמה) -->
+  <!-- ========================================== -->
+  <div id="viewLogin" class="card">
+    <h2 style="text-align:center;">🔐 כניסה לפורטל הפלוגתי</h2>
+    <label>הקש מספר אישי:</label>
+    <input type="text" id="loginPn" placeholder="מספר אישי..." inputmode="numeric">
+    <button type="button" id="btnCheckPn" class="btn-action btn-primary" onclick="checkPersonalNumber()">המשך</button>
 
-  <button type="button" id="submitBtn" class="submit-btn hidden">שלח דיווח לגיליון</button>
-</div>
+    <!-- שלב הגדרת סיסמה ראשונית -->
+    <div id="setPasswordBox" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid #334155;">
+      <div style="color:#38bdf8;font-weight:bold;margin-bottom:8px;" id="welcomeNewAuth"></div>
+      <label>בחר סיסמה אישית לכניסות הבאות (לפחות 4 תווים):</label>
+      <input type="password" id="newPassInput" placeholder="הזן סיסמה חדשה...">
+      <label>אימות סיסמה:</label>
+      <input type="password" id="confirmPassInput" placeholder="הזן שוב לאימות...">
+      <button type="button" id="btnSavePass" class="btn-action btn-success" onclick="saveNewPassword()">💾 שמור סיסמה והתחבר</button>
+    </div>
+
+    <!-- שלב הזנת סיסמה קיימת -->
+    <div id="verifyPasswordBox" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid #334155;">
+      <div style="color:#cbd5e1;font-weight:bold;margin-bottom:8px;" id="welcomeReturningAuth"></div>
+      <label>הזן סיסמה:</label>
+      <input type="password" id="loginPassInput" placeholder="סיסמה...">
+      <button type="button" id="btnVerifyPass" class="btn-action btn-primary" onclick="verifyExistingPassword()">🔓 התחבר למערכת</button>
+    </div>
+
+    <div id="loginStatus" class="status-box"></div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- מסך 2: בחירת הרשאה (לבעלי ריבוי הרשאות) -->
+  <!-- ========================================== -->
+  <div id="viewRoleSelect" class="card hidden">
+    <h2 style="text-align:center;">הינך מעוניין להתחבר כ:</h2>
+    <div id="roleTilesContainer" class="role-grid"></div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- ממשק א': חייל (נשקייה ואפסנאות) -->
+  <!-- ========================================== -->
+  <div id="viewSoldier" class="hidden">
+    <div class="card">
+      <div style="background:#0f172a;padding:12px;border-radius:8px;margin-bottom:14px;border:1px solid #475569;">
+        <div style="font-weight:bold;color:#38bdf8;font-size:1.15rem;" id="sHubName"></div>
+        <div style="color:#cbd5e1;font-size:0.9rem;margin-top:4px;" id="sHubMeta"></div>
+      </div>
+
+      <div class="btn-tab-container">
+        <div id="tabWpBtn" class="btn-tab active" onclick="switchSoldierSubTab('weapons')">🔫 נשקייה</div>
+        <div id="tabLgBtn" class="btn-tab" onclick="switchSoldierSubTab('logistics')">📦 אפסנאות</div>
+      </div>
+
+      <!-- נשקייה -->
+      <div id="weaponsSection">
+        <div id="licenseBox" class="hidden">
+          <label>רישיון נהיגה:</label>
+          <select id="soldierLicense" onchange="document.getElementById('licenseOther').style.display=(this.value==='אחר'?'block':'none')">
+            <option value="ללא">ללא רישיון</option>
+            <option value="B">B (פרטי)</option>
+            <option value="C1">C1 (עד 12 טון)</option>
+            <option value="C">C (משא כבד)</option>
+            <option value="אחר">אחר (פרט)</option>
+          </select>
+          <input type="text" id="licenseOther" style="display:none;" placeholder="פרט רישיון...">
+        </div>
+
+        <label style="color:#f87171;">נשק נוכחי (סמן כדי להזדכות):</label>
+        <div id="weaponsCurrentList"></div>
+
+        <label style="color:#38bdf8;margin-top:10px;">הוספת נשק/אמל"ח לחתימה:</label>
+        <div id="weaponsNewContainer"></div>
+        <button type="button" class="btn-add-line" onclick="addWeaponRow()">+ הוסף נשק/אמל"ח</button>
+        <button type="button" class="btn-action btn-success" onclick="submitWeaponsAction()">💾 שמור נשקייה</button>
+      </div>
+
+      <!-- אפסנאות -->
+      <div id="logisticsSection" class="hidden">
+        <label style="color:#38bdf8;">ציוד אפסנאות עליו אתה חתום כרגע:</label>
+        <div id="logisticsCurrentList" style="margin-bottom:12px;"></div>
+        <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:12px;">* זיכוי ציוד אפסנאות מתבצע ישירות מול המפל"ג.</div>
+
+        <label style="color:#38bdf8;">חתימה על ציוד אפסנאות נוסף:</label>
+        <div id="logisticsNewContainer"></div>
+        <button type="button" class="btn-add-line" onclick="addLogisticsRow()">+ הוסף פריט אפסנאות</button>
+        <button type="button" class="btn-action btn-success" onclick="submitLogisticsAction()">💾 חתום על ציוד אפסנאות</button>
+      </div>
+
+      <div id="soldierActionStatus" class="status-box"></div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- ממשק ב': מפקד (נוכחות והיערכות לתעסוקה) -->
+  <!-- ========================================== -->
+  <div id="viewCommander" class="hidden">
+    <div class="btn-tab-container">
+      <div id="tabCmdAttBtn" class="btn-tab active" onclick="switchCmdSubTab('att')">📋 דיווח נוכחות יומי</div>
+      <div id="tabCmdPrepBtn" class="btn-tab" onclick="switchCmdSubTab('prep')">🎖️ היערכות לתעסוקה</div>
+    </div>
+
+    <!-- דיווח נוכחות יומי -->
+    <div id="cmdAttendanceSection">
+      <div class="card">
+        <h2>📋 דיווח נוכחות יומי</h2>
+        <label>תאריך תוקף הדוח (dd/mm/yyyy):</label>
+        <div class="date-input-group">
+          <input type="text" id="attReportDate" placeholder="dd/mm/yyyy">
+          <input type="date" id="attDatePicker">
+        </div>
+        <label>בחר מסגרת:</label>
+        <select id="attFrameworkSelect" onchange="renderAttendanceSoldiers()">
+          <option value="">-- בחר מסגרת --</option>
+          <option value="מחלקה 1">מחלקה 1</option>
+          <option value="מחלקה 2">מחלקה 2</option>
+          <option value="מחלקה 3">מחלקה 3</option>
+          <option value="חפ&quot;ק">חפ"ק</option>
+          <option value="מפל&quot;ג">מפל"ג</option>
+          <option value="חמ&quot;ל">חמ"ל</option>
+          <option value="מסופחים">מסופחים</option>
+        </select>
+        <label>שם המפקד המדווח:</label>
+        <input type="text" id="attReporterName">
+      </div>
+      <div id="attSoldiersContainer"></div>
+      <div id="attStatusBox" class="status-box"></div>
+      <button type="button" id="btnSubmitAtt" class="btn-action btn-success hidden" onclick="submitAttendanceReport()">🚀 שלח דיווח נוכחות</button>
+    </div>
+
+    <!-- היערכות לתעסוקה -->
+    <div id="cmdPrepSection" class="hidden">
+      <div class="card">
+        <h2>🎖️ היערכות לתעסוקה (27/12 - 11/02)</h2>
+        <label>בחר מסגרת / מחלקה:</label>
+        <select id="prepFrameworkSelect" onchange="renderPrepSoldiers()">
+          <option value="">-- בחר מסגרת --</option>
+          <option value="מחלקה 1">מחלקה 1</option>
+          <option value="מחלקה 2">מחלקה 2</option>
+          <option value="מחלקה 3">מחלקה 3</option>
+          <option value="חפ&quot;ק">חפ"ק</option>
+          <option value="מפל&quot;ג">מפל"ג</option>
+          <option value="חמ&quot;ל">חמ"ל</option>
+          <option value="מסופחים">מסופחים</option>
+        </select>
+        <label>שם המפקד הממלא:</label>
+        <input type="text" id="prepReporterName">
+      </div>
+      <div id="prepSoldiersContainer"></div>
+      <button type="button" id="btnAddPrepExtra" class="btn-add-line hidden" onclick="addPrepExtraRow()">+ הוסף לוחם שלא מופיע ברשימה</button>
+      <div id="prepStatusBox" class="status-box"></div>
+      <button type="button" id="btnSubmitPrep" class="btn-action btn-primary hidden" onclick="submitPrepReport()">🚀 שלח היערכות לתעסוקה</button>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- ממשק ג': מפל"ג (לוגיסטיקה וזיכויים) -->
+  <!-- ========================================== -->
+  <div id="viewMaflag" class="hidden">
+    <div class="btn-tab-container">
+      <div id="tabMafCardBtn" class="btn-tab active" onclick="switchMafSubTab('card')">🎖️ כרטיס לוחם</div>
+      <div id="tabMafRepBtn" class="btn-tab" onclick="switchMafSubTab('rep')">📦 דוחות אפסנאות</div>
+    </div>
+
+    <div id="mafCardSection" class="card">
+      <h2>🎖️ כרטיס לוחם (מפל"ג)</h2>
+      <label>חיפוש חייל (שם או מ"א):</label>
+      <input type="text" placeholder="הקלד שם או מ&quot;א..." oninput="filterSelectOptions('mafSoldierSelect', this.value, onMafSoldierSelected)">
+      <label>בחר לוחם:</label>
+      <select id="mafSoldierSelect" onchange="onMafSoldierSelected()"></select>
+
+      <div id="mafSoldierDetails" class="hidden" style="margin-top:14px;">
+        <div style="background:#0f172a;padding:12px;border-radius:8px;margin-bottom:12px;border:1px solid #475569;">
+          <div style="font-weight:bold;color:#38bdf8;font-size:1.1rem;" id="mafSName"></div>
+          <div style="color:#cbd5e1;font-size:0.9rem;" id="mafSMeta"></div>
+        </div>
+        <label style="color:#38bdf8;">📦 ציוד אפסנאות וציוד נלווה:</label>
+        <div id="mafLogisticsList"></div>
+        <label style="color:#f87171;margin-top:10px;">🔫 נשק ואמצעי לחימה:</label>
+        <div id="mafWeaponsList"></div>
+
+        <button type="button" class="btn-action btn-danger" onclick="submitMaflagReturns()">🔴 בצע זיכוי לפריטים המסומנים</button>
+        <button type="button" class="btn-action btn-wa" style="margin-top:8px;" onclick="sendMaflagSoldierWa()">📱 שלח כרטיס מלא לוואטסאפ</button>
+        <div id="mafActionStatus" class="status-box"></div>
+      </div>
+    </div>
+
+    <div id="mafRepSection" class="card hidden">
+      <h2>📦 דוחות ציוד ואפסנאות</h2>
+      <label>סוג דוח:</label>
+      <select id="mafRepType" onchange="onMafRepTypeChange()">
+        <option value="all_company">כלל הפלוגה - דוח ציוד מפורט</option>
+        <option value="by_framework">דוח ציוד לפי מסגרת</option>
+        <option value="by_tool">דוח לפי פריט</option>
+        <option value="summary_tools">דוח מרכז לפי פריטים</option>
+      </select>
+      <div id="boxMafFw" class="hidden">
+        <label>בחר מסגרת:</label>
+        <select id="mafFwSelect"></select>
+      </div>
+      <div id="boxMafTool" class="hidden">
+        <label>בחר פריט:</label>
+        <select id="mafToolSelect"></select>
+      </div>
+      <button type="button" class="btn-action btn-primary" onclick="generateMafReport()">🔍 הפק דוח ציוד</button>
+      <div id="mafRepOut" class="hidden" style="margin-top:12px;">
+        <textarea id="mafRepText" rows="10" readonly></textarea>
+        <button type="button" class="btn-action btn-wa" onclick="openWaText('mafRepText')">📱 פתח בוואטסאפ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- ממשק ד': הנהלה / שלומי (דוחות ואדמין) -->
+  <!-- ========================================== -->
+  <div id="viewAdmin" class="hidden">
+    <div class="btn-tab-container">
+      <div id="tabAdmRepBtn" class="btn-tab active" onclick="switchAdmSubTab('rep')">📊 דוחות פלוגה</div>
+      <div id="tabAdmToolsBtn" class="btn-tab" onclick="switchAdmSubTab('tools')">🛠️ ניהול ואדמין</div>
+    </div>
+
+    <!-- דוחות פלוגה -->
+    <div id="admRepSection" class="card">
+      <h2>📊 מרכז דוחות פלוגתי</h2>
+      <div class="btn-tab-container">
+        <div id="tabSubPres" class="btn-tab active" onclick="switchRepDomain('presence')">נוכחות</div>
+        <div id="tabSubWpn" class="btn-tab" onclick="switchRepDomain('weapons')">נשקייה וצל"ם</div>
+      </div>
+
+      <div id="repPresenceControls">
+        <label>סוג דוח נוכחות:</label>
+        <select id="repPresType">
+          <option value="summary">סיכום סטטיסטי</option>
+          <option value="detailed">דוח שמי מפורט</option>
+        </select>
+        <label>תאריך הדוח:</label>
+        <input type="date" id="repPresDate">
+        <label>מסגרת:</label>
+        <select id="repPresFw"><option value="ALL">כלל הפלוגה</option></select>
+      </div>
+
+      <div id="repWeaponsControls" class="hidden">
+        <label>סוג דוח נשק:</label>
+        <select id="repWpnType" onchange="onRepWpnTypeChange()">
+          <option value="all_company">דוח נשק פלוגתי</option>
+          <option value="by_framework">דוח נשק לפי מסגרות</option>
+          <option value="by_tool">דוח נשק לפי סוג נשק</option>
+          <option value="by_soldier">דוח אישי לחייל (כולל אפסנאות)</option>
+        </select>
+        <div id="boxRepWpnFw" class="hidden"><label>מסגרת:</label><select id="repWpnFwSel"></select></div>
+        <div id="boxRepWpnTool" class="hidden"><label>סוג נשק:</label><select id="repWpnToolSel"></select></div>
+        <div id="boxRepWpnSoldier" class="hidden"><label>חייל:</label><select id="repWpnSoldierSel"></select></div>
+      </div>
+
+      <button type="button" class="btn-action btn-primary" onclick="generateAdminReport()">🔍 הפק דוח</button>
+      <div id="admRepErr" class="status-box status-err"></div>
+      <div id="admRepOut" class="hidden" style="margin-top:12px;">
+        <textarea id="admRepText" rows="11" readonly></textarea>
+        <div class="btn-row">
+          <button type="button" class="btn-action btn-wa" onclick="openWaText('admRepText')">📱 וואטסאפ</button>
+          <button type="button" class="btn-action btn-primary" onclick="copyTextArea('admRepText')">📋 העתק</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- כלי ניהול ואדמין -->
+    <div id="admToolsSection" class="hidden">
+      <div class="card">
+        <h2>✏️ תיקון דיווח לחייל</h2>
+        <label>תאריך:</label><input type="date" id="uDate">
+        <label>חיפוש חייל:</label><input type="text" placeholder="סנן שם..." oninput="filterSelectOptions('uSoldier', this.value, onAdmSoldierSelect)">
+        <label>בחר חייל:</label><select id="uSoldier" onchange="onAdmSoldierSelect()"></select>
+        <label>סטטוס ראשי:</label>
+        <select id="uMainStatus" onchange="syncAdmSubOptions()">
+          <option value="נוכח">נוכח</option>
+          <option value="אינו נוכח">אינו נוכח</option>
+          <option value="לא פעיל">⛔ העבר ללא פעיל</option>
+        </select>
+        <label>סטטוס משני:</label><select id="uSubStatus"></select>
+        <label>הערה:</label><input type="text" id="uNotes">
+        <button type="button" class="btn-action btn-primary" onclick="submitAdmSingleUpdate()">💾 עדכן חייל</button>
+        <div id="uStatus" class="status-box"></div>
+      </div>
+
+      <div class="card">
+        <h2>➕ הוספת חייל חדש</h2>
+        <label>שם מלא: *</label><input type="text" id="aName" placeholder="ישראל ישראלי">
+        <label>מספר אישי: *</label><input type="text" id="aPn" placeholder="8123456" inputmode="numeric">
+        <label>מסגרת: *</label><select id="aFw"></select>
+        <label>הרשאה (ניתן להפריד בפסיק):</label>
+        <input type="text" id="aRole" value="חייל" placeholder="חייל / מפקד / מפלג / הנהלה">
+        <div class="checkbox-row"><input type="checkbox" id="aActive" checked><label for="aActive">פעיל בשמ"פ?</label></div>
+        <button type="button" class="btn-action btn-success" onclick="submitAdmAddSoldier()">🚀 שמור והוסף</button>
+        <div id="aStatus" class="status-box"></div>
+      </div>
+
+      <div class="card">
+        <h2>🔀 העברת חייל בין מסגרות</h2>
+        <label>חיפוש חייל:</label><input type="text" placeholder="סנן..." oninput="filterSelectOptions('mSoldier', this.value)">
+        <label>חייל:</label><select id="mSoldier"></select>
+        <label>מסגרת יעד:</label><select id="mNewFw"></select>
+        <button type="button" class="btn-action btn-purple" onclick="submitAdmMoveSoldier()">🔀 העבר מסגרת</button>
+        <div id="mStatus" class="status-box"></div>
+      </div>
+
+      <div class="card" style="border-color:#0284c7;">
+        <h2>🔍 בדיקת פערים (עבור ירוק בעיינים)</h2>
+        <label>הדבק רשימת מספרים אישיים:</label>
+        <textarea id="pastedPnInput" rows="4" placeholder="הדבק כאן מ&quot;א מאקסל או וואטסאפ..."></textarea>
+        <button type="button" class="btn-action btn-primary" onclick="runPnCrossCheck()">⚡ בצע הצלבה</button>
+        <div id="crossCheckOut" class="hidden" style="margin-top:12px;">
+          <textarea id="crossCheckText" rows="9" readonly></textarea>
+          <div class="btn-row">
+            <button type="button" class="btn-action btn-wa" onclick="openWaText('crossCheckText')">📱 וואטסאפ</button>
+            <button type="button" class="btn-action btn-primary" onclick="copyTextArea('crossCheckText')">📋 העתק</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🔄 סנכרון מבנה מטריצות</h2>
+        <button type="button" class="btn-action btn-warning" onclick="submitAdmSync()">🔄 סנכרן מטריצות עכשיו</button>
+        <div id="syncStatus" class="status-box"></div>
+      </div>
+    </div>
+  </div>
 
 <script>
+  // כתובת ה-API של Google Apps Script
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlc5o7RAZbAJjnvotxPunwiZ4yCEmFNo6RgP3pgJn4JzGqecSnJU_u0XCimnlRfOH-/exec";
 
-  let allSoldiers = [];
+  let currentUser = null;
+  let activeRole = null;
 
-  function escapeHtml(str) {
-    return String(str || "")
-      .replace(/&/g, "&amp;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+  // מאגרי נתונים נטענים
+  let soldierGearData = null;
+  let wpToolsList = [];
+  let lgToolsList = [];
+  let attendanceSoldiers = [];
+  let prepSoldiers = [];
+  let sharedDB = null;
+  let mafLoadedSoldier = null;
+  let repDomain = "presence";
+
+  // קריאת API מאוחדת מול Apps Script
+  async function apiCall(payload) {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+    return await res.json();
   }
 
-  function formatDateToEur(dateObj) {
-    const d = String(dateObj.getDate()).padStart(2, '0');
-    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const y = dateObj.getFullYear();
-    return `${d}/${m}/${y}`;
-  }
-
-  function formatDateToIso(dateObj) {
-    const d = String(dateObj.getDate()).padStart(2, '0');
-    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const y = dateObj.getFullYear();
-    return `${y}-${m}-${d}`;
-  }
-
-  function isoToEur(isoStr) {
-    if (!isoStr) return "";
-    const parts = isoStr.split("-");
-    if (parts.length === 3) {
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-    return isoStr;
-  }
-
-  function eurToIso(eurStr) {
-    if (!eurStr) return "";
-    const parts = eurStr.split("/");
-    if (parts.length === 3) {
-      return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-    }
-    return eurStr;
-  }
-
-  function showMessage(text, type) {
-    const el = document.getElementById("statusMessage");
-    el.className = `alert alert-${type}`;
+  function showBox(id, text, isOk) {
+    const el = document.getElementById(id);
+    el.style.display = "block";
+    el.className = "status-box " + (isOk ? "status-ok" : "status-err");
     el.innerText = text;
   }
 
-  function toggleSubMenu(idx) {
-    const isPresent = document.querySelector(`input[name="mainStatus_${idx}"]:checked`).value === "נוכח";
-    document.getElementById(`presentMenu_${idx}`).classList.toggle("hidden", !isPresent);
-    document.getElementById(`absentMenu_${idx}`).classList.toggle("hidden", isPresent);
+  function hideAllViews() {
+    ["viewLogin", "viewRoleSelect", "viewSoldier", "viewCommander", "viewMaflag", "viewAdmin"].forEach(id => {
+      document.getElementById(id).classList.add("hidden");
+    });
   }
 
-  function toggleNotesField(idx) {
-    const val = document.getElementById(`subStatusAbsent_${idx}`).value;
-    document.getElementById(`notesContainer_${idx}`).classList.toggle("hidden", val !== "אחר");
+  // ==========================================
+  // 1. זרימת כניסה והזדהות
+  // ==========================================
+  async function checkPersonalNumber() {
+    const pn = document.getElementById("loginPn").value.trim();
+    if (!pn) { alert("נא להזין מספר אישי"); return; }
+
+    const btn = document.getElementById("btnCheckPn");
+    btn.disabled = true; btn.innerText = "בודק הרשאות...";
+    document.getElementById("loginStatus").style.display = "none";
+    document.getElementById("setPasswordBox").classList.add("hidden");
+    document.getElementById("verifyPasswordBox").classList.add("hidden");
+
+    try {
+      const res = await apiCall({ action: "auth_check", personalNumber: pn });
+      btn.disabled = false; btn.innerText = "המשך";
+
+      if (res.status !== "success" || !res.found) {
+        showBox("loginStatus", res.message || "מספר אישי לא נמצא", false);
+        return;
+      }
+
+      currentUser = res.user;
+
+      if (!currentUser.requiresPassword) {
+        // חייל רגיל -> כניסה ישירה ללא סיסמה
+        completeAuthentication(currentUser);
+      } else if (!currentUser.hasPassword) {
+        // תפקיד ניהולי ללא סיסמה מוגדרת -> הגדרה ראשונית
+        document.getElementById("welcomeNewAuth").innerText = `שלום ${currentUser.name}, זו כניסתך הראשונה בתפקיד. אנא הגדר סיסמה:`;
+        document.getElementById("setPasswordBox").classList.remove("hidden");
+      } else {
+        // תפקיד ניהולי עם סיסמה קיימת -> אימות סיסמה
+        document.getElementById("welcomeReturningAuth").innerText = `שלום ${currentUser.name}, הזן סיסמה להמשך:`;
+        document.getElementById("verifyPasswordBox").classList.remove("hidden");
+      }
+    } catch (err) {
+      btn.disabled = false; btn.innerText = "המשך";
+      showBox("loginStatus", "שגיאת תקשורת מול השרת: " + err, false);
+    }
   }
 
-  function filterSoldiers() {
-    const selectedFw = document.getElementById("frameworkSelect").value;
-    const container = document.getElementById("soldiersContainer");
-    const submitBtn = document.getElementById("submitBtn");
+  async function saveNewPassword() {
+    const p1 = document.getElementById("newPassInput").value.trim();
+    const p2 = document.getElementById("confirmPassInput").value.trim();
+    if (p1.length < 4) { alert("הסיסמה חייבת להכיל לפחות 4 תווים"); return; }
+    if (p1 !== p2) { alert("הסיסמאות אינן תואמות"); return; }
+
+    const btn = document.getElementById("btnSavePass");
+    btn.disabled = true; btn.innerText = "שומר סיסמה...";
+
+    try {
+      const res = await apiCall({ action: "auth_set_password", personalNumber: currentUser.personalNumber, password: p1 });
+      btn.disabled = false; btn.innerText = "💾 שמור סיסמה והתחבר";
+      if (res.status === "success") {
+        currentUser = res.user;
+        completeAuthentication(currentUser);
+      } else {
+        showBox("loginStatus", res.message, false);
+      }
+    } catch (err) {
+      btn.disabled = false; btn.innerText = "💾 שמור סיסמה והתחבר";
+      showBox("loginStatus", "שגיאת שרת: " + err, false);
+    }
+  }
+
+  async function verifyExistingPassword() {
+    const pass = document.getElementById("loginPassInput").value.trim();
+    if (!pass) { alert("נא להזין סיסמה"); return; }
+
+    const btn = document.getElementById("btnVerifyPass");
+    btn.disabled = true; btn.innerText = "מאמת...";
+
+    try {
+      const res = await apiCall({ action: "auth_verify_password", personalNumber: currentUser.personalNumber, password: pass });
+      btn.disabled = false; btn.innerText = "🔓 התחבר למערכת";
+      if (res.status === "success" && res.authenticated) {
+        currentUser = res.user;
+        completeAuthentication(currentUser);
+      } else {
+        showBox("loginStatus", res.message || "סיסמה שגויה", false);
+      }
+    } catch (err) {
+      btn.disabled = false; btn.innerText = "🔓 התחבר למערכת";
+      showBox("loginStatus", "שגיאת שרת: " + err, false);
+    }
+  }
+
+  function completeAuthentication(user) {
+    document.getElementById("topUserBar").classList.remove("hidden");
+    document.getElementById("barUserName").innerText = user.name;
+
+    if (user.roles.length > 1) {
+      document.getElementById("btnSwitchRole").classList.remove("hidden");
+      showRoleSelector();
+    } else {
+      document.getElementById("btnSwitchRole").classList.add("hidden");
+      openRoleWorkspace(user.roles[0]);
+    }
+  }
+
+  function showRoleSelector() {
+    hideAllViews();
+    document.getElementById("barUserRole").innerText = "";
+    const container = document.getElementById("roleTilesContainer");
     container.innerHTML = "";
 
-    if (!selectedFw) {
-      submitBtn.classList.add("hidden");
-      return;
-    }
+    const roleMeta = {
+      "חייל": { icon: "🪖", title: "חייל", sub: "נשקייה ואפסנאות" },
+      "מפקד": { icon: "📋", title: "מפקד", sub: "נוכחות והיערכות" },
+      "מפלג": { icon: "📦", title: "מפל\"ג", sub: "לוגיסטיקה וזיכויים" },
+      "הנהלה": { icon: "📊", title: "הנהלת הפלוגה", sub: "דוחות וניהול" },
+      "שלומי": { icon: "⚡", title: "שלומי", sub: "ניהול על ואדמין" }
+    };
 
-    const filtered = allSoldiers.filter(s => s.framework === selectedFw);
-
-    if (filtered.length === 0) {
-      container.innerHTML = `<div class="card" style="text-align:center;">לא נמצאו חיילים רשומים תחת מסגרת זו.</div>`;
-      submitBtn.classList.add("hidden");
-      return;
-    }
-
-    filtered.forEach((soldier, idx) => {
-      const isPresent = (soldier.mainStatus || "נוכח") === "נוכח";
-      const rawSub = soldier.subStatus || (isPresent ? "נוכחות מלאה" : "חופשה");
-      const notes = soldier.notes || "";
-
-      let absentSubVal = rawSub;
-      if (rawSub === "גימלים" || rawSub.includes("ג'")) {
-        absentSubVal = "ג' - רפואי";
-      }
-
-      const isOther = !isPresent && absentSubVal === "אחר";
-
-      const card = document.createElement("div");
-      card.className = "soldier-row";
-      card.innerHTML = `
-        <div class="soldier-name">${soldier.name}</div>
-        <div class="radio-group">
-          <label>
-            <input type="radio" name="mainStatus_${idx}" value="נוכח" ${isPresent ? "checked" : ""} onchange="toggleSubMenu(${idx})">
-            נוכח
-          </label>
-          <label>
-            <input type="radio" name="mainStatus_${idx}" value="אינו נוכח" ${!isPresent ? "checked" : ""} onchange="toggleSubMenu(${idx})">
-            אינו נוכח
-          </label>
-        </div>
-
-        <div id="presentMenu_${idx}" class="${isPresent ? "" : "hidden"}">
-          <label>פירוט נוכחות:</label>
-          <select id="subStatusPresent_${idx}">
-            <option value="נוכחות מלאה" ${rawSub === "נוכחות מלאה" ? "selected" : ""}>נוכחות מלאה</option>
-            <option value="מגיע היום" ${rawSub === "מגיע היום" ? "selected" : ""}>מגיע היום</option>
-            <option value="יוצא היום" ${rawSub === "יוצא היום" ? "selected" : ""}>יוצא היום</option>
-          </select>
-        </div>
-
-        <div id="absentMenu_${idx}" class="${!isPresent ? "" : "hidden"}">
-          <label>סיבת היעדרות:</label>
-          <select id="subStatusAbsent_${idx}" onchange="toggleNotesField(${idx})">
-            <option value="חופשה" ${absentSubVal === "חופשה" ? "selected" : ""}>חופשה</option>
-            <option value="ג' - רפואי" ${absentSubVal === "ג' - רפואי" ? "selected" : ""}>ג' - רפואי</option>
-            <option value="שוחרר" ${absentSubVal === "שוחרר" ? "selected" : ""}>שוחרר</option>
-            <option value="אחר" ${absentSubVal === "אחר" ? "selected" : ""}>אחר</option>
-          </select>
-          <div id="notesContainer_${idx}" class="${isOther ? "" : "hidden"}">
-            <label>פירוט (עבור "אחר"):</label>
-            <input type="text" id="notes_${idx}" placeholder="פרט כאן..." value="${escapeHtml(notes)}">
-          </div>
-        </div>
-      `;
-      card.dataset.soldierName = soldier.name;
-      container.appendChild(card);
+    currentUser.roles.forEach(role => {
+      const meta = roleMeta[role] || { icon: "🎖️", title: role, sub: "ממשק תפקיד" };
+      const tile = document.createElement("div");
+      tile.className = "role-tile";
+      tile.onclick = () => openRoleWorkspace(role);
+      tile.innerHTML = `<div class="role-icon">${meta.icon}</div><div class="role-label">${meta.title}</div><div class="role-sub">${meta.sub}</div>`;
+      container.appendChild(tile);
     });
 
-    submitBtn.classList.remove("hidden");
+    document.getElementById("viewRoleSelect").classList.remove("hidden");
   }
 
-  async function submitReport() {
-    const reporterName = document.getElementById("reporterName").value.trim();
-    const framework = document.getElementById("frameworkSelect").value;
-    let reportDate = document.getElementById("reportDate").value.trim();
+  function logoutUser() {
+    currentUser = null; activeRole = null;
+    document.getElementById("topUserBar").classList.add("hidden");
+    document.getElementById("loginPn").value = "";
+    document.getElementById("loginPassInput").value = "";
+    document.getElementById("setPasswordBox").classList.add("hidden");
+    document.getElementById("verifyPasswordBox").classList.add("hidden");
+    document.getElementById("loginStatus").style.display = "none";
+    hideAllViews();
+    document.getElementById("viewLogin").classList.remove("hidden");
+  }
 
-    if (!reportDate) {
-      alert("נא להזין תאריך תוקף לדוח.");
-      return;
+  async function openRoleWorkspace(role) {
+    activeRole = role;
+    hideAllViews();
+    document.getElementById("barUserRole").innerText = `(${role})`;
+
+    if (role === "חייל") {
+      document.getElementById("viewSoldier").classList.remove("hidden");
+      await loadSoldierWorkspace();
+    } else if (role === "מפקד") {
+      document.getElementById("viewCommander").classList.remove("hidden");
+      await loadCommanderWorkspace();
+    } else if (role === "מפלג") {
+      document.getElementById("viewMaflag").classList.remove("hidden");
+      await loadMaflagWorkspace();
+    } else {
+      // הנהלה / שלומי
+      document.getElementById("viewAdmin").classList.remove("hidden");
+      await loadAdminWorkspace();
+    }
+  }
+
+  // ==========================================
+  // 2. ממשק חייל (נשקייה ואפסנאות)
+  // ==========================================
+  function switchSoldierSubTab(tab) {
+    document.getElementById("tabWpBtn").className = "btn-tab" + (tab === "weapons" ? " active" : "");
+    document.getElementById("tabLgBtn").className = "btn-tab" + (tab === "logistics" ? " active" : "");
+    document.getElementById("weaponsSection").classList.toggle("hidden", tab !== "weapons");
+    document.getElementById("logisticsSection").classList.toggle("hidden", tab !== "logistics");
+    document.getElementById("soldierActionStatus").style.display = "none";
+  }
+
+  async function loadSoldierWorkspace() {
+    document.getElementById("sHubName").innerText = "טוען נתונים אישיים...";
+    const res = await apiCall({ action: "get_soldier_gear", personalNumber: currentUser.personalNumber });
+    wpToolsList = res.weaponsTools || [];
+    lgToolsList = res.logisticsTools || [];
+
+    if (res.soldierData && res.soldierData.found) {
+      soldierGearData = res.soldierData.soldier;
+      renderSoldierHub();
+    }
+  }
+
+  function renderSoldierHub() {
+    const s = soldierGearData;
+    document.getElementById("sHubName").innerText = `${s.name} (מ"א: ${s.personalNumber})`;
+    let meta = `מסגרת: ${s.framework}`;
+    if (s.hasLicenseRecorded && s.license && s.license !== "ללא") meta += ` | רישיון: ${s.license}`;
+    document.getElementById("sHubMeta").innerText = meta;
+
+    document.getElementById("licenseBox").classList.toggle("hidden", s.hasLicenseRecorded);
+
+    const wpList = document.getElementById("weaponsCurrentList"); wpList.innerHTML = "";
+    if (s.weaponsItems.length === 0) {
+      wpList.innerHTML = '<div style="color:#94a3b8;font-size:0.85rem;">אין נשק או אמל"ח חתום כרגע.</div>';
+    } else {
+      s.weaponsItems.forEach(it => {
+        const d = document.createElement("div"); d.className = "item-box";
+        d.innerHTML = `<div style="font-weight:bold;">${it.toolName} (מס': ${it.serialNumber})</div>
+          <label class="return-check"><input type="checkbox" class="chk-wp-ret" data-tool="${it.toolName}" data-serial="${it.serialNumber}"> 🔴 הזדכתי על כלי זה</label>`;
+        wpList.appendChild(d);
+      });
     }
 
-    const m = reportDate.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
-    if (!m) {
-      alert("נא להזין תאריך תקין במבנה dd/mm/yyyy (לדוגמה: 11/11/2026)");
-      return;
+    const lgList = document.getElementById("logisticsCurrentList"); lgList.innerHTML = "";
+    if (s.logisticsItems.length === 0) {
+      lgList.innerHTML = '<div style="color:#94a3b8;font-size:0.85rem;">אין ציוד אפסנאות חתום כרגע.</div>';
+    } else {
+      s.logisticsItems.forEach(it => {
+        const isQty = !isNaN(parseInt(it.quantityOrSerial, 10)) && parseInt(it.quantityOrSerial, 10) < 50;
+        const isV = (it.quantityOrSerial === "V" || it.quantityOrSerial === "v");
+        const valLabel = isV ? "חתום" : (isQty ? it.quantityOrSerial + " יח'" : it.quantityOrSerial);
+        const d = document.createElement("div"); d.className = "item-box";
+        d.innerHTML = `<div style="font-weight:bold;color:#38bdf8;">${it.toolName}</div><div style="color:#cbd5e1;font-size:0.9rem;">כמות/סטטוס: ${valLabel}</div>`;
+        lgList.appendChild(d);
+      });
     }
-    reportDate = `${m[1].padStart(2, '0')}/${m[2].padStart(2, '0')}/${m[3]}`;
 
-    if (!reporterName) {
-      alert("נא להזין את שם המפקד המדווח.");
-      return;
+    document.getElementById("weaponsNewContainer").innerHTML = "";
+    document.getElementById("logisticsNewContainer").innerHTML = "";
+    if (s.isNewToWeapons) addWeaponRow();
+    if (s.isNewToLogistics) addLogisticsRow();
+  }
+
+  function addWeaponRow() {
+    const container = document.getElementById("weaponsNewContainer");
+    const div = document.createElement("div"); div.className = "item-box";
+    let opts = wpToolsList.map(t => `<option value="${t}" ${t === "M16" ? "selected" : ""}>${t}</option>`).join("");
+    opts += `<option value="OTHER_CUSTOM">+ אחר (הגדר נשק חדש)</option>`;
+
+    div.innerHTML = `
+      <label>סוג נשק/אמל"ח:</label>
+      <select class="wp-tool" onchange="onWpnTypeChange(this)">${opts}</select>
+      <input type="text" class="custom-name hidden" placeholder="שם נשק...">
+      <label>מספר נשק / סידורי:</label>
+      <input type="text" class="wp-serial" placeholder="הקלד מספר נשק..." oninput="checkWpnKit(this)">
+      <div class="wp-sight-box hidden" style="margin-top:8px;">
+        <label class="wp-sight-lbl" style="color:#38bdf8;"></label>
+        <input type="text" class="wp-sight-serial">
+      </div>
+      <div class="wp-kit-container">
+        <div style="font-weight:bold;color:#38bdf8;margin-bottom:6px;">📦 ציוד נשקייה נלווה:</div>
+        <label style="font-size:0.85rem;">מחסניות:</label>
+        <select class="wp-mags">${[0,1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">${n === 0 ? "0 מחסניות" : n}</option>`).join("")}</select>
+        <label class="kit-check"><input type="checkbox" class="wp-makpork"><span>מקפורק</span></label>
+        <label class="kit-check"><input type="checkbox" class="wp-strap"><span>רצועה לנשק</span></label>
+        <label class="kit-check"><input type="checkbox" class="wp-glasses"><span>משקפי "שומר אחי"</span></label>
+      </div>`;
+    container.appendChild(div);
+  }
+
+  function onWpnTypeChange(sel) {
+    const box = sel.closest(".item-box");
+    box.querySelector(".custom-name").classList.toggle("hidden", sel.value !== "OTHER_CUSTOM");
+    checkWpnKit(box.querySelector(".wp-serial"));
+  }
+
+  function checkWpnKit(inp) {
+    const box = inp.closest(".item-box");
+    const toolVal = box.querySelector(".wp-tool").value;
+    const hasSerial = inp.value.trim().length > 0;
+    const nonFirearms = ["כוונת", "מפרו", "מארס", "טריג'יקון", "ציין לייזר", "אמר\"ל", "עכבר"];
+    const isNon = nonFirearms.some(nf => toolVal.indexOf(nf) !== -1);
+
+    box.querySelector(".wp-kit-container").style.display = (hasSerial && !isNon) ? "block" : "none";
+
+    const sightBox = box.querySelector(".wp-sight-box");
+    const sightLbl = box.querySelector(".wp-sight-lbl");
+    const sightInp = box.querySelector(".wp-sight-serial");
+
+    if (hasSerial && toolVal === "M16") {
+      sightBox.classList.remove("hidden");
+      sightLbl.innerText = "כוונת מפרו (מספר סידורי):";
+      sightInp.placeholder = "הקלד מספר כוונת מפרו (אופציונלי)...";
+      sightInp.dataset.sightType = "מפרו";
+    } else if (hasSerial && toolVal === "M4") {
+      sightBox.classList.remove("hidden");
+      sightLbl.innerText = "כוונת טריג' (מספר סידורי):";
+      sightInp.placeholder = "הקלד מספר כוונת טריג' (אופציונלי)...";
+      sightInp.dataset.sightType = "טריג'יקון";
+    } else {
+      sightBox.classList.add("hidden");
+      sightInp.value = "";
+      delete sightInp.dataset.sightType;
     }
+  }
 
-    const cards = document.querySelectorAll(".soldier-row");
-    const records = [];
+  function addLogisticsRow() {
+    const container = document.getElementById("logisticsNewContainer");
+    const div = document.createElement("div"); div.className = "item-box";
+    let opts = lgToolsList.map(t => `<option value="${t}">${t}</option>`).join("");
+    opts += `<option value="OTHER_CUSTOM">+ אחר (הגדר פריט חדש)</option>`;
+    div.innerHTML = `<label>פריט אפסנאות:</label>
+      <select class="lg-tool" onchange="this.parentElement.querySelector('.custom-name').classList.toggle('hidden', this.value!=='OTHER_CUSTOM')">${opts}</select>
+      <input type="text" class="custom-name hidden" placeholder="שם פריט...">
+      <label>כמות:</label><input type="number" class="lg-qty" value="1" min="1">`;
+    container.appendChild(div);
+  }
 
-    cards.forEach((card, idx) => {
-      const name = card.dataset.soldierName;
-      const isPresent = document.querySelector(`input[name="mainStatus_${idx}"]:checked`).value === "נוכח";
-      let mainStatus = isPresent ? "נוכח" : "אינו נוכח";
-      let subStatus = "";
-      let notes = "";
+  async function submitWeaponsAction() {
+    const returned = [];
+    document.querySelectorAll(".chk-wp-ret:checked").forEach(c => {
+      returned.push({ toolName: c.dataset.tool, serialNumber: c.dataset.serial });
+    });
 
-      if (isPresent) {
-        subStatus = document.getElementById(`subStatusPresent_${idx}`).value;
-      } else {
-        subStatus = document.getElementById(`subStatusAbsent_${idx}`).value;
-        if (subStatus === "ג' - רפואי") {
-          subStatus = "גימלים";
-        }
-        if (subStatus === "אחר") {
-          notes = document.getElementById(`notes_${idx}`).value.trim();
-        }
+    const newItems = [];
+    const boxes = document.querySelectorAll("#weaponsNewContainer .item-box");
+    for (let i = 0; i < boxes.length; i++) {
+      const sel = boxes[i].querySelector(".wp-tool");
+      const cust = boxes[i].querySelector(".custom-name").value.trim();
+      const serial = boxes[i].querySelector(".wp-serial").value.trim();
+      const name = (sel.value === "OTHER_CUSTOM") ? cust : sel.value;
+
+      if (name && !serial) {
+        alert("חסר מספר נשק");
+        boxes[i].querySelector(".wp-serial").focus();
+        return;
       }
+      if (name && serial) newItems.push({ toolName: name, serialNumber: serial });
 
+      const sightInp = boxes[i].querySelector(".wp-sight-serial");
+      if (sightInp && sightInp.value.trim() && sightInp.dataset.sightType) {
+        newItems.push({ toolName: sightInp.dataset.sightType, serialNumber: sightInp.value.trim() });
+      }
+      const mags = boxes[i].querySelector(".wp-mags");
+      if (mags && parseInt(mags.value, 10) > 0) newItems.push({ toolName: "מחסניות", serialNumber: mags.value });
+      if (boxes[i].querySelector(".wp-makpork").checked) newItems.push({ toolName: "מקפורק", serialNumber: "V" });
+      if (boxes[i].querySelector(".wp-strap").checked) newItems.push({ toolName: "רצועה לנשק", serialNumber: "V" });
+      if (boxes[i].querySelector(".wp-glasses").checked) newItems.push({ toolName: "משקפי שומר אחי", serialNumber: "V" });
+    }
+
+    if (returned.length === 0 && newItems.length === 0) {
+      alert("לא סומנו זיכויים ולא נוספו כלים חדשים"); return;
+    }
+
+    let finalLic = soldierGearData.license || "ללא";
+    if (!soldierGearData.hasLicenseRecorded) {
+      const licVal = document.getElementById("soldierLicense").value;
+      finalLic = (licVal === "אחר") ? document.getElementById("licenseOther").value.trim() : licVal;
+      if (!finalLic) finalLic = "ללא";
+    }
+
+    showBox("soldierActionStatus", "מעדכן נשקייה...", true);
+    const r = await apiCall({
+      action: "submit_weapons",
+      personalNumber: soldierGearData.personalNumber,
+      name: soldierGearData.name,
+      framework: soldierGearData.framework,
+      license: finalLic,
+      returnedItems: returned,
+      newItems: newItems
+    });
+    showBox("soldierActionStatus", r.message, r.status === "success");
+    await loadSoldierWorkspace();
+  }
+
+  async function submitLogisticsAction() {
+    const newItems = [];
+    document.querySelectorAll("#logisticsNewContainer .item-box").forEach(box => {
+      const sel = box.querySelector(".lg-tool");
+      const cust = box.querySelector(".custom-name").value.trim();
+      const qty = box.querySelector(".lg-qty").value.trim();
+      const name = (sel.value === "OTHER_CUSTOM") ? cust : sel.value;
+      if (name) newItems.push({ toolName: name, quantityOrSerial: qty });
+    });
+
+    if (newItems.length === 0) { alert("נא להזין לפחות פריט אפסנאות אחד"); return; }
+
+    showBox("soldierActionStatus", "חותם על ציוד אפסנאות...", true);
+    const r = await apiCall({
+      action: "submit_logistics",
+      personalNumber: soldierGearData.personalNumber,
+      name: soldierGearData.name,
+      framework: soldierGearData.framework,
+      newItems: newItems
+    });
+    showBox("soldierActionStatus", r.message, r.status === "success");
+    await loadSoldierWorkspace();
+  }
+
+  // ==========================================
+  // 3. ממשק מפקד (נוכחות והיערכות לתעסוקה)
+  // ==========================================
+  function switchCmdSubTab(tab) {
+    document.getElementById("tabCmdAttBtn").className = "btn-tab" + (tab === "att" ? " active" : "");
+    document.getElementById("tabCmdPrepBtn").className = "btn-tab" + (tab === "prep" ? " active" : "");
+    document.getElementById("cmdAttendanceSection").classList.toggle("hidden", tab !== "att");
+    document.getElementById("cmdPrepSection").classList.toggle("hidden", tab !== "prep");
+  }
+
+  async function loadCommanderWorkspace() {
+    // אתחול תאריך מחר בפורמט dd/mm/yyyy
+    const tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
+    const dStr = `${String(tmr.getDate()).padStart(2,'0')}/${String(tmr.getMonth()+1).padStart(2,'0')}/${tmr.getFullYear()}`;
+    const isoStr = `${tmr.getFullYear()}-${String(tmr.getMonth()+1).padStart(2,'0')}-${String(tmr.getDate()).padStart(2,'0')}`;
+
+    document.getElementById("attReportDate").value = dStr;
+    const picker = document.getElementById("attDatePicker");
+    picker.value = isoStr;
+    picker.onchange = function() {
+      if (this.value) {
+        const p = this.value.split("-");
+        document.getElementById("attReportDate").value = `${p[2]}/${p[1]}/${p[0]}`;
+      }
+    };
+
+    document.getElementById("attReporterName").value = currentUser.name;
+    document.getElementById("prepReporterName").value = currentUser.name;
+
+    const [attRes, prepRes] = await Promise.all([
+      apiCall({ action: "get_attendance_soldiers" }),
+      apiCall({ action: "get_prep_soldiers" })
+    ]);
+    attendanceSoldiers = attRes.soldiers || [];
+    prepSoldiers = prepRes.soldiers || [];
+  }
+
+  function renderAttendanceSoldiers() {
+    const fw = document.getElementById("attFrameworkSelect").value;
+    const container = document.getElementById("attSoldiersContainer");
+    const btn = document.getElementById("btnSubmitAtt");
+    container.innerHTML = "";
+    document.getElementById("attStatusBox").style.display = "none";
+
+    if (!fw) { btn.classList.add("hidden"); return; }
+
+    const list = attendanceSoldiers.filter(s => s.framework === fw);
+    if (list.length === 0) {
+      container.innerHTML = '<div class="card" style="text-align:center;">אין חיילים פעילים במסגרת זו.</div>';
+      btn.classList.add("hidden"); return;
+    }
+
+    list.forEach((s, idx) => {
+      const isPres = (s.mainStatus || "נוכח") === "נוכח";
+      const rawSub = s.subStatus || (isPres ? "נוכחות מלאה" : "חופשה");
+      const absSub = (rawSub === "גימלים" || rawSub.includes("ג'")) ? "גימלים" : rawSub;
+      const isOther = !isPres && absSub === "אחר";
+
+      const card = document.createElement("div"); card.className = "card";
+      card.dataset.soldierName = s.name;
+      card.innerHTML = `
+        <div style="font-weight:bold;font-size:1.05rem;margin-bottom:10px;">${s.name}</div>
+        <div class="radio-group">
+          <label class="radio-card ${isPres ? "active-green" : ""}" id="attLblP_${idx}" onclick="setAttRadio(${idx}, true)">
+            <input type="radio" name="attMain_${idx}" value="נוכח" ${isPres ? "checked" : ""}> נוכח
+          </label>
+          <label class="radio-card ${!isPres ? "active-red" : ""}" id="attLblA_${idx}" onclick="setAttRadio(${idx}, false)">
+            <input type="radio" name="attMain_${idx}" value="אינו נוכח" ${!isPres ? "checked" : ""}> אינו נוכח
+          </label>
+        </div>
+        <div id="attPresMenu_${idx}" class="${isPres ? "" : "hidden"}">
+          <select id="attSubP_${idx}">
+            <option value="נוכחות מלאה" ${rawSub==="נוכחות מלאה"?"selected":""}>נוכחות מלאה</option>
+            <option value="מגיע היום" ${rawSub==="מגיע היום"?"selected":""}>מגיע היום</option>
+            <option value="יוצא היום" ${rawSub==="יוצא היום"?"selected":""}>יוצא היום</option>
+          </select>
+        </div>
+        <div id="attAbsMenu_${idx}" class="${!isPres ? "" : "hidden"}">
+          <select id="attSubA_${idx}" onchange="document.getElementById('attNoteBox_${idx}').classList.toggle('hidden', this.value!=='אחר')">
+            <option value="חופשה" ${absSub==="חופשה"?"selected":""}>חופשה</option>
+            <option value="גימלים" ${absSub==="גימלים"?"selected":""}>ג' - רפואי</option>
+            <option value="שוחרר" ${absSub==="שוחרר"?"selected":""}>שוחרר</option>
+            <option value="אחר" ${absSub==="אחר"?"selected":""}>אחר</option>
+          </select>
+          <div id="attNoteBox_${idx}" class="${isOther ? "" : "hidden"}">
+            <input type="text" id="attNote_${idx}" placeholder="פרט סיבה..." value="${s.notes || ""}">
+          </div>
+        </div>`;
+      container.appendChild(card);
+    });
+    btn.classList.remove("hidden");
+  }
+
+  function setAttRadio(idx, isPres) {
+    document.getElementById(`attLblP_${idx}`).className = "radio-card" + (isPres ? " active-green" : "");
+    document.getElementById(`attLblA_${idx}`).className = "radio-card" + (!isPres ? " active-red" : "");
+    document.getElementById(`attPresMenu_${idx}`).classList.toggle("hidden", !isPres);
+    document.getElementById(`attAbsMenu_${idx}`).classList.toggle("hidden", isPres);
+  }
+
+  async function submitAttendanceReport() {
+    const fw = document.getElementById("attFrameworkSelect").value;
+    const reporter = document.getElementById("attReporterName").value.trim();
+    const rDate = document.getElementById("attReportDate").value.trim();
+    if (!fw || !reporter || !rDate) { alert("נא למלא תאריך, מסגרת ושם מדווח"); return; }
+
+    const records = [];
+    document.querySelectorAll("#attSoldiersContainer .card").forEach((card, idx) => {
+      const name = card.dataset.soldierName;
+      if (!name) return;
+      const isPres = card.querySelector(`input[name="attMain_${idx}"]:checked`).value === "נוכח";
+      const mainStatus = isPres ? "נוכח" : "אינו נוכח";
+      const subStatus = isPres ? document.getElementById(`attSubP_${idx}`).value : document.getElementById(`attSubA_${idx}`).value;
+      const notes = (!isPres && subStatus === "אחר") ? document.getElementById(`attNote_${idx}`).value.trim() : "";
       records.push({ name, mainStatus, subStatus, notes });
     });
 
-    const submitBtn = document.getElementById("submitBtn");
-    submitBtn.disabled = true;
-    submitBtn.innerText = "שולח נתונים...";
+    const btn = document.getElementById("btnSubmitAtt");
+    btn.disabled = true; btn.innerText = "שולח דיווח...";
+    const res = await apiCall({ action: "submit_attendance", framework: fw, reporterName: reporter, reportDate: rDate, records });
+    btn.disabled = false; btn.innerText = "🚀 שלח דיווח נוכחות";
 
-    try {
-      await fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ framework, reporterName, reportDate, records })
+    showBox("attStatusBox", res.message, res.status === "success");
+    if (res.status === "success") {
+      // עדכון מקומי
+      records.forEach(r => {
+        const s = attendanceSoldiers.find(x => x.name === r.name);
+        if (s) { s.mainStatus = r.mainStatus; s.subStatus = r.subStatus; s.notes = r.notes; }
       });
-
-      showMessage("הדיווח נקלט בהצלחה בגיליון הפלוגתי!", "success");
-      document.getElementById("soldiersContainer").innerHTML = "";
-      submitBtn.classList.add("hidden");
-      document.getElementById("frameworkSelect").value = "";
-    } catch (e) {
-      showMessage("שגיאה בשליחת הדיווח. נסה שוב.", "error");
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.innerText = "שלח דיווח לגיליון";
     }
   }
 
-  window.addEventListener('DOMContentLoaded', async () => {
-    // אתחול אוטומטי לתאריך של מחר (היום הנוכחי + 1)
-    const targetTomorrow = new Date();
-    targetTomorrow.setDate(targetTomorrow.getDate() + 1);
+  // היערכות לתעסוקה
+  const PREP_MIN = "2026-12-27";
+  const PREP_MAX = "2027-02-11";
 
-    document.getElementById("reportDate").value = formatDateToEur(targetTomorrow);
-    
-    const helper = document.getElementById("datePickerHelper");
-    if (helper) {
-      helper.value = formatDateToIso(targetTomorrow);
-      helper.addEventListener("change", function() {
-        if (this.value) {
-          document.getElementById("reportDate").value = isoToEur(this.value);
-        }
-      });
+  function renderPrepSoldiers() {
+    const fw = document.getElementById("prepFrameworkSelect").value;
+    const container = document.getElementById("prepSoldiersContainer");
+    const btn = document.getElementById("btnSubmitPrep");
+    const addBtn = document.getElementById("btnAddPrepExtra");
+    container.innerHTML = "";
+    document.getElementById("prepStatusBox").style.display = "none";
+
+    if (!fw) { btn.classList.add("hidden"); addBtn.classList.add("hidden"); return; }
+
+    const list = prepSoldiers.filter(s => s.framework === fw);
+    list.forEach((s, idx) => container.appendChild(createPrepCard(s, idx, s.isExtra === true)));
+    addBtn.classList.remove("hidden");
+    btn.classList.remove("hidden");
+  }
+
+  function addPrepExtraRow() {
+    const container = document.getElementById("prepSoldiersContainer");
+    const idx = container.querySelectorAll(".card").length;
+    container.appendChild(createPrepCard({}, idx, true));
+  }
+
+  function createPrepCard(s, idx, isExtra) {
+    const rep = s.existingReport;
+    const st = (rep && rep.status) ? rep.status : "מגיע";
+    const reason = (rep && rep.reason) ? rep.reason : "";
+    const pType = (rep && rep.partialType) ? rep.partialType : "until";
+    const pStart = (rep && rep.startDate) ? rep.startDate : PREP_MIN;
+    const pEnd = (rep && rep.endDate) ? rep.endDate : PREP_MAX;
+
+    const card = document.createElement("div"); card.className = "card";
+    card.dataset.isExtra = isExtra ? "true" : "false";
+    card.dataset.pn = s.personalNumber || "";
+    if (!isExtra) card.dataset.soldierName = s.name;
+
+    const repBadge = rep ? `<span class="badge-tag badge-reported">דווח בעבר</span>` : "";
+    let head = "";
+    if (isExtra) {
+      head = `<div style="margin-bottom:8px;"><strong>לוחם נוסף</strong> ${repBadge}<span class="badge-tag badge-extra">ידני</span></div>
+        <div class="btn-row">
+          <input type="text" id="pExName_${idx}" placeholder="שם מלא *" value="${s.name || ""}">
+          <input type="text" id="pExPn_${idx}" placeholder="מ&quot;א (אופציונלי)" value="${s.personalNumber || ""}">
+        </div>`;
+    } else {
+      const inact = !s.isActive ? `<span class="badge-tag badge-inactive">לא פעיל</span>` : "";
+      head = `<div style="margin-bottom:8px;"><strong>${s.name} ${s.personalNumber ? "("+s.personalNumber+")" : ""}</strong> ${repBadge}${inact}</div>`;
     }
 
-    document.getElementById("reportDate").addEventListener("change", function() {
-      const iso = eurToIso(this.value.trim());
-      if (iso && helper) {
-        helper.value = iso;
+    card.innerHTML = `${head}
+      <div class="radio-group">
+        <label class="radio-card ${st==="מגיע"?"active-green":""}" id="pLblG_${idx}" onclick="setPrepStatus(${idx},'מגיע')"><input type="radio" name="pSt_${idx}" value="מגיע" ${st==="מגיע"?"checked":""}> מגיע</label>
+        <label class="radio-card ${st==="לא מגיע"?"active-red":""}" id="pLblN_${idx}" onclick="setPrepStatus(${idx},'לא מגיע')"><input type="radio" name="pSt_${idx}" value="לא מגיע" ${st==="לא מגיע"?"checked":""}> לא מגיע</label>
+        <label class="radio-card ${st==="מגיע חלקית"?"active-amber":""}" id="pLblP_${idx}" onclick="setPrepStatus(${idx},'מגיע חלקית')"><input type="radio" name="pSt_${idx}" value="מגיע חלקית" ${st==="מגיע חלקית"?"checked":""}> חלקית</label>
+      </div>
+      <div id="pBoxNo_${idx}" class="${st==="לא מגיע"?"":"hidden"}">
+        <input type="text" id="pReasonNo_${idx}" placeholder="סיבה לאי-הגעה *" value="${st==="לא מגיע"?reason:""}">
+      </div>
+      <div id="pBoxPart_${idx}" class="${st==="מגיע חלקית"?"":"hidden"}">
+        <input type="text" id="pReasonPart_${idx}" placeholder="סיבה להגעה חלקית *" value="${st==="מגיע חלקית"?reason:""}">
+        <select id="pType_${idx}" onchange="togglePrepDates(${idx})">
+          <option value="until" ${pType==="until"?"selected":""}>מגיע עד:</option>
+          <option value="from" ${pType==="from"?"selected":""}>מגיע מ-:</option>
+          <option value="between" ${pType==="between"?"selected":""}>מגיע בין- לבין-:</option>
+        </select>
+        <div id="pWrapFrom_${idx}" class="${pType==="until"?"hidden":""}"><label>מ-תאריך:</label><input type="date" id="pFrom_${idx}" min="${PREP_MIN}" max="${PREP_MAX}" value="${pStart}"></div>
+        <div id="pWrapUntil_${idx}" class="${pType==="from"?"hidden":""}"><label>עד-תאריך:</label><input type="date" id="pUntil_${idx}" min="${PREP_MIN}" max="${PREP_MAX}" value="${pEnd}"></div>
+      </div>`;
+    return card;
+  }
+
+  function setPrepStatus(idx, st) {
+    document.getElementById(`pLblG_${idx}`).className = "radio-card" + (st==="מגיע"?" active-green":"");
+    document.getElementById(`pLblN_${idx}`).className = "radio-card" + (st==="לא מגיע"?" active-red":"");
+    document.getElementById(`pLblP_${idx}`).className = "radio-card" + (st==="מגיע חלקית"?" active-amber":"");
+    document.getElementById(`pBoxNo_${idx}`).classList.toggle("hidden", st!=="לא מגיע");
+    document.getElementById(`pBoxPart_${idx}`).classList.toggle("hidden", st!=="מגיע חלקית");
+  }
+
+  function togglePrepDates(idx) {
+    const t = document.getElementById(`pType_${idx}`).value;
+    document.getElementById(`pWrapFrom_${idx}`).classList.toggle("hidden", t==="until");
+    document.getElementById(`pWrapUntil_${idx}`).classList.toggle("hidden", t==="from");
+  }
+
+  async function submitPrepReport() {
+    const fw = document.getElementById("prepFrameworkSelect").value;
+    const reporter = document.getElementById("prepReporterName").value.trim();
+    if (!fw || !reporter) { alert("נא לבחור מסגרת ושם ממלא"); return; }
+
+    const records = [];
+    const cards = document.querySelectorAll("#prepSoldiersContainer .card");
+    for (let idx = 0; idx < cards.length; idx++) {
+      const card = cards[idx];
+      const isEx = card.dataset.isExtra === "true";
+      const name = isEx ? document.getElementById(`pExName_${idx}`).value.trim() : card.dataset.soldierName;
+      const pn = isEx ? document.getElementById(`pExPn_${idx}`).value.trim() : card.dataset.pn;
+      if (!name) { alert("חובה למלא שם ללוחם הנוסף"); return; }
+
+      const status = card.querySelector(`input[name="pSt_${idx}"]:checked`).value;
+      let reason = "", partialType = null, startDate = null, endDate = null;
+
+      if (status === "לא מגיע") {
+        reason = document.getElementById(`pReasonNo_${idx}`).value.trim();
+        if (!reason) { alert(`נא להזין סיבה עבור ${name}`); return; }
+      } else if (status === "מגיע חלקית") {
+        reason = document.getElementById(`pReasonPart_${idx}`).value.trim();
+        if (!reason) { alert(`נא להזין סיבה עבור ${name}`); return; }
+        partialType = document.getElementById(`pType_${idx}`).value;
+        startDate = partialType === "until" ? PREP_MIN : document.getElementById(`pFrom_${idx}`).value;
+        endDate = partialType === "from" ? PREP_MAX : document.getElementById(`pUntil_${idx}`).value;
       }
+      records.push({ name, framework: fw, personalNumber: pn, status, reason, partialType, startDate, endDate });
+    }
+
+    const btn = document.getElementById("btnSubmitPrep");
+    btn.disabled = true; btn.innerText = "שומר נתונים...";
+    const res = await apiCall({ action: "submit_prep", framework: fw, reporterName: reporter, records });
+    btn.disabled = false; btn.innerText = "🚀 שלח היערכות לתעסוקה";
+    showBox("prepStatusBox", res.message, res.status === "success");
+    if (res.status === "success") {
+      const pRes = await apiCall({ action: "get_prep_soldiers" });
+      prepSoldiers = pRes.soldiers || [];
+    }
+  }
+
+  // ==========================================
+  // 4. ממשק מפל"ג (לוגיסטיקה וזיכויים)
+  // ==========================================
+  function switchMafSubTab(tab) {
+    document.getElementById("tabMafCardBtn").className = "btn-tab" + (tab === "card" ? " active" : "");
+    document.getElementById("tabMafRepBtn").className = "btn-tab" + (tab === "rep" ? " active" : "");
+    document.getElementById("mafCardSection").classList.toggle("hidden", tab !== "card");
+    document.getElementById("mafRepSection").classList.toggle("hidden", tab !== "rep");
+  }
+
+  async function loadMaflagWorkspace() {
+    sharedDB = await apiCall({ action: "get_shared_dataset" });
+    const sel = document.getElementById("mafSoldierSelect");
+    sel.innerHTML = '<option value="">-- בחר לוחם --</option>';
+    const ordMap = { "מחלקה 1":1, "מחלקה 2":2, "מחלקה 3":3, "חפ\"ק":4, "מפל\"ג":5, "חמ\"ל":6, "מסופחים":7 };
+
+    (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[a.framework]||99)-(ordMap[b.framework]||99) || a.name.localeCompare(b.name,'he')).forEach(s => {
+      const o = document.createElement("option");
+      o.value = s.personalNumber;
+      o.textContent = `${s.framework} | ${s.name} (${s.personalNumber})`;
+      sel.appendChild(o);
     });
 
-    document.getElementById("frameworkSelect").addEventListener("change", filterSoldiers);
-    document.getElementById("submitBtn").addEventListener("click", submitReport);
+    const fwSel = document.getElementById("mafFwSelect"); fwSel.innerHTML = "";
+    (sharedDB.canonicalFrameworks || []).forEach(fw => {
+      const o = document.createElement("option"); o.value = fw; o.textContent = fw; fwSel.appendChild(o);
+    });
 
-    try {
-      const res = await fetch(SCRIPT_URL);
-      const data = await res.json();
-      allSoldiers = data.soldiers || [];
-    } catch (e) {
-      showMessage("שגיאה בטעינת החיילים מהגיליון.", "error");
+    const tSel = document.getElementById("mafToolSelect"); tSel.innerHTML = "";
+    (sharedDB.logisticsTools || []).forEach(t => {
+      const o = document.createElement("option"); o.value = t; o.textContent = t; tSel.appendChild(o);
+    });
+  }
+
+  async function onMafSoldierSelected() {
+    const pn = document.getElementById("mafSoldierSelect").value;
+    if (!pn) { document.getElementById("mafSoldierDetails").classList.add("hidden"); return; }
+
+    const res = await apiCall({ action: "get_soldier_gear", personalNumber: pn });
+    if (res.soldierData && res.soldierData.found) {
+      mafLoadedSoldier = res.soldierData.soldier;
+      const s = mafLoadedSoldier;
+      document.getElementById("mafSName").innerText = `${s.name} (מ"א: ${s.personalNumber})`;
+      document.getElementById("mafSMeta").innerText = `מסגרת: ${s.framework}`;
+
+      const lgDiv = document.getElementById("mafLogisticsList"); lgDiv.innerHTML = "";
+      s.logisticsItems.forEach(it => {
+        const isQty = !isNaN(parseInt(it.quantityOrSerial,10)) && parseInt(it.quantityOrSerial,10) < 50;
+        const qtyInp = isQty ? ` (כמות: ${it.quantityOrSerial}) | לזכות: <input type="number" class="maf-qty" data-tool="${it.toolName}" value="${it.quantityOrSerial}" min="1" max="${it.quantityOrSerial}" style="width:65px;display:inline-block;padding:4px;margin:0 4px;">` : "";
+        const d = document.createElement("div"); d.className = "item-box";
+        d.innerHTML = `<label class="return-check"><input type="checkbox" class="chk-maf-lg" data-tool="${it.toolName}" data-val="${it.quantityOrSerial}"> ${it.toolName}${qtyInp}</label>`;
+        lgDiv.appendChild(d);
+      });
+
+      const wpDiv = document.getElementById("mafWeaponsList"); wpDiv.innerHTML = "";
+      s.weaponsItems.forEach(it => {
+        const d = document.createElement("div"); d.className = "item-box";
+        d.innerHTML = `<label class="return-check"><input type="checkbox" class="chk-maf-wp" data-tool="${it.toolName}" data-serial="${it.serialNumber}"> ${it.toolName} (מס': ${it.serialNumber})</label>`;
+        wpDiv.appendChild(d);
+      });
+
+      document.getElementById("mafSoldierDetails").classList.remove("hidden");
     }
-  });
+  }
+
+  async function submitMaflagReturns() {
+    const wpRets = [];
+    document.querySelectorAll(".chk-maf-wp:checked").forEach(c => wpRets.push({ toolName: c.dataset.tool, serialNumber: c.dataset.serial }));
+    const lgRets = [];
+    document.querySelectorAll(".chk-maf-lg:checked").forEach(c => {
+      const qInp = document.querySelector(`.maf-qty[data-tool="${c.dataset.tool}"]`);
+      lgRets.push({ toolName: c.dataset.tool, quantityOrSerial: c.dataset.val, returnQty: qInp ? qInp.value : c.dataset.val });
+    });
+
+    if (wpRets.length === 0 && lgRets.length === 0) { alert("נא לסמן פריטים לזיכוי"); return; }
+
+    showBox("mafActionStatus", "מבצע זיכויים...", true);
+    if (wpRets.length > 0) {
+      await apiCall({ action: "submit_weapons", personalNumber: mafLoadedSoldier.personalNumber, name: mafLoadedSoldier.name, framework: mafLoadedSoldier.framework, returnedItems: wpRets, newItems: [], authorizedBy: "מפל\"ג" });
+    }
+    if (lgRets.length > 0) {
+      await apiCall({ action: "maflag_return", personalNumber: mafLoadedSoldier.personalNumber, name: mafLoadedSoldier.name, framework: mafLoadedSoldier.framework, returnedItems: lgRets });
+    }
+    showBox("mafActionStatus", "הזיכוי בוצע בהצלחה!", true);
+    await onMafSoldierSelected();
+  }
+
+  function sendMaflagSoldierWa() {
+    const s = mafLoadedSoldier;
+    if (!s) return;
+    let msg = `*כרטיס לוחם - מסייעת 8109*\n• שם: *${s.name}* (${s.personalNumber})\n• מסגרת: ${s.framework}\n\n📦 *ציוד אפסנאות ונלווה:*\n`;
+    msg += s.logisticsItems.length ? s.logisticsItems.map((it,i)=>`${i+1}. ${it.toolName}: ${it.quantityOrSerial}`).join("\n") : "(אין)";
+    msg += `\n\n🔫 *נשק ואמל"ח:*\n`;
+    msg += s.weaponsItems.length ? s.weaponsItems.map((it,i)=>`${i+1}. ${it.toolName}: ${it.serialNumber}`).join("\n") : "(אין)";
+    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(msg), "_blank");
+  }
+
+  function onMafRepTypeChange() {
+    const t = document.getElementById("mafRepType").value;
+    document.getElementById("boxMafFw").classList.toggle("hidden", t !== "by_framework");
+    document.getElementById("boxMafTool").classList.toggle("hidden", t !== "by_tool");
+  }
+
+  function generateMafReport() {
+    const type = document.getElementById("mafRepType").value;
+    const soldiers = sharedDB.logisticsSoldiers || [];
+    let msg = "";
+
+    if (type === "all_company") {
+      msg = "*דוח ציוד ואפסנאות - מסייעת 8109*\n\n";
+      (sharedDB.canonicalFrameworks || []).forEach(fw => {
+        const grp = soldiers.filter(s => s.framework === fw && s.items.length > 0);
+        if (grp.length) {
+          msg += `📌 *${fw}*\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName} (${it.quantityOrSerial})`).join(", ")}`).join("\n") + "\n\n";
+        }
+      });
+    } else if (type === "by_framework") {
+      const fw = document.getElementById("mafFwSelect").value;
+      const grp = soldiers.filter(s => s.framework === fw && s.items.length > 0);
+      msg = `*דוח ציוד - ${fw}*\n\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName} (${it.quantityOrSerial})`).join(", ")}`).join("\n");
+    } else if (type === "by_tool") {
+      const tool = document.getElementById("mafToolSelect").value;
+      let total = 0; const lines = [];
+      soldiers.forEach(s => s.items.forEach(it => {
+        if (it.toolName === tool) {
+          const q = parseInt(it.quantityOrSerial,10); const num = (!isNaN(q)&&q>0)?q:1;
+          total += num; lines.push(`${s.name} ${it.quantityOrSerial}`);
+        }
+      }));
+      msg = `${tool}: סך הכל ${total}\n` + lines.join("\n");
+    } else {
+      const counts = {};
+      soldiers.forEach(s => s.items.forEach(it => {
+        const q = parseInt(it.quantityOrSerial,10); const num = (!isNaN(q)&&q>0)?q:1;
+        counts[it.toolName] = (counts[it.toolName]||0) + num;
+      }));
+      msg = "דוח מרכז לפי פריטים\n\n" + Object.keys(counts).map(k => `${k} ${counts[k]}`).join("\n");
+    }
+    document.getElementById("mafRepText").value = msg;
+    document.getElementById("mafRepOut").classList.remove("hidden");
+  }
+
+  // ==========================================
+  // 5. ממשק הנהלה / שלומי (דוחות ואדמין)
+  // ==========================================
+  function switchAdmSubTab(tab) {
+    document.getElementById("tabAdmRepBtn").className = "btn-tab" + (tab === "rep" ? " active" : "");
+    document.getElementById("tabAdmToolsBtn").className = "btn-tab" + (tab === "tools" ? " active" : "");
+    document.getElementById("admRepSection").classList.toggle("hidden", tab !== "rep");
+    document.getElementById("admToolsSection").classList.toggle("hidden", tab !== "tools");
+  }
+
+  function switchRepDomain(dom) {
+    repDomain = dom;
+    document.getElementById("tabSubPres").className = "btn-tab" + (dom === "presence" ? " active" : "");
+    document.getElementById("tabSubWpn").className = "btn-tab" + (dom === "weapons" ? " active" : "");
+    document.getElementById("repPresenceControls").classList.toggle("hidden", dom !== "presence");
+    document.getElementById("repWeaponsControls").classList.toggle("hidden", dom !== "weapons");
+    document.getElementById("admRepOut").classList.add("hidden");
+  }
+
+  function onRepWpnTypeChange() {
+    const t = document.getElementById("repWpnType").value;
+    document.getElementById("boxRepWpnFw").classList.toggle("hidden", t !== "by_framework");
+    document.getElementById("boxRepWpnTool").classList.toggle("hidden", t !== "by_tool");
+    document.getElementById("boxRepWpnSoldier").classList.toggle("hidden", t !== "by_soldier");
+  }
+
+  async function loadAdminWorkspace() {
+    const [dbRes, attRes] = await Promise.all([
+      apiCall({ action: "get_shared_dataset" }),
+      apiCall({ action: "get_attendance_soldiers" })
+    ]);
+    sharedDB = dbRes;
+    attendanceSoldiers = attRes.soldiers || [];
+
+    const validDates = (sharedDB.dates || []).filter(Boolean);
+    if (validDates.length) {
+      const p = validDates[validDates.length-1].split("/");
+      if (p.length===3) document.getElementById("repPresDate").value = `${p[2]}-${p[1]}-${p[0]}`;
+    }
+    document.getElementById("uDate").value = new Date().toISOString().split("T")[0];
+
+    const fws = sharedDB.canonicalFrameworks || [];
+    ["repPresFw", "repWpnFwSel", "aFw", "mNewFw"].forEach(id => {
+      const el = document.getElementById(id);
+      if (id !== "repPresFw") el.innerHTML = "";
+      fws.forEach(fw => { const o = document.createElement("option"); o.value = fw; o.textContent = fw; el.appendChild(o); });
+    });
+
+    const wToolSel = document.getElementById("repWpnToolSel"); wToolSel.innerHTML = "";
+    (sharedDB.weaponsTools || []).forEach(t => { const o = document.createElement("option"); o.value = t; o.textContent = t; wToolSel.appendChild(o); });
+
+    const ordMap = { "מחלקה 1":1, "מחלקה 2":2, "מחלקה 3":3, "חפ\"ק":4, "מפל\"ג":5, "חמ\"ל":6, "מסופחים":7 };
+    const sorted = (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[a.framework]||99)-(ordMap[b.framework]||99) || a.name.localeCompare(b.name,'he'));
+
+    ["repWpnSoldierSel", "uSoldier", "mSoldier"].forEach(id => {
+      const el = document.getElementById(id); el.innerHTML = "";
+      sorted.forEach(s => {
+        const o = document.createElement("option");
+        o.value = (id === "repWpnSoldierSel") ? s.personalNumber : s.name;
+        o.dataset.fw = s.framework;
+        o.textContent = `${s.framework} | ${s.name}`;
+        el.appendChild(o);
+      });
+    });
+
+    onAdmSoldierSelect();
+  }
+
+  function generateAdminReport() {
+    document.getElementById("admRepErr").style.display = "none";
+    if (repDomain === "weapons") {
+      const type = document.getElementById("repWpnType").value;
+      const soldiers = sharedDB.weaponsSoldiers || [];
+      let msg = "";
+
+      if (type === "all_company") {
+        msg = "*דוח נשק פלוגתי - מסייעת 8109*\n\n";
+        (sharedDB.canonicalFrameworks || []).forEach(fw => {
+          const grp = soldiers.filter(s => s.framework === fw && s.items.length > 0);
+          if (grp.length) msg += `📌 *${fw}*\n` + grp.map(s => `• ${s.name} (${s.personalNumber}): ${s.items.map(it=>`${it.toolName}: ${it.serialNumber}`).join(", ")}`).join("\n") + "\n\n";
+        });
+      } else if (type === "by_framework") {
+        const fw = document.getElementById("repWpnFwSel").value;
+        const grp = soldiers.filter(s => s.framework === fw && s.items.length > 0);
+        msg = `*דוח נשק - ${fw}*\n\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName}: ${it.serialNumber}`).join(", ")}`).join("\n");
+      } else if (type === "by_tool") {
+        const tool = document.getElementById("repWpnToolSel").value;
+        const holders = [];
+        soldiers.forEach(s => s.items.forEach(it => { if (it.toolName === tool) holders.push(`${s.name} (${s.framework}) - ${it.serialNumber}`); }));
+        msg = `*מצבת מחזיקים - ${tool}* (${holders.length})\n\n` + holders.join("\n");
+      } else {
+        const pn = document.getElementById("repWpnSoldierSel").value;
+        const s = (sharedDB.masterSoldiers || []).find(x => x.personalNumber === pn);
+        const wp = (sharedDB.weaponsSoldiers || []).find(x => x.personalNumber === pn);
+        const lg = (sharedDB.logisticsSoldiers || []).find(x => x.personalNumber === pn);
+        msg = `*דוח אישי לחייל - ${s.name} (${pn})*\n\n🔫 *נשקייה:*\n` + ((wp && wp.items.length) ? wp.items.map(it=>`• ${it.toolName}: ${it.serialNumber}`).join("\n") : "(אין)");
+        msg += `\n\n📦 *אפסנאות ונלווה:*\n` + ((lg && lg.items.length) ? lg.items.map(it=>`• ${it.toolName}: ${it.quantityOrSerial}`).join("\n") : "(אין)");
+      }
+      document.getElementById("admRepText").value = msg;
+      document.getElementById("admRepOut").classList.remove("hidden");
+      return;
+    }
+
+    // דוח נוכחות
+    const iso = document.getElementById("repPresDate").value;
+    const p = iso.split("-");
+    const eurDate = p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : iso;
+    const colIdx = (sharedDB.dates || []).indexOf(eurDate);
+    if (colIdx === -1) {
+      showBox("admRepErr", `לא נמצאו נתונים לתאריך ${eurDate}`, false); return;
+    }
+
+    const rType = document.getElementById("repPresType").value;
+    const targetFw = document.getElementById("repPresFw").value;
+    let msg = "";
+
+    if (rType === "detailed") {
+      msg = `*דוח שמי מפורט [${eurDate}]*\n\n`;
+      (sharedDB.canonicalFrameworks || []).forEach(fw => {
+        if (targetFw !== "ALL" && fw !== targetFw) return;
+        const lines = [];
+        for (let i = 0; i < sharedDB.names.length; i++) {
+          const nm = sharedDB.names[i];
+          if (sharedDB.activeNames.indexOf(nm) === -1 || sharedDB.frameworks[i] !== fw) continue;
+          const st = String(sharedDB.detailed[i][colIdx] || "לא דווח");
+          const isP = String(sharedDB.presence[i][colIdx]) === "V";
+          lines.push(`• ${nm} - ${isP ? "נוכח" : "אינו נוכח"} (${st})`);
+        }
+        if (lines.length) msg += `📌 *${fw}*\n${lines.join("\n")}\n\n`;
+      });
+    } else {
+      let tot = 0, pres = 0, yam = 0, rel = 0;
+      const gims = [], vacs = [];
+      for (let i = 0; i < sharedDB.names.length; i++) {
+        const nm = sharedDB.names[i];
+        if (sharedDB.activeNames.indexOf(nm) === -1) continue;
+        if (targetFw !== "ALL" && sharedDB.frameworks[i] !== targetFw) continue;
+        tot++;
+        const st = String(sharedDB.detailed[i][colIdx] || "");
+        if (String(sharedDB.presence[i][colIdx]) === "V") pres++;
+        if (st !== "שוחרר") yam++;
+        if (st.includes("שוחרר")) rel++;
+        else if (st.includes("גימלים") || st.includes("ג'")) gims.push(nm);
+        else if (st.includes("חופשה")) vacs.push(nm);
+      }
+      msg = `*דוח נוכחות - מסייעת 8109 [${eurDate}]*\n\n• סה"כ רשומים: ${tot}\n• נוכחים בפועל: ${pres}\n• זכאי ימ"מ: ${yam}\n• משוחררים: ${rel}\n\n• גימלים (${gims.length}): ${gims.join(", ")||"אין"}\n• חופשות (${vacs.length}): ${vacs.join(", ")||"אין"}`;
+    }
+    document.getElementById("admRepText").value = msg;
+    document.getElementById("admRepOut").classList.remove("hidden");
+  }
+
+  function syncAdmSubOptions() {
+    const map = { "נוכח": ["נוכחות מלאה", "מגיע היום", "יוצא היום", "אחר"], "אינו נוכח": ["חופשה", "גימלים", "שוחרר", "אחר"], "לא פעיל": ["הסרה מהטופס"] };
+    const subSel = document.getElementById("uSubStatus"); subSel.innerHTML = "";
+    (map[document.getElementById("uMainStatus").value] || []).forEach(v => {
+      const o = document.createElement("option"); o.value = v; o.textContent = v; subSel.appendChild(o);
+    });
+  }
+
+  function onAdmSoldierSelect() {
+    const nm = document.getElementById("uSoldier").value;
+    const found = attendanceSoldiers.find(s => s.name === nm);
+    if (found) {
+      document.getElementById("uMainStatus").value = found.mainStatus || "נוכח";
+      syncAdmSubOptions();
+      document.getElementById("uSubStatus").value = found.subStatus || "נוכחות מלאה";
+      document.getElementById("uNotes").value = found.notes || "";
+    } else {
+      syncAdmSubOptions();
+    }
+  }
+
+  async function submitAdmSingleUpdate() {
+    const sel = document.getElementById("uSoldier");
+    const name = sel.value;
+    const fw = sel.options[sel.selectedIndex]?.dataset.fw || "";
+    const res = await apiCall({
+      action: "admin_update_soldier", name, framework: fw,
+      reportDate: document.getElementById("uDate").value,
+      mainStatus: document.getElementById("uMainStatus").value,
+      subStatus: document.getElementById("uSubStatus").value,
+      notes: document.getElementById("uNotes").value.trim()
+    });
+    showBox("uStatus", res.message, res.status === "success");
+  }
+
+  async function submitAdmAddSoldier() {
+    const res = await apiCall({
+      action: "admin_add_soldier",
+      name: document.getElementById("aName").value.trim(),
+      personalNumber: document.getElementById("aPn").value.trim(),
+      framework: document.getElementById("aFw").value,
+      role: document.getElementById("aRole").value.trim(),
+      isActive: document.getElementById("aActive").checked
+    });
+    showBox("aStatus", res.message, res.status === "success");
+    if (res.status === "success") await loadAdminWorkspace();
+  }
+
+  async function submitAdmMoveSoldier() {
+    const res = await apiCall({
+      action: "admin_move_soldier",
+      name: document.getElementById("mSoldier").value,
+      newFramework: document.getElementById("mNewFw").value
+    });
+    showBox("mStatus", res.message, res.status === "success");
+    if (res.status === "success") await loadAdminWorkspace();
+  }
+
+  async function submitAdmSync() {
+    const res = await apiCall({ action: "admin_sync" });
+    showBox("syncStatus", res.message, res.status === "success");
+  }
+
+  function runPnCrossCheck() {
+    const raw = document.getElementById("pastedPnInput").value.trim();
+    if (!raw) { alert("נא להדביק רשימת מ\"א"); return; }
+    const matches = raw.match(/\b\d{5,8}\b/g) || [];
+    const pastedSet = new Set(matches);
+    const missing = attendanceSoldiers.filter(s => !pastedSet.has(String(s.personalNumber).trim()));
+
+    let rep = `*דוח פערי התייצבות - מסייעת 8109*\n• סה"כ פעילים: ${attendanceSoldiers.length}\n• חסרים ברשימה: ${missing.length}\n\n`;
+    (sharedDB.canonicalFrameworks || []).forEach(fw => {
+      const grp = missing.filter(s => s.framework === fw);
+      if (grp.length) rep += `📌 *${fw}* (${grp.length}):\n` + grp.map(s => `• ${s.name} (${s.personalNumber})`).join("\n") + "\n\n";
+    });
+    document.getElementById("crossCheckText").value = rep;
+    document.getElementById("crossCheckOut").classList.remove("hidden");
+  }
+
+  // כלי עזר כלליים
+  function filterSelectOptions(selectId, term, callback) {
+    const t = term.trim().toLowerCase();
+    const sel = document.getElementById(selectId);
+    let first = -1;
+    for (let i = 0; i < sel.options.length; i++) {
+      const m = sel.options[i].text.toLowerCase().indexOf(t) !== -1;
+      sel.options[i].style.display = m ? "" : "none";
+      if (m && first === -1) first = i;
+    }
+    if (first !== -1) { sel.selectedIndex = first; if (callback) callback(); }
+  }
+
+  function openWaText(areaId) {
+    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(document.getElementById(areaId).value), "_blank");
+  }
+
+  function copyTextArea(areaId) {
+    const el = document.getElementById(areaId); el.select(); document.execCommand("copy");
+    alert("הועתק ללוח!");
+  }
 </script>
 </body>
 </html>
