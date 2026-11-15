@@ -5,115 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>מסייעת 8109 - פורטל פלוגתי</title>
   <style>
-    :root {
-      --primary: #0284c7;
-      --bg: #0f172a;
-      --card: #1e293b;
-      --border: #334155;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --success: #16a34a;
-      --danger: #dc2626;
-      --warning: #d97706;
-    }
+    :root { --primary: #0284c7; --bg: #0f172a; --card: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --success: #16a34a; --danger: #dc2626; --warning: #d97706; }
     * { box-sizing: border-box; }
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      margin: 0 auto;
-      padding: 14px;
-      max-width: 560px;
-    }
-    .brand-header {
-      text-align: center;
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-    }
-    .brand-header img {
-      max-width: 120px;
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      margin-bottom: 6px;
-      border: 1px solid #475569;
-    }
-    .brand-title {
-      font-size: 1.5rem;
-      font-weight: 900;
-      letter-spacing: 1px;
-      color: #f8fafc;
-    }
-    .brand-line {
-      height: 3px;
-      width: 60px;
-      background: #38bdf8;
-      margin: 6px auto 0;
-      border-radius: 2px;
-    }
-    .top-user-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #1e293b;
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin-bottom: 14px;
-      border: 1px solid #475569;
-      font-size: 0.9rem;
-    }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0 auto; padding: 14px; max-width: 560px; }
+    .brand-header { text-align: center; margin-bottom: 16px; padding-bottom: 10px; }
+    .brand-header img { max-width: 120px; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 6px; border: 1px solid #475569; }
+    .brand-title { font-size: 1.5rem; font-weight: 900; letter-spacing: 1px; }
+    .brand-line { height: 3px; width: 60px; background: #38bdf8; margin: 6px auto 0; border-radius: 2px; }
+    .top-user-bar { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; border: 1px solid #475569; font-size: 0.9rem; }
     .top-bar-actions { display: flex; gap: 6px; }
-    .btn-mini {
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: 1px solid #475569;
-      background: #0f172a;
-      color: #cbd5e1;
-      font-size: 0.8rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    .btn-mini { padding: 6px 10px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #cbd5e1; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
     .btn-mini.danger { border-color: #dc2626; color: #fca5a5; }
-    .card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-      border: 1px solid var(--border);
-    }
+    .card { background: var(--card); border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 1px solid var(--border); }
     h2 { margin: 0 0 12px; font-size: 1.2rem; color: #38bdf8; }
-    label {
-      display: block;
-      font-weight: bold;
-      margin: 8px 0 5px;
-      font-size: 0.9rem;
-      color: #cbd5e1;
-    }
-    input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea {
-      width: 100%;
-      padding: 11px;
-      margin-bottom: 12px;
-      border: 1px solid #475569;
-      border-radius: 8px;
-      font-size: 1rem;
-      background: #0f172a;
-      color: #fff;
-      font-family: inherit;
-    }
+    label { display: block; font-weight: bold; margin: 8px 0 5px; font-size: 0.9rem; color: #cbd5e1; }
+    input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 11px; margin-bottom: 12px; border: 1px solid #475569; border-radius: 8px; font-size: 1rem; background: #0f172a; color: #fff; font-family: inherit; }
+    select:disabled { opacity: 0.85; background: #1e293b; color: #38bdf8; font-weight: bold; }
     textarea { resize: vertical; }
-    .btn-action {
-      width: 100%;
-      border: none;
-      padding: 13px;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      color: #fff;
-      margin-top: 4px;
-    }
+    .btn-action { width: 100%; border: none; padding: 13px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; color: #fff; margin-top: 4px; }
     .btn-primary { background: var(--primary); }
     .btn-success { background: var(--success); }
     .btn-danger { background: var(--danger); }
@@ -121,80 +30,26 @@
     .btn-purple { background: #8b5cf6; }
     .btn-wa { background: #25D366; }
     .btn-action:disabled { background: #475569; cursor: not-allowed; }
-    .btn-add-line {
-      background: transparent;
-      border: 1px dashed #38bdf8;
-      color: #38bdf8;
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 12px;
-    }
+    .btn-add-line { background: transparent; border: 1px dashed #38bdf8; color: #38bdf8; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 12px; }
     .btn-tab-container { display: flex; gap: 8px; margin-bottom: 16px; }
-    .btn-tab {
-      flex: 1;
-      padding: 11px 6px;
-      border: 1px solid #475569;
-      border-radius: 8px;
-      background: #1e293b;
-      color: #94a3b8;
-      font-weight: bold;
-      cursor: pointer;
-      text-align: center;
-      font-size: 0.9rem;
-    }
+    .btn-tab { flex: 1; padding: 11px 6px; border: 1px solid #475569; border-radius: 8px; background: #1e293b; color: #94a3b8; font-weight: bold; cursor: pointer; text-align: center; font-size: 0.9rem; }
     .btn-tab.active { background: #0284c7; color: #fff; border-color: #0284c7; }
-    .role-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-    }
-    .role-tile {
-      background: #0f172a;
-      border: 2px solid #334155;
-      border-radius: 12px;
-      padding: 20px 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .role-tile:hover, .role-tile:active {
-      border-color: #38bdf8;
-      background: #172554;
-    }
+    .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .role-tile { background: #0f172a; border: 2px solid #334155; border-radius: 12px; padding: 20px 12px; text-align: center; cursor: pointer; }
+    .role-tile:hover { border-color: #38bdf8; background: #172554; }
     .role-icon { font-size: 2rem; margin-bottom: 8px; }
     .role-label { font-weight: bold; font-size: 1.05rem; color: #f8fafc; }
     .role-sub { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
-    .status-box {
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 10px;
-      display: none;
-      text-align: center;
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
+    .status-box { padding: 10px; border-radius: 8px; margin-top: 10px; display: none; text-align: center; font-weight: bold; font-size: 0.9rem; }
     .status-ok { background: #064e3b; color: #a7f3d0; border: 1px solid #059669; }
     .status-err { background: #7f1d1d; color: #fecaca; border: 1px solid #dc2626; }
-    .item-box {
-      background: #0f172a;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #334155;
-    }
+    .item-box { background: #0f172a; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #334155; }
     .hidden { display: none !important; }
     .date-input-group { display: flex; gap: 8px; margin-bottom: 12px; }
     .date-input-group input[type="text"] { margin-bottom: 0; font-weight: bold; text-align: center; }
     .date-input-group input[type="date"] { width: 52px; padding: 10px; margin-bottom: 0; flex-shrink: 0; }
     .radio-group { display: flex; gap: 8px; margin-bottom: 10px; }
-    .radio-card {
-      flex: 1; text-align: center; padding: 10px 4px; border: 1px solid #334155;
-      border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: #0f172a; user-select: none;
-    }
+    .radio-card { flex: 1; text-align: center; padding: 10px 4px; border: 1px solid #334155; border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: #0f172a; user-select: none; }
     .radio-card input { display: none; }
     .radio-card.active-green { background: #166534; border-color: #22c55e; color: #fff; font-weight: bold; }
     .radio-card.active-red { background: #991b1b; border-color: #ef4444; color: #fff; font-weight: bold; }
@@ -204,16 +59,7 @@
     .checkbox-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .checkbox-row input { width: 20px; height: 20px; margin: 0; }
     .btn-row { display: flex; gap: 8px; margin-top: 8px; }
-    .construction-box {
-      text-align: center;
-      padding: 36px 16px;
-      color: #94a3b8;
-      font-size: 1.15rem;
-      font-weight: bold;
-      background: #0f172a;
-      border-radius: 10px;
-      border: 1px dashed #475569;
-    }
+    .construction-box { text-align: center; padding: 36px 16px; color: #94a3b8; font-size: 1.15rem; font-weight: bold; background: #0f172a; border-radius: 10px; border: 1px dashed #475569; }
   </style>
 </head>
 <body>
@@ -236,16 +82,13 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- מסך 1: הזדהות ראשית (מ"א + סיסמה) -->
-  <!-- ========================================== -->
+  <!-- מסך 1: הזדהות -->
   <div id="viewLogin" class="card">
     <h2 style="text-align:center;">🔐 כניסה לפורטל הפלוגתי</h2>
     <label>הקש מספר אישי:</label>
     <input type="text" id="loginPn" placeholder="מספר אישי..." inputmode="numeric">
     <button type="button" id="btnCheckPn" class="btn-action btn-primary" onclick="checkPersonalNumber()">המשך</button>
 
-    <!-- שלב הגדרת סיסמה ראשונית -->
     <div id="setPasswordBox" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid #334155;">
       <div style="color:#38bdf8;font-weight:bold;margin-bottom:8px;" id="welcomeNewAuth"></div>
       <label>בחר סיסמה אישית לכניסות הבאות (לפחות 4 תווים):</label>
@@ -255,7 +98,6 @@
       <button type="button" id="btnSavePass" class="btn-action btn-success" onclick="saveNewPassword()">💾 שמור סיסמה והתחבר</button>
     </div>
 
-    <!-- שלב הזנת סיסמה קיימת -->
     <div id="verifyPasswordBox" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid #334155;">
       <div style="color:#cbd5e1;font-weight:bold;margin-bottom:8px;" id="welcomeReturningAuth"></div>
       <label>הזן סיסמה:</label>
@@ -266,17 +108,13 @@
     <div id="loginStatus" class="status-box"></div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- מסך 2: בחירת ממשק (לבעלי ריבוי הרשאות) -->
-  <!-- ========================================== -->
+  <!-- מסך 2: בחירת ממשק -->
   <div id="viewRoleSelect" class="card hidden">
     <h2 style="text-align:center;">הינך מעוניין להתחבר כ:</h2>
     <div id="roleTilesContainer" class="role-grid"></div>
   </div>
 
-  <!-- ========================================== -->
   <!-- ממשק 1: חייל -->
-  <!-- ========================================== -->
   <div id="viewSoldier" class="hidden">
     <div class="card">
       <div style="background:#0f172a;padding:12px;border-radius:8px;margin-bottom:14px;border:1px solid #475569;">
@@ -290,7 +128,6 @@
         <div id="tabSbBtn" class="btn-tab" onclick="switchSoldierSubTab('shavzak')">📅 צפייה בשבצ"ק</div>
       </div>
 
-      <!-- נשקייה -->
       <div id="weaponsSection">
         <div id="licenseBox" class="hidden">
           <label>רישיון נהיגה:</label>
@@ -303,29 +140,24 @@
           </select>
           <input type="text" id="licenseOther" style="display:none;" placeholder="פרט רישיון...">
         </div>
-
         <label style="color:#f87171;">נשק נוכחי (סמן כדי להזדכות):</label>
         <div id="weaponsCurrentList"></div>
-
         <label style="color:#38bdf8;margin-top:10px;">הוספת נשק/אמל"ח לחתימה:</label>
         <div id="weaponsNewContainer"></div>
         <button type="button" class="btn-add-line" onclick="addWeaponRow()">+ הוסף נשק/אמל"ח</button>
         <button type="button" class="btn-action btn-success" onclick="submitWeaponsAction()">💾 שמור נשקייה</button>
       </div>
 
-      <!-- אפסנאות -->
       <div id="logisticsSection" class="hidden">
         <label style="color:#38bdf8;">ציוד אפסנאות עליו אתה חתום כרגע:</label>
         <div id="logisticsCurrentList" style="margin-bottom:12px;"></div>
         <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:12px;">* זיכוי ציוד אפסנאות מתבצע ישירות מול המפל"ג.</div>
-
         <label style="color:#38bdf8;">חתימה על ציוד אפסנאות נוסף:</label>
         <div id="logisticsNewContainer"></div>
         <button type="button" class="btn-add-line" onclick="addLogisticsRow()">+ הוסף פריט אפסנאות</button>
         <button type="button" class="btn-action btn-success" onclick="submitLogisticsAction()">💾 חתום על ציוד אפסנאות</button>
       </div>
 
-      <!-- צפייה בשבצ"ק -->
       <div id="shavzakViewSection" class="hidden">
         <div class="construction-box">🚧 חלק זה עדיין בבניה..</div>
       </div>
@@ -334,16 +166,13 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- ממשק 2: מפקד -->
-  <!-- ========================================== -->
+  <!-- ממשק 2: מפקד / נאמן כ"א -->
   <div id="viewCommander" class="hidden">
     <div class="btn-tab-container">
       <div id="tabCmdAttBtn" class="btn-tab active" onclick="switchCmdSubTab('att')">📋 דיווח נוכחות יומי</div>
       <div id="tabCmdShvBtn" class="btn-tab" onclick="switchCmdSubTab('shv')">📅 הזנת שבצ"ק</div>
     </div>
 
-    <!-- דיווח נוכחות יומי -->
     <div id="cmdAttendanceSection">
       <div class="card">
         <h2>📋 דיווח נוכחות יומי</h2>
@@ -352,18 +181,9 @@
           <input type="text" id="attReportDate" placeholder="dd/mm/yyyy">
           <input type="date" id="attDatePicker">
         </div>
-        <label>בחר מסגרת:</label>
-        <select id="attFrameworkSelect" onchange="renderAttendanceSoldiers()">
-          <option value="">-- בחר מסגרת --</option>
-          <option value="מחלקה 1">מחלקה 1</option>
-          <option value="מחלקה 2">מחלקה 2</option>
-          <option value="מחלקה 3">מחלקה 3</option>
-          <option value="חפ&quot;ק">חפ"ק</option>
-          <option value="מפל&quot;ג">מפל"ג</option>
-          <option value="חמ&quot;ל">חמ"ל</option>
-          <option value="מסופחים">מסופחים</option>
-        </select>
-        <label>שם המפקד המדווח:</label>
+        <label>מסגרת:</label>
+        <select id="attFrameworkSelect" onchange="renderAttendanceSoldiers()"></select>
+        <label>שם המדווח:</label>
         <input type="text" id="attReporterName">
       </div>
       <div id="attSoldiersContainer"></div>
@@ -371,16 +191,13 @@
       <button type="button" id="btnSubmitAtt" class="btn-action btn-success hidden" onclick="submitAttendanceReport()">🚀 שלח דיווח נוכחות</button>
     </div>
 
-    <!-- הזנת שבצ"ק -->
     <div id="cmdShavzakSection" class="card hidden">
       <h2>📅 הזנת שבצ"ק</h2>
       <div class="construction-box">🚧 חלק זה עדיין בבניה</div>
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- ממשק 3: מפל"ג -->
-  <!-- ========================================== -->
   <div id="viewMaflag" class="hidden">
     <div class="btn-tab-container">
       <div id="tabMafCardBtn" class="btn-tab active" onclick="switchMafSubTab('card')">🎖️ כרטיס לוחם</div>
@@ -419,14 +236,8 @@
         <option value="by_tool">דוח לפי פריט</option>
         <option value="summary_tools">דוח מרכז לפי פריטים</option>
       </select>
-      <div id="boxMafFw" class="hidden">
-        <label>בחר מסגרת:</label>
-        <select id="mafFwSelect"></select>
-      </div>
-      <div id="boxMafTool" class="hidden">
-        <label>בחר פריט:</label>
-        <select id="mafToolSelect"></select>
-      </div>
+      <div id="boxMafFw" class="hidden"><label>בחר מסגרת:</label><select id="mafFwSelect"></select></div>
+      <div id="boxMafTool" class="hidden"><label>בחר פריט:</label><select id="mafToolSelect"></select></div>
       <button type="button" class="btn-action btn-primary" onclick="generateMafReport()">🔍 הפק דוח ציוד</button>
       <div id="mafRepOut" class="hidden" style="margin-top:12px;">
         <textarea id="mafRepText" rows="10" readonly></textarea>
@@ -435,9 +246,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- ממשק 4: פיקוד עליון (הפקת דוחות) -->
-  <!-- ========================================== -->
+  <!-- ממשק 4: פיקוד עליון -->
   <div id="viewHighCommand" class="hidden">
     <div class="card">
       <h2>📊 מרכז דוחות פלוגתי</h2>
@@ -483,9 +292,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- ממשק 5: שלומי (אדמין וניהול מערכת) -->
-  <!-- ========================================== -->
+  <!-- ממשק 5: שלומי (ניהול ואדמין) -->
   <div id="viewShlomi" class="hidden">
     <div class="card">
       <h2>✏️ תיקון דיווח לחייל</h2>
@@ -510,7 +317,7 @@
       <label>מספר אישי: *</label><input type="text" id="aPn" placeholder="8123456" inputmode="numeric">
       <label>מסגרת: *</label><select id="aFw"></select>
       <label>הרשאה (ניתן להפריד בפסיק):</label>
-      <input type="text" id="aRole" value="חייל" placeholder="חייל / מפקד / מפל&quot;ג / פיקוד עליון / שלומי">
+      <input type="text" id="aRole" value="חייל" placeholder="חייל / מפקד / נאמן כ&quot;א / מפל&quot;ג / פיקוד עליון / שלומי">
       <div class="checkbox-row"><input type="checkbox" id="aActive" checked><label for="aActive">פעיל בשמ"פ?</label></div>
       <button type="button" class="btn-action btn-success" onclick="submitAdmAddSoldier()">🚀 שמור והוסף</button>
       <div id="aStatus" class="status-box"></div>
@@ -547,12 +354,11 @@
   </div>
 
 <script>
-  // כתובת ה-API של Google Apps Script
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlc5o7RAZbAJjnvotxPunwiZ4yCEmFNo6RgP3pgJn4JzGqecSnJU_u0XCimnlRfOH-/exec";
+  const ALL_FRAMEWORKS = ["מחלקה 1", "מחלקה 2", "מחלקה 3", "חפ\"ק", "מפל\"ג", "חמ\"ל", "מסופחים"];
 
   let currentUser = null;
   let activeRole = null;
-
   let soldierGearData = null;
   let wpToolsList = [];
   let lgToolsList = [];
@@ -589,24 +395,26 @@
       const clean = String(r || "").trim().replace(/[״׳']/g, "\"");
       if (clean === "מפלג" || clean === "מפל\"ג") set.add("מפל\"ג");
       else if (clean === "הנהלה" || clean === "פיקוד עליון") set.add("פיקוד עליון");
+      else if (clean === "נאמן כא" || clean === "נאמן כ\"א" || clean === "נאמן כח אדם") set.add("נאמן כ\"א");
       else if (clean) set.add(clean);
     });
 
     if (set.has("פיקוד עליון")) set.add("מפקד");
     if (set.has("שלומי")) {
       set.add("מפקד");
+      set.add("נאמן כ\"א");
       set.add("מפל\"ג");
       set.add("פיקוד עליון");
     }
 
-    const order = ["חייל", "מפקד", "מפל\"ג", "פיקוד עליון", "שלומי"];
+    const order = ["חייל", "מפקד", "נאמן כ\"א", "מפל\"ג", "פיקוד עליון", "שלומי"];
     const res = order.filter(r => set.has(r));
     set.forEach(r => { if (!res.includes(r)) res.push(r); });
     return res;
   }
 
   // ==========================================
-  // 1. זרימת כניסה והזדהות
+  // הזדהות ובחירת ממשק
   // ==========================================
   async function checkPersonalNumber() {
     const pn = document.getElementById("loginPn").value.trim();
@@ -653,7 +461,6 @@
 
     const btn = document.getElementById("btnSavePass");
     btn.disabled = true; btn.innerText = "שומר סיסמה...";
-
     try {
       const res = await apiCall({ action: "auth_set_password", personalNumber: currentUser.personalNumber, password: p1 });
       btn.disabled = false; btn.innerText = "💾 שמור סיסמה והתחבר";
@@ -661,9 +468,7 @@
         currentUser = res.user;
         currentUser.roles = normalizeClientRoles(currentUser.roles);
         completeAuthentication(currentUser);
-      } else {
-        showBox("loginStatus", res.message, false);
-      }
+      } else showBox("loginStatus", res.message, false);
     } catch (err) {
       btn.disabled = false; btn.innerText = "💾 שמור סיסמה והתחבר";
       showBox("loginStatus", "שגיאת שרת: " + err, false);
@@ -676,7 +481,6 @@
 
     const btn = document.getElementById("btnVerifyPass");
     btn.disabled = true; btn.innerText = "מאמת...";
-
     try {
       const res = await apiCall({ action: "auth_verify_password", personalNumber: currentUser.personalNumber, password: pass });
       btn.disabled = false; btn.innerText = "🔓 התחבר למערכת";
@@ -684,9 +488,7 @@
         currentUser = res.user;
         currentUser.roles = normalizeClientRoles(currentUser.roles);
         completeAuthentication(currentUser);
-      } else {
-        showBox("loginStatus", res.message || "סיסמה שגויה", false);
-      }
+      } else showBox("loginStatus", res.message || "סיסמה שגויה", false);
     } catch (err) {
       btn.disabled = false; btn.innerText = "🔓 התחבר למערכת";
       showBox("loginStatus", "שגיאת שרת: " + err, false);
@@ -715,6 +517,7 @@
     const roleMeta = {
       "חייל": { icon: "🪖", title: "חייל", sub: "חתימות וצפייה בשבצ\"ק" },
       "מפקד": { icon: "📋", title: "מפקד", sub: "דיווח יומי והזנת שבצ\"ק" },
+      "נאמן כ\"א": { icon: "🗂️", title: "נאמן כ\"א", sub: "דיווח נוכחות והזנת שבצ\"ק" },
       "מפל\"ג": { icon: "📦", title: "מפל\"ג", sub: "זיכויים ודוחות אפסנאות" },
       "פיקוד עליון": { icon: "📊", title: "פיקוד עליון", sub: "מרכז הפקת דוחות" },
       "שלומי": { icon: "⚡", title: "שלומי", sub: "ניהול מערכת ואדמין" }
@@ -725,22 +528,7 @@
       const tile = document.createElement("div");
       tile.className = "role-tile";
       tile.onclick = () => openRoleWorkspace(role);
-
-      const iconDiv = document.createElement("div");
-      iconDiv.className = "role-icon";
-      iconDiv.textContent = meta.icon;
-
-      const labelDiv = document.createElement("div");
-      labelDiv.className = "role-label";
-      labelDiv.textContent = meta.title;
-
-      const subDiv = document.createElement("div");
-      subDiv.className = "role-sub";
-      subDiv.textContent = meta.sub;
-
-      tile.appendChild(iconDiv);
-      tile.appendChild(labelDiv);
-      tile.appendChild(subDiv);
+      tile.innerHTML = `<div class="role-icon">${meta.icon}</div><div class="role-label">${meta.title}</div><div class="role-sub">${meta.sub}</div>`;
       container.appendChild(tile);
     });
 
@@ -767,9 +555,9 @@
     if (role === "חייל") {
       document.getElementById("viewSoldier").classList.remove("hidden");
       await loadSoldierWorkspace();
-    } else if (role === "מפקד") {
+    } else if (role === "מפקד" || role === "נאמן כ\"א") {
       document.getElementById("viewCommander").classList.remove("hidden");
-      await loadCommanderWorkspace();
+      await loadCommanderWorkspace(role);
     } else if (role === "מפל\"ג") {
       document.getElementById("viewMaflag").classList.remove("hidden");
       await loadMaflagWorkspace();
@@ -783,13 +571,12 @@
   }
 
   // ==========================================
-  // 2. ממשק חייל
+  // ממשק 1: חייל
   // ==========================================
   function switchSoldierSubTab(tab) {
     document.getElementById("tabWpBtn").className = "btn-tab" + (tab === "weapons" ? " active" : "");
     document.getElementById("tabLgBtn").className = "btn-tab" + (tab === "logistics" ? " active" : "");
     document.getElementById("tabSbBtn").className = "btn-tab" + (tab === "shavzak" ? " active" : "");
-
     document.getElementById("weaponsSection").classList.toggle("hidden", tab !== "weapons");
     document.getElementById("logisticsSection").classList.toggle("hidden", tab !== "logistics");
     document.getElementById("shavzakViewSection").classList.toggle("hidden", tab !== "shavzak");
@@ -801,7 +588,6 @@
     const res = await apiCall({ action: "get_soldier_gear", personalNumber: currentUser.personalNumber });
     wpToolsList = res.weaponsTools || [];
     lgToolsList = res.logisticsTools || [];
-
     if (res.soldierData && res.soldierData.found) {
       soldierGearData = res.soldierData.soldier;
       renderSoldierHub();
@@ -814,11 +600,10 @@
     let meta = `מסגרת: ${s.framework}`;
     if (s.hasLicenseRecorded && s.license && s.license !== "ללא") meta += ` | רישיון: ${s.license}`;
     document.getElementById("sHubMeta").innerText = meta;
-
     document.getElementById("licenseBox").classList.toggle("hidden", s.hasLicenseRecorded);
 
     const wpList = document.getElementById("weaponsCurrentList"); wpList.innerHTML = "";
-    if (s.weaponsItems.length === 0) {
+    if (!s.weaponsItems.length) {
       wpList.innerHTML = '<div style="color:#94a3b8;font-size:0.85rem;">אין נשק או אמל"ח חתום כרגע.</div>';
     } else {
       s.weaponsItems.forEach(it => {
@@ -830,13 +615,12 @@
     }
 
     const lgList = document.getElementById("logisticsCurrentList"); lgList.innerHTML = "";
-    if (s.logisticsItems.length === 0) {
+    if (!s.logisticsItems.length) {
       lgList.innerHTML = '<div style="color:#94a3b8;font-size:0.85rem;">אין ציוד אפסנאות חתום כרגע.</div>';
     } else {
       s.logisticsItems.forEach(it => {
         const isQty = !isNaN(parseInt(it.quantityOrSerial, 10)) && parseInt(it.quantityOrSerial, 10) < 50;
-        const isV = (it.quantityOrSerial === "V" || it.quantityOrSerial === "v");
-        const valLabel = isV ? "חתום" : (isQty ? it.quantityOrSerial + " יח'" : it.quantityOrSerial);
+        const valLabel = (it.quantityOrSerial === "V" || it.quantityOrSerial === "v") ? "חתום" : (isQty ? it.quantityOrSerial + " יח'" : it.quantityOrSerial);
         const d = document.createElement("div"); d.className = "item-box";
         d.innerHTML = `<div style="font-weight:bold;color:#38bdf8;">${it.toolName}</div><div style="color:#cbd5e1;font-size:0.9rem;">כמות/סטטוס: ${valLabel}</div>`;
         lgList.appendChild(d);
@@ -852,23 +636,14 @@
   function addWeaponRow() {
     const container = document.getElementById("weaponsNewContainer");
     const div = document.createElement("div"); div.className = "item-box";
-    let opts = wpToolsList.map(t => `<option value="${t}" ${t === "M16" ? "selected" : ""}>${t}</option>`).join("");
-    opts += `<option value="OTHER_CUSTOM">+ אחר (הגדר נשק חדש)</option>`;
-
-    div.innerHTML = `
-      <label>סוג נשק/אמל"ח:</label>
-      <select class="wp-tool" onchange="onWpnTypeChange(this)">${opts}</select>
+    let opts = wpToolsList.map(t => `<option value="${t}" ${t === "M16" ? "selected" : ""}>${t}</option>`).join("") + `<option value="OTHER_CUSTOM">+ אחר</option>`;
+    div.innerHTML = `<label>סוג נשק/אמל"ח:</label><select class="wp-tool" onchange="onWpnTypeChange(this)">${opts}</select>
       <input type="text" class="custom-name hidden" placeholder="שם נשק...">
-      <label>מספר נשק / סידורי:</label>
-      <input type="text" class="wp-serial" placeholder="הקלד מספר נשק..." oninput="checkWpnKit(this)">
-      <div class="wp-sight-box hidden" style="margin-top:8px;">
-        <label class="wp-sight-lbl" style="color:#38bdf8;"></label>
-        <input type="text" class="wp-sight-serial">
-      </div>
+      <label>מספר נשק / סידורי:</label><input type="text" class="wp-serial" placeholder="הקלד מספר נשק..." oninput="checkWpnKit(this)">
+      <div class="wp-sight-box hidden" style="margin-top:8px;"><label class="wp-sight-lbl" style="color:#38bdf8;"></label><input type="text" class="wp-sight-serial"></div>
       <div class="wp-kit-container">
         <div style="font-weight:bold;color:#38bdf8;margin-bottom:6px;">📦 ציוד נשקייה נלווה:</div>
-        <label style="font-size:0.85rem;">מחסניות:</label>
-        <select class="wp-mags">${[0,1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">${n === 0 ? "0 מחסניות" : n}</option>`).join("")}</select>
+        <label style="font-size:0.85rem;">מחסניות:</label><select class="wp-mags">${[0,1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">${n === 0 ? "0 מחסניות" : n}</option>`).join("")}</select>
         <label class="kit-check"><input type="checkbox" class="wp-makpork"><span>מקפורק</span></label>
         <label class="kit-check"><input type="checkbox" class="wp-strap"><span>רצועה לנשק</span></label>
         <label class="kit-check"><input type="checkbox" class="wp-glasses"><span>משקפי "שומר אחי"</span></label>
@@ -886,79 +661,47 @@
     const box = inp.closest(".item-box");
     const toolVal = box.querySelector(".wp-tool").value;
     const hasSerial = inp.value.trim().length > 0;
-    const nonFirearms = ["כוונת", "מפרו", "מארס", "טריג'יקון", "ציין לייזר", "אמר\"ל", "עכבר"];
-    const isNon = nonFirearms.some(nf => toolVal.indexOf(nf) !== -1);
-
+    const isNon = ["כוונת", "מפרו", "מארס", "טריג'יקון", "ציין לייזר", "אמר\"ל", "עכבר"].some(nf => toolVal.indexOf(nf) !== -1);
     box.querySelector(".wp-kit-container").style.display = (hasSerial && !isNon) ? "block" : "none";
 
-    const sightBox = box.querySelector(".wp-sight-box");
-    const sightLbl = box.querySelector(".wp-sight-lbl");
-    const sightInp = box.querySelector(".wp-sight-serial");
-
+    const sightBox = box.querySelector(".wp-sight-box"), sightLbl = box.querySelector(".wp-sight-lbl"), sightInp = box.querySelector(".wp-sight-serial");
     if (hasSerial && toolVal === "M16") {
-      sightBox.classList.remove("hidden");
-      sightLbl.innerText = "כוונת מפרו (מספר סידורי):";
-      sightInp.placeholder = "הקלד מספר כוונת מפרו (אופציונלי)...";
-      sightInp.dataset.sightType = "מפרו";
+      sightBox.classList.remove("hidden"); sightLbl.innerText = "כוונת מפרו (מספר סידורי):"; sightInp.placeholder = "מספר כוונת מפרו (אופציונלי)..."; sightInp.dataset.sightType = "מפרו";
     } else if (hasSerial && toolVal === "M4") {
-      sightBox.classList.remove("hidden");
-      sightLbl.innerText = "כוונת טריג' (מספר סידורי):";
-      sightInp.placeholder = "הקלד מספר כוונת טריג' (אופציונלי)...";
-      sightInp.dataset.sightType = "טריג'יקון";
+      sightBox.classList.remove("hidden"); sightLbl.innerText = "כוונת טריג' (מספר סידורי):"; sightInp.placeholder = "מספר כוונת טריג' (אופציונלי)..."; sightInp.dataset.sightType = "טריג'יקון";
     } else {
-      sightBox.classList.add("hidden");
-      sightInp.value = "";
-      delete sightInp.dataset.sightType;
+      sightBox.classList.add("hidden"); sightInp.value = ""; delete sightInp.dataset.sightType;
     }
   }
 
   function addLogisticsRow() {
     const container = document.getElementById("logisticsNewContainer");
     const div = document.createElement("div"); div.className = "item-box";
-    let opts = lgToolsList.map(t => `<option value="${t}">${t}</option>`).join("");
-    opts += `<option value="OTHER_CUSTOM">+ אחר (הגדר פריט חדש)</option>`;
-    div.innerHTML = `<label>פריט אפסנאות:</label>
-      <select class="lg-tool" onchange="this.parentElement.querySelector('.custom-name').classList.toggle('hidden', this.value!=='OTHER_CUSTOM')">${opts}</select>
-      <input type="text" class="custom-name hidden" placeholder="שם פריט...">
-      <label>כמות:</label><input type="number" class="lg-qty" value="1" min="1">`;
+    let opts = lgToolsList.map(t => `<option value="${t}">${t}</option>`).join("") + `<option value="OTHER_CUSTOM">+ אחר</option>`;
+    div.innerHTML = `<label>פריט אפסנאות:</label><select class="lg-tool" onchange="this.parentElement.querySelector('.custom-name').classList.toggle('hidden', this.value!=='OTHER_CUSTOM')">${opts}</select>
+      <input type="text" class="custom-name hidden" placeholder="שם פריט..."><label>כמות:</label><input type="number" class="lg-qty" value="1" min="1">`;
     container.appendChild(div);
   }
 
   async function submitWeaponsAction() {
     const returned = [];
-    document.querySelectorAll(".chk-wp-ret:checked").forEach(c => {
-      returned.push({ toolName: c.dataset.tool, serialNumber: c.dataset.serial });
-    });
-
+    document.querySelectorAll(".chk-wp-ret:checked").forEach(c => returned.push({ toolName: c.dataset.tool, serialNumber: c.dataset.serial }));
     const newItems = [];
     const boxes = document.querySelectorAll("#weaponsNewContainer .item-box");
     for (let i = 0; i < boxes.length; i++) {
-      const sel = boxes[i].querySelector(".wp-tool");
-      const cust = boxes[i].querySelector(".custom-name").value.trim();
-      const serial = boxes[i].querySelector(".wp-serial").value.trim();
+      const sel = boxes[i].querySelector(".wp-tool"), cust = boxes[i].querySelector(".custom-name").value.trim(), serial = boxes[i].querySelector(".wp-serial").value.trim();
       const name = (sel.value === "OTHER_CUSTOM") ? cust : sel.value;
-
-      if (name && !serial) {
-        alert("חסר מספר נשק");
-        boxes[i].querySelector(".wp-serial").focus();
-        return;
-      }
+      if (name && !serial) { alert("חסר מספר נשק"); boxes[i].querySelector(".wp-serial").focus(); return; }
       if (name && serial) newItems.push({ toolName: name, serialNumber: serial });
-
       const sightInp = boxes[i].querySelector(".wp-sight-serial");
-      if (sightInp && sightInp.value.trim() && sightInp.dataset.sightType) {
-        newItems.push({ toolName: sightInp.dataset.sightType, serialNumber: sightInp.value.trim() });
-      }
+      if (sightInp && sightInp.value.trim() && sightInp.dataset.sightType) newItems.push({ toolName: sightInp.dataset.sightType, serialNumber: sightInp.value.trim() });
       const mags = boxes[i].querySelector(".wp-mags");
       if (mags && parseInt(mags.value, 10) > 0) newItems.push({ toolName: "מחסניות", serialNumber: mags.value });
       if (boxes[i].querySelector(".wp-makpork").checked) newItems.push({ toolName: "מקפורק", serialNumber: "V" });
       if (boxes[i].querySelector(".wp-strap").checked) newItems.push({ toolName: "רצועה לנשק", serialNumber: "V" });
       if (boxes[i].querySelector(".wp-glasses").checked) newItems.push({ toolName: "משקפי שומר אחי", serialNumber: "V" });
     }
-
-    if (returned.length === 0 && newItems.length === 0) {
-      alert("לא סומנו זיכויים ולא נוספו כלים חדשים"); return;
-    }
+    if (!returned.length && !newItems.length) { alert("לא סומנו זיכויים ולא נוספו כלים חדשים"); return; }
 
     let finalLic = soldierGearData.license || "ללא";
     if (!soldierGearData.hasLicenseRecorded) {
@@ -968,15 +711,7 @@
     }
 
     showBox("soldierActionStatus", "מעדכן נשקייה...", true);
-    const r = await apiCall({
-      action: "submit_weapons",
-      personalNumber: soldierGearData.personalNumber,
-      name: soldierGearData.name,
-      framework: soldierGearData.framework,
-      license: finalLic,
-      returnedItems: returned,
-      newItems: newItems
-    });
+    const r = await apiCall({ action: "submit_weapons", personalNumber: soldierGearData.personalNumber, name: soldierGearData.name, framework: soldierGearData.framework, license: finalLic, returnedItems: returned, newItems });
     showBox("soldierActionStatus", r.message, r.status === "success");
     await loadSoldierWorkspace();
   }
@@ -984,29 +719,19 @@
   async function submitLogisticsAction() {
     const newItems = [];
     document.querySelectorAll("#logisticsNewContainer .item-box").forEach(box => {
-      const sel = box.querySelector(".lg-tool");
-      const cust = box.querySelector(".custom-name").value.trim();
-      const qty = box.querySelector(".lg-qty").value.trim();
+      const sel = box.querySelector(".lg-tool"), cust = box.querySelector(".custom-name").value.trim(), qty = box.querySelector(".lg-qty").value.trim();
       const name = (sel.value === "OTHER_CUSTOM") ? cust : sel.value;
       if (name) newItems.push({ toolName: name, quantityOrSerial: qty });
     });
-
-    if (newItems.length === 0) { alert("נא להזין לפחות פריט אפסנאות אחד"); return; }
-
+    if (!newItems.length) { alert("נא להזין לפחות פריט אפסנאות אחד"); return; }
     showBox("soldierActionStatus", "חותם על ציוד אפסנאות...", true);
-    const r = await apiCall({
-      action: "submit_logistics",
-      personalNumber: soldierGearData.personalNumber,
-      name: soldierGearData.name,
-      framework: soldierGearData.framework,
-      newItems: newItems
-    });
+    const r = await apiCall({ action: "submit_logistics", personalNumber: soldierGearData.personalNumber, name: soldierGearData.name, framework: soldierGearData.framework, newItems });
     showBox("soldierActionStatus", r.message, r.status === "success");
     await loadSoldierWorkspace();
   }
 
   // ==========================================
-  // 3. ממשק מפקד
+  // ממשק 2: מפקד ונאמן כ"א (מוגבל למסגרת האישית)
   // ==========================================
   function switchCmdSubTab(tab) {
     document.getElementById("tabCmdAttBtn").className = "btn-tab" + (tab === "att" ? " active" : "");
@@ -1015,7 +740,7 @@
     document.getElementById("cmdShavzakSection").classList.toggle("hidden", tab !== "shv");
   }
 
-  async function loadCommanderWorkspace() {
+  async function loadCommanderWorkspace(role) {
     const tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
     const dStr = `${String(tmr.getDate()).padStart(2,'0')}/${String(tmr.getMonth()+1).padStart(2,'0')}/${tmr.getFullYear()}`;
     const isoStr = `${tmr.getFullYear()}-${String(tmr.getMonth()+1).padStart(2,'0')}-${String(tmr.getDate()).padStart(2,'0')}`;
@@ -1032,8 +757,29 @@
 
     document.getElementById("attReporterName").value = currentUser.name;
 
-    const attRes = await apiCall({ action: "get_attendance_soldiers" });
-    attendanceSoldiers = attRes.soldiers || [];
+    const isTopCommand = currentUser.roles.includes("פיקוד עליון") || currentUser.roles.includes("שלומי");
+    const isRestrictedToOwnFw = !isTopCommand && (role === "מפקד" || role === "נאמן כ\"א");
+    const fwSel = document.getElementById("attFrameworkSelect");
+    fwSel.innerHTML = "";
+
+    if (isRestrictedToOwnFw && currentUser.framework) {
+      const opt = document.createElement("option");
+      opt.value = currentUser.framework;
+      opt.textContent = currentUser.framework;
+      fwSel.appendChild(opt);
+      fwSel.value = currentUser.framework;
+      fwSel.disabled = true;
+
+      const attRes = await apiCall({ action: "get_attendance_soldiers", filterFramework: currentUser.framework });
+      attendanceSoldiers = attRes.soldiers || [];
+      renderAttendanceSoldiers();
+    } else {
+      fwSel.disabled = false;
+      fwSel.innerHTML = '<option value="">-- בחר מסגרת --</option>' + ALL_FRAMEWORKS.map(f => `<option value="${f}">${f}</option>`).join("");
+      const attRes = await apiCall({ action: "get_attendance_soldiers" });
+      attendanceSoldiers = attRes.soldiers || [];
+      renderAttendanceSoldiers();
+    }
   }
 
   function renderAttendanceSoldiers() {
@@ -1046,7 +792,7 @@
     if (!fw) { btn.classList.add("hidden"); return; }
 
     const list = attendanceSoldiers.filter(s => s.framework === fw);
-    if (list.length === 0) {
+    if (!list.length) {
       container.innerHTML = '<div class="card" style="text-align:center;">אין חיילים פעילים במסגרת זו.</div>';
       btn.classList.add("hidden"); return;
     }
@@ -1059,15 +805,10 @@
 
       const card = document.createElement("div"); card.className = "card";
       card.dataset.soldierName = s.name;
-      card.innerHTML = `
-        <div style="font-weight:bold;font-size:1.05rem;margin-bottom:10px;">${s.name}</div>
+      card.innerHTML = `<div style="font-weight:bold;font-size:1.05rem;margin-bottom:10px;">${s.name}</div>
         <div class="radio-group">
-          <label class="radio-card ${isPres ? "active-green" : ""}" id="attLblP_${idx}" onclick="setAttRadio(${idx}, true)">
-            <input type="radio" name="attMain_${idx}" value="נוכח" ${isPres ? "checked" : ""}> נוכח
-          </label>
-          <label class="radio-card ${!isPres ? "active-red" : ""}" id="attLblA_${idx}" onclick="setAttRadio(${idx}, false)">
-            <input type="radio" name="attMain_${idx}" value="אינו נוכח" ${!isPres ? "checked" : ""}> אינו נוכח
-          </label>
+          <label class="radio-card ${isPres ? "active-green" : ""}" id="attLblP_${idx}" onclick="setAttRadio(${idx}, true)"><input type="radio" name="attMain_${idx}" value="נוכח" ${isPres ? "checked" : ""}> נוכח</label>
+          <label class="radio-card ${!isPres ? "active-red" : ""}" id="attLblA_${idx}" onclick="setAttRadio(${idx}, false)"><input type="radio" name="attMain_${idx}" value="אינו נוכח" ${!isPres ? "checked" : ""}> אינו נוכח</label>
         </div>
         <div id="attPresMenu_${idx}" class="${isPres ? "" : "hidden"}">
           <select id="attSubP_${idx}">
@@ -1083,9 +824,7 @@
             <option value="שוחרר" ${absSub==="שוחרר"?"selected":""}>שוחרר</option>
             <option value="אחר" ${absSub==="אחר"?"selected":""}>אחר</option>
           </select>
-          <div id="attNoteBox_${idx}" class="${isOther ? "" : "hidden"}">
-            <input type="text" id="attNote_${idx}" placeholder="פרט סיבה..." value="${s.notes || ""}">
-          </div>
+          <div id="attNoteBox_${idx}" class="${isOther ? "" : "hidden"}"><input type="text" id="attNote_${idx}" placeholder="פרט סיבה..." value="${s.notes || ""}"></div>
         </div>`;
       container.appendChild(card);
     });
@@ -1118,7 +857,15 @@
 
     const btn = document.getElementById("btnSubmitAtt");
     btn.disabled = true; btn.innerText = "שולח דיווח...";
-    const res = await apiCall({ action: "submit_attendance", framework: fw, reporterName: reporter, reportDate: rDate, records });
+    const res = await apiCall({
+      action: "submit_attendance",
+      requesterPn: currentUser.personalNumber,
+      activeRole: activeRole,
+      framework: fw,
+      reporterName: reporter,
+      reportDate: rDate,
+      records
+    });
     btn.disabled = false; btn.innerText = "🚀 שלח דיווח נוכחות";
 
     showBox("attStatusBox", res.message, res.status === "success");
@@ -1131,7 +878,7 @@
   }
 
   // ==========================================
-  // 4. ממשק מפל"ג
+  // ממשק 3: מפל"ג
   // ==========================================
   function switchMafSubTab(tab) {
     document.getElementById("tabMafCardBtn").className = "btn-tab" + (tab === "card" ? " active" : "");
@@ -1145,29 +892,18 @@
     const sel = document.getElementById("mafSoldierSelect");
     sel.innerHTML = '<option value="">-- בחר לוחם --</option>';
     const ordMap = { "מחלקה 1":1, "מחלקה 2":2, "מחלקה 3":3, "חפ\"ק":4, "מפל\"ג":5, "חמ\"ל":6, "מסופחים":7 };
-
     (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[a.framework]||99)-(ordMap[b.framework]||99) || a.name.localeCompare(b.name,'he')).forEach(s => {
-      const o = document.createElement("option");
-      o.value = s.personalNumber;
-      o.textContent = `${s.framework} | ${s.name} (${s.personalNumber})`;
-      sel.appendChild(o);
+      const o = document.createElement("option"); o.value = s.personalNumber; o.textContent = `${s.framework} | ${s.name} (${s.personalNumber})`; sel.appendChild(o);
     });
-
     const fwSel = document.getElementById("mafFwSelect"); fwSel.innerHTML = "";
-    (sharedDB.canonicalFrameworks || []).forEach(fw => {
-      const o = document.createElement("option"); o.value = fw; o.textContent = fw; fwSel.appendChild(o);
-    });
-
+    (sharedDB.canonicalFrameworks || []).forEach(fw => { const o = document.createElement("option"); o.value = fw; o.textContent = fw; fwSel.appendChild(o); });
     const tSel = document.getElementById("mafToolSelect"); tSel.innerHTML = "";
-    (sharedDB.logisticsTools || []).forEach(t => {
-      const o = document.createElement("option"); o.value = t; o.textContent = t; tSel.appendChild(o);
-    });
+    (sharedDB.logisticsTools || []).forEach(t => { const o = document.createElement("option"); o.value = t; o.textContent = t; tSel.appendChild(o); });
   }
 
   async function onMafSoldierSelected() {
     const pn = document.getElementById("mafSoldierSelect").value;
     if (!pn) { document.getElementById("mafSoldierDetails").classList.add("hidden"); return; }
-
     const res = await apiCall({ action: "get_soldier_gear", personalNumber: pn });
     if (res.soldierData && res.soldierData.found) {
       mafLoadedSoldier = res.soldierData.soldier;
@@ -1190,40 +926,27 @@
         d.innerHTML = `<label class="return-check"><input type="checkbox" class="chk-maf-wp" data-tool="${it.toolName}" data-serial="${it.serialNumber}"> ${it.toolName} (מס': ${it.serialNumber})</label>`;
         wpDiv.appendChild(d);
       });
-
       document.getElementById("mafSoldierDetails").classList.remove("hidden");
     }
   }
 
   async function submitMaflagReturns() {
-    const wpRets = [];
-    document.querySelectorAll(".chk-maf-wp:checked").forEach(c => wpRets.push({ toolName: c.dataset.tool, serialNumber: c.dataset.serial }));
-    const lgRets = [];
-    document.querySelectorAll(".chk-maf-lg:checked").forEach(c => {
+    const wpRets = []; document.querySelectorAll(".chk-maf-wp:checked").forEach(c => wpRets.push({ toolName: c.dataset.tool, serialNumber: c.dataset.serial }));
+    const lgRets = []; document.querySelectorAll(".chk-maf-lg:checked").forEach(c => {
       const qInp = document.querySelector(`.maf-qty[data-tool="${c.dataset.tool}"]`);
       lgRets.push({ toolName: c.dataset.tool, quantityOrSerial: c.dataset.val, returnQty: qInp ? qInp.value : c.dataset.val });
     });
-
-    if (wpRets.length === 0 && lgRets.length === 0) { alert("נא לסמן פריטים לזיכוי"); return; }
-
+    if (!wpRets.length && !lgRets.length) { alert("נא לסמן פריטים לזיכוי"); return; }
     showBox("mafActionStatus", "מבצע זיכויים...", true);
-    if (wpRets.length > 0) {
-      await apiCall({ action: "submit_weapons", personalNumber: mafLoadedSoldier.personalNumber, name: mafLoadedSoldier.name, framework: mafLoadedSoldier.framework, returnedItems: wpRets, newItems: [], authorizedBy: "מפל\"ג" });
-    }
-    if (lgRets.length > 0) {
-      await apiCall({ action: "maflag_return", personalNumber: mafLoadedSoldier.personalNumber, name: mafLoadedSoldier.name, framework: mafLoadedSoldier.framework, returnedItems: lgRets });
-    }
+    if (wpRets.length) await apiCall({ action: "submit_weapons", personalNumber: mafLoadedSoldier.personalNumber, name: mafLoadedSoldier.name, framework: mafLoadedSoldier.framework, returnedItems: wpRets, newItems: [], authorizedBy: "מפל\"ג" });
+    if (lgRets.length) await apiCall({ action: "maflag_return", personalNumber: mafLoadedSoldier.personalNumber, name: mafLoadedSoldier.name, framework: mafLoadedSoldier.framework, returnedItems: lgRets });
     showBox("mafActionStatus", "הזיכוי בוצע בהצלחה!", true);
     await onMafSoldierSelected();
   }
 
   function sendMaflagSoldierWa() {
-    const s = mafLoadedSoldier;
-    if (!s) return;
-    let msg = `*כרטיס לוחם - מסייעת 8109*\n• שם: *${s.name}* (${s.personalNumber})\n• מסגרת: ${s.framework}\n\n📦 *ציוד אפסנאות ונלווה:*\n`;
-    msg += s.logisticsItems.length ? s.logisticsItems.map((it,i)=>`${i+1}. ${it.toolName}: ${it.quantityOrSerial}`).join("\n") : "(אין)";
-    msg += `\n\n🔫 *נשק ואמל"ח:*\n`;
-    msg += s.weaponsItems.length ? s.weaponsItems.map((it,i)=>`${i+1}. ${it.toolName}: ${it.serialNumber}`).join("\n") : "(אין)";
+    const s = mafLoadedSoldier; if (!s) return;
+    let msg = `*כרטיס לוחם - מסייעת 8109*\n• שם: *${s.name}* (${s.personalNumber})\n• מסגרת: ${s.framework}\n\n📦 *ציוד אפסנאות ונלווה:*\n` + (s.logisticsItems.length ? s.logisticsItems.map((it,i)=>`${i+1}. ${it.toolName}: ${it.quantityOrSerial}`).join("\n") : "(אין)") + `\n\n🔫 *נשק ואמל"ח:*\n` + (s.weaponsItems.length ? s.weaponsItems.map((it,i)=>`${i+1}. ${it.toolName}: ${it.serialNumber}`).join("\n") : "(אין)");
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(msg), "_blank");
   }
 
@@ -1234,38 +957,24 @@
   }
 
   function generateMafReport() {
-    const type = document.getElementById("mafRepType").value;
-    const soldiers = sharedDB.logisticsSoldiers || [];
+    const type = document.getElementById("mafRepType").value, soldiers = sharedDB.logisticsSoldiers || [];
     let msg = "";
-
     if (type === "all_company") {
       msg = "*דוח ציוד ואפסנאות - מסייעת 8109*\n\n";
       (sharedDB.canonicalFrameworks || []).forEach(fw => {
-        const grp = soldiers.filter(s => s.framework === fw && s.items.length > 0);
-        if (grp.length) {
-          msg += `📌 *${fw}*\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName} (${it.quantityOrSerial})`).join(", ")}`).join("\n") + "\n\n";
-        }
+        const grp = soldiers.filter(s => s.framework === fw && s.items.length);
+        if (grp.length) msg += `📌 *${fw}*\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName} (${it.quantityOrSerial})`).join(", ")}`).join("\n") + "\n\n";
       });
     } else if (type === "by_framework") {
-      const fw = document.getElementById("mafFwSelect").value;
-      const grp = soldiers.filter(s => s.framework === fw && s.items.length > 0);
+      const fw = document.getElementById("mafFwSelect").value, grp = soldiers.filter(s => s.framework === fw && s.items.length);
       msg = `*דוח ציוד - ${fw}*\n\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName} (${it.quantityOrSerial})`).join(", ")}`).join("\n");
     } else if (type === "by_tool") {
-      const tool = document.getElementById("mafToolSelect").value;
-      let total = 0; const lines = [];
-      soldiers.forEach(s => s.items.forEach(it => {
-        if (it.toolName === tool) {
-          const q = parseInt(it.quantityOrSerial,10); const num = (!isNaN(q)&&q>0)?q:1;
-          total += num; lines.push(`${s.name} ${it.quantityOrSerial}`);
-        }
-      }));
+      const tool = document.getElementById("mafToolSelect").value; let total = 0; const lines = [];
+      soldiers.forEach(s => s.items.forEach(it => { if (it.toolName === tool) { const q = parseInt(it.quantityOrSerial,10); const num = (!isNaN(q)&&q>0)?q:1; total += num; lines.push(`${s.name} ${it.quantityOrSerial}`); } }));
       msg = `${tool}: סך הכל ${total}\n` + lines.join("\n");
     } else {
       const counts = {};
-      soldiers.forEach(s => s.items.forEach(it => {
-        const q = parseInt(it.quantityOrSerial,10); const num = (!isNaN(q)&&q>0)?q:1;
-        counts[it.toolName] = (counts[it.toolName]||0) + num;
-      }));
+      soldiers.forEach(s => s.items.forEach(it => { const q = parseInt(it.quantityOrSerial,10); const num = (!isNaN(q)&&q>0)?q:1; counts[it.toolName] = (counts[it.toolName]||0) + num; }));
       msg = "דוח מרכז לפי פריטים\n\n" + Object.keys(counts).map(k => `${k} ${counts[k]}`).join("\n");
     }
     document.getElementById("mafRepText").value = msg;
@@ -1273,7 +982,7 @@
   }
 
   // ==========================================
-  // 5. ממשק פיקוד עליון (מרכז דוחות)
+  // ממשק 4: פיקוד עליון
   // ==========================================
   function switchRepDomain(dom) {
     repDomain = dom;
@@ -1293,59 +1002,43 @@
 
   async function loadHighCommandWorkspace() {
     sharedDB = await apiCall({ action: "get_shared_dataset" });
-
     const validDates = (sharedDB.dates || []).filter(Boolean);
     if (validDates.length) {
       const p = validDates[validDates.length-1].split("/");
       if (p.length===3) document.getElementById("repPresDate").value = `${p[2]}-${p[1]}-${p[0]}`;
     }
-
     const fws = sharedDB.canonicalFrameworks || [];
-    const presFw = document.getElementById("repPresFw");
-    presFw.innerHTML = '<option value="ALL">כלל הפלוגה</option>';
-    const wpnFw = document.getElementById("repWpnFwSel");
-    wpnFw.innerHTML = "";
-
+    const presFw = document.getElementById("repPresFw"); presFw.innerHTML = '<option value="ALL">כלל הפלוגה</option>';
+    const wpnFw = document.getElementById("repWpnFwSel"); wpnFw.innerHTML = "";
     fws.forEach(fw => {
       const o1 = document.createElement("option"); o1.value = fw; o1.textContent = fw; presFw.appendChild(o1);
       const o2 = document.createElement("option"); o2.value = fw; o2.textContent = fw; wpnFw.appendChild(o2);
     });
-
     const wToolSel = document.getElementById("repWpnToolSel"); wToolSel.innerHTML = "";
     (sharedDB.weaponsTools || []).forEach(t => { const o = document.createElement("option"); o.value = t; o.textContent = t; wToolSel.appendChild(o); });
 
     const ordMap = { "מחלקה 1":1, "מחלקה 2":2, "מחלקה 3":3, "חפ\"ק":4, "מפל\"ג":5, "חמ\"ל":6, "מסופחים":7 };
     const sorted = (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[a.framework]||99)-(ordMap[b.framework]||99) || a.name.localeCompare(b.name,'he'));
-
     const sSel = document.getElementById("repWpnSoldierSel"); sSel.innerHTML = "";
-    sorted.forEach(s => {
-      const o = document.createElement("option");
-      o.value = s.personalNumber;
-      o.textContent = `${s.framework} | ${s.name} (${s.personalNumber})`;
-      sSel.appendChild(o);
-    });
+    sorted.forEach(s => { const o = document.createElement("option"); o.value = s.personalNumber; o.textContent = `${s.framework} | ${s.name} (${s.personalNumber})`; sSel.appendChild(o); });
   }
 
   function generateHighCommandReport() {
     document.getElementById("hcRepErr").style.display = "none";
     if (repDomain === "weapons") {
-      const type = document.getElementById("repWpnType").value;
-      const soldiers = sharedDB.weaponsSoldiers || [];
+      const type = document.getElementById("repWpnType").value, soldiers = sharedDB.weaponsSoldiers || [];
       let msg = "";
-
       if (type === "all_company") {
         msg = "*דוח נשק פלוגתי - מסייעת 8109*\n\n";
         (sharedDB.canonicalFrameworks || []).forEach(fw => {
-          const grp = soldiers.filter(s => s.framework === fw && s.items.length > 0);
+          const grp = soldiers.filter(s => s.framework === fw && s.items.length);
           if (grp.length) msg += `📌 *${fw}*\n` + grp.map(s => `• ${s.name} (${s.personalNumber}): ${s.items.map(it=>`${it.toolName}: ${it.serialNumber}`).join(", ")}`).join("\n") + "\n\n";
         });
       } else if (type === "by_framework") {
-        const fw = document.getElementById("repWpnFwSel").value;
-        const grp = soldiers.filter(s => s.framework === fw && s.items.length > 0);
+        const fw = document.getElementById("repWpnFwSel").value, grp = soldiers.filter(s => s.framework === fw && s.items.length);
         msg = `*דוח נשק - ${fw}*\n\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName}: ${it.serialNumber}`).join(", ")}`).join("\n");
       } else if (type === "by_tool") {
-        const tool = document.getElementById("repWpnToolSel").value;
-        const holders = [];
+        const tool = document.getElementById("repWpnToolSel").value, holders = [];
         soldiers.forEach(s => s.items.forEach(it => { if (it.toolName === tool) holders.push(`${s.name} (${s.framework}) - ${it.serialNumber}`); }));
         msg = `*מצבת מחזיקים - ${tool}* (${holders.length})\n\n` + holders.join("\n");
       } else {
@@ -1353,26 +1046,20 @@
         const s = (sharedDB.masterSoldiers || []).find(x => x.personalNumber === pn);
         const wp = (sharedDB.weaponsSoldiers || []).find(x => x.personalNumber === pn);
         const lg = (sharedDB.logisticsSoldiers || []).find(x => x.personalNumber === pn);
-        msg = `*דוח אישי לחייל - ${s.name} (${pn})*\n\n🔫 *נשקייה:*\n` + ((wp && wp.items.length) ? wp.items.map(it=>`• ${it.toolName}: ${it.serialNumber}`).join("\n") : "(אין)");
-        msg += `\n\n📦 *אפסנאות ונלווה:*\n` + ((lg && lg.items.length) ? lg.items.map(it=>`• ${it.toolName}: ${it.quantityOrSerial}`).join("\n") : "(אין)");
+        msg = `*דוח אישי לחייל - ${s.name} (${pn})*\n\n🔫 *נשקייה:*\n` + ((wp && wp.items.length) ? wp.items.map(it=>`• ${it.toolName}: ${it.serialNumber}`).join("\n") : "(אין)") + `\n\n📦 *אפסנאות ונלווה:*\n` + ((lg && lg.items.length) ? lg.items.map(it=>`• ${it.toolName}: ${it.quantityOrSerial}`).join("\n") : "(אין)");
       }
       document.getElementById("hcRepText").value = msg;
       document.getElementById("hcRepOut").classList.remove("hidden");
       return;
     }
 
-    const iso = document.getElementById("repPresDate").value;
-    const p = iso.split("-");
+    const iso = document.getElementById("repPresDate").value, p = iso.split("-");
     const eurDate = p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : iso;
     const colIdx = (sharedDB.dates || []).indexOf(eurDate);
-    if (colIdx === -1) {
-      showBox("hcRepErr", `לא נמצאו נתונים לתאריך ${eurDate}`, false); return;
-    }
+    if (colIdx === -1) { showBox("hcRepErr", `לא נמצאו נתונים לתאריך ${eurDate}`, false); return; }
 
-    const rType = document.getElementById("repPresType").value;
-    const targetFw = document.getElementById("repPresFw").value;
+    const rType = document.getElementById("repPresType").value, targetFw = document.getElementById("repPresFw").value;
     let msg = "";
-
     if (rType === "detailed") {
       msg = `*דוח שמי מפורט [${eurDate}]*\n\n`;
       (sharedDB.canonicalFrameworks || []).forEach(fw => {
@@ -1381,15 +1068,13 @@
         for (let i = 0; i < sharedDB.names.length; i++) {
           const nm = sharedDB.names[i];
           if (sharedDB.activeNames.indexOf(nm) === -1 || sharedDB.frameworks[i] !== fw) continue;
-          const st = String(sharedDB.detailed[i][colIdx] || "לא דווח");
-          const isP = String(sharedDB.presence[i][colIdx]) === "V";
+          const st = String(sharedDB.detailed[i][colIdx] || "לא דווח"), isP = String(sharedDB.presence[i][colIdx]) === "V";
           lines.push(`• ${nm} - ${isP ? "נוכח" : "אינו נוכח"} (${st})`);
         }
         if (lines.length) msg += `📌 *${fw}*\n${lines.join("\n")}\n\n`;
       });
     } else {
-      let tot = 0, pres = 0, yam = 0, rel = 0;
-      const gims = [], vacs = [];
+      let tot = 0, pres = 0, yam = 0, rel = 0; const gims = [], vacs = [];
       for (let i = 0; i < sharedDB.names.length; i++) {
         const nm = sharedDB.names[i];
         if (sharedDB.activeNames.indexOf(nm) === -1) continue;
@@ -1409,19 +1094,14 @@
   }
 
   // ==========================================
-  // 6. ממשק שלומי (אדמין וניהול מערכת)
+  // ממשק 5: שלומי (אדמין וניהול מערכת)
   // ==========================================
   async function loadShlomiWorkspace() {
-    const [dbRes, attRes] = await Promise.all([
-      apiCall({ action: "get_shared_dataset" }),
-      apiCall({ action: "get_attendance_soldiers" })
-    ]);
-    sharedDB = dbRes;
-    attendanceSoldiers = attRes.soldiers || [];
-
+    const [dbRes, attRes] = await Promise.all([apiCall({ action: "get_shared_dataset" }), apiCall({ action: "get_attendance_soldiers" })]);
+    sharedDB = dbRes; attendanceSoldiers = attRes.soldiers || [];
     document.getElementById("uDate").value = new Date().toISOString().split("T")[0];
 
-    const fws = sharedDB.canonicalFrameworks || [];
+    const fws = sharedDB.canonicalFrameworks || ALL_FRAMEWORKS;
     ["aFw", "mNewFw"].forEach(id => {
       const el = document.getElementById(id); el.innerHTML = "";
       fws.forEach(fw => { const o = document.createElement("option"); o.value = fw; o.textContent = fw; el.appendChild(o); });
@@ -1429,27 +1109,17 @@
 
     const ordMap = { "מחלקה 1":1, "מחלקה 2":2, "מחלקה 3":3, "חפ\"ק":4, "מפל\"ג":5, "חמ\"ל":6, "מסופחים":7 };
     const sorted = (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[a.framework]||99)-(ordMap[b.framework]||99) || a.name.localeCompare(b.name,'he'));
-
     ["uSoldier", "mSoldier"].forEach(id => {
       const el = document.getElementById(id); el.innerHTML = "";
-      sorted.forEach(s => {
-        const o = document.createElement("option");
-        o.value = s.name;
-        o.dataset.fw = s.framework;
-        o.textContent = `${s.framework} | ${s.name}`;
-        el.appendChild(o);
-      });
+      sorted.forEach(s => { const o = document.createElement("option"); o.value = s.name; o.dataset.fw = s.framework; o.textContent = `${s.framework} | ${s.name}`; el.appendChild(o); });
     });
-
     onAdmSoldierSelect();
   }
 
   function syncAdmSubOptions() {
     const map = { "נוכח": ["נוכחות מלאה", "מגיע היום", "יוצא היום", "אחר"], "אינו נוכח": ["חופשה", "גימלים", "שוחרר", "אחר"], "לא פעיל": ["הסרה מהטופס"] };
     const subSel = document.getElementById("uSubStatus"); subSel.innerHTML = "";
-    (map[document.getElementById("uMainStatus").value] || []).forEach(v => {
-      const o = document.createElement("option"); o.value = v; o.textContent = v; subSel.appendChild(o);
-    });
+    (map[document.getElementById("uMainStatus").value] || []).forEach(v => { const o = document.createElement("option"); o.value = v; o.textContent = v; subSel.appendChild(o); });
   }
 
   function onAdmSoldierSelect() {
@@ -1460,44 +1130,23 @@
       syncAdmSubOptions();
       document.getElementById("uSubStatus").value = found.subStatus || "נוכחות מלאה";
       document.getElementById("uNotes").value = found.notes || "";
-    } else {
-      syncAdmSubOptions();
-    }
+    } else syncAdmSubOptions();
   }
 
   async function submitAdmSingleUpdate() {
-    const sel = document.getElementById("uSoldier");
-    const name = sel.value;
-    const fw = sel.options[sel.selectedIndex]?.dataset.fw || "";
-    const res = await apiCall({
-      action: "admin_update_soldier", name, framework: fw,
-      reportDate: document.getElementById("uDate").value,
-      mainStatus: document.getElementById("uMainStatus").value,
-      subStatus: document.getElementById("uSubStatus").value,
-      notes: document.getElementById("uNotes").value.trim()
-    });
+    const sel = document.getElementById("uSoldier"), name = sel.value, fw = sel.options[sel.selectedIndex]?.dataset.fw || "";
+    const res = await apiCall({ action: "admin_update_soldier", name, framework: fw, reportDate: document.getElementById("uDate").value, mainStatus: document.getElementById("uMainStatus").value, subStatus: document.getElementById("uSubStatus").value, notes: document.getElementById("uNotes").value.trim() });
     showBox("uStatus", res.message, res.status === "success");
   }
 
   async function submitAdmAddSoldier() {
-    const res = await apiCall({
-      action: "admin_add_soldier",
-      name: document.getElementById("aName").value.trim(),
-      personalNumber: document.getElementById("aPn").value.trim(),
-      framework: document.getElementById("aFw").value,
-      role: document.getElementById("aRole").value.trim(),
-      isActive: document.getElementById("aActive").checked
-    });
+    const res = await apiCall({ action: "admin_add_soldier", name: document.getElementById("aName").value.trim(), personalNumber: document.getElementById("aPn").value.trim(), framework: document.getElementById("aFw").value, role: document.getElementById("aRole").value.trim(), isActive: document.getElementById("aActive").checked });
     showBox("aStatus", res.message, res.status === "success");
     if (res.status === "success") await loadShlomiWorkspace();
   }
 
   async function submitAdmMoveSoldier() {
-    const res = await apiCall({
-      action: "admin_move_soldier",
-      name: document.getElementById("mSoldier").value,
-      newFramework: document.getElementById("mNewFw").value
-    });
+    const res = await apiCall({ action: "admin_move_soldier", name: document.getElementById("mSoldier").value, newFramework: document.getElementById("mNewFw").value });
     showBox("mStatus", res.message, res.status === "success");
     if (res.status === "success") await loadShlomiWorkspace();
   }
@@ -1510,12 +1159,10 @@
   function runPnCrossCheck() {
     const raw = document.getElementById("pastedPnInput").value.trim();
     if (!raw) { alert("נא להדביק רשימת מ\"א"); return; }
-    const matches = raw.match(/\b\d{5,8}\b/g) || [];
-    const pastedSet = new Set(matches);
+    const pastedSet = new Set(raw.match(/\b\d{5,8}\b/g) || []);
     const missing = attendanceSoldiers.filter(s => !pastedSet.has(String(s.personalNumber).trim()));
-
     let rep = `*דוח פערי התייצבות - מסייעת 8109*\n• סה"כ פעילים: ${attendanceSoldiers.length}\n• חסרים ברשימה: ${missing.length}\n\n`;
-    (sharedDB.canonicalFrameworks || []).forEach(fw => {
+    (sharedDB.canonicalFrameworks || ALL_FRAMEWORKS).forEach(fw => {
       const grp = missing.filter(s => s.framework === fw);
       if (grp.length) rep += `📌 *${fw}* (${grp.length}):\n` + grp.map(s => `• ${s.name} (${s.personalNumber})`).join("\n") + "\n\n";
     });
@@ -1523,11 +1170,8 @@
     document.getElementById("crossCheckOut").classList.remove("hidden");
   }
 
-  // כלי עזר כלליים
   function filterSelectOptions(selectId, term, callback) {
-    const t = term.trim().toLowerCase();
-    const sel = document.getElementById(selectId);
-    let first = -1;
+    const t = term.trim().toLowerCase(), sel = document.getElementById(selectId); let first = -1;
     for (let i = 0; i < sel.options.length; i++) {
       const m = sel.options[i].text.toLowerCase().indexOf(t) !== -1;
       sel.options[i].style.display = m ? "" : "none";
@@ -1536,14 +1180,8 @@
     if (first !== -1) { sel.selectedIndex = first; if (callback) callback(); }
   }
 
-  function openWaText(areaId) {
-    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(document.getElementById(areaId).value), "_blank");
-  }
-
-  function copyTextArea(areaId) {
-    const el = document.getElementById(areaId); el.select(); document.execCommand("copy");
-    alert("הועתק ללוח!");
-  }
+  function openWaText(areaId) { window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(document.getElementById(areaId).value), "_blank"); }
+  function copyTextArea(areaId) { const el = document.getElementById(areaId); el.select(); document.execCommand("copy"); alert("הועתק ללוח!"); }
 </script>
 </body>
 </html>
