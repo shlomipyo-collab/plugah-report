@@ -61,15 +61,13 @@
     .checkbox-row input { width: 20px; height: 20px; margin: 0; }
     .btn-row { display: flex; gap: 8px; margin-top: 8px; }
 
-    /* סגנונות פרויקט השבצ"ק */
+    /* סגנונות שבצ"ק */
     .shv-mission-hero { background: linear-gradient(135deg, #1e3a8a, #0f172a); border: 2px solid #38bdf8; border-radius: 12px; padding: 18px; margin-bottom: 14px; text-align: center; }
     .shv-hero-day { font-size: 0.9rem; color: #7dd3fc; font-weight: bold; margin-bottom: 4px; }
     .shv-hero-task { font-size: 1.5rem; font-weight: 900; color: #fff; margin: 4px 0; }
     .shv-hero-hours { font-size: 1.15rem; color: #fde047; font-weight: bold; }
     .shv-workspace-grid { display: grid; grid-template-columns: 270px 1fr; gap: 14px; align-items: start; }
-    @media (max-width: 768px) {
-      .shv-workspace-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 768px) { .shv-workspace-grid { grid-template-columns: 1fr; } }
     .shv-pool-panel { background: #1e293b; border: 1px solid #38bdf8; border-radius: 12px; padding: 14px; position: sticky; top: 10px; }
     .shv-soldier-chip { display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1px solid #475569; padding: 9px 11px; border-radius: 8px; margin-bottom: 7px; cursor: pointer; transition: all 0.15s; }
     .shv-soldier-chip:hover { border-color: #38bdf8; background: #172554; }
@@ -180,7 +178,6 @@
         <div id="tabSbBtn" class="btn-tab" onclick="switchSoldierSubTab('shavzak')">📅 צפייה בשבצ"ק</div>
       </div>
 
-      <!-- נשקייה -->
       <div id="weaponsSection">
         <div id="licenseBox" class="hidden">
           <label>רישיון נהיגה:</label>
@@ -201,7 +198,6 @@
         <button type="button" class="btn-action btn-success" onclick="submitWeaponsAction()">💾 שמור נשקייה</button>
       </div>
 
-      <!-- אפסנאות -->
       <div id="logisticsSection" class="hidden">
         <label style="color:#38bdf8;">ציוד אפסנאות עליו אתה חתום כרגע:</label>
         <div id="logisticsCurrentList" style="margin-bottom:12px;"></div>
@@ -212,7 +208,6 @@
         <button type="button" class="btn-action btn-success" onclick="submitLogisticsAction()">💾 חתום על ציוד אפסנאות</button>
       </div>
 
-      <!-- צפייה בשבצ"ק -->
       <div id="shavzakViewSection" class="hidden">
         <div id="soldierShvLoading" style="text-align:center;color:#94a3b8;padding:14px;">טוען משימות שבצ"ק...</div>
         <div id="soldierShvContent" class="hidden">
@@ -235,7 +230,6 @@
       <div id="tabCmdShvBtn" class="btn-tab" onclick="switchCmdSubTab('shv')">📅 הזנת שבצ"ק</div>
     </div>
 
-    <!-- דיווח נוכחות יומי -->
     <div id="cmdAttendanceSection" class="narrow-wrap">
       <div class="card">
         <h2>📋 דיווח נוכחות יומי</h2>
@@ -254,7 +248,6 @@
       <button type="button" id="btnSubmitAtt" class="btn-action btn-success hidden" onclick="submitAttendanceReport()">🚀 שלח דיווח נוכחות</button>
     </div>
 
-    <!-- הזנת שבצ"ק -->
     <div id="cmdShavzakSection" class="hidden">
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
@@ -270,7 +263,6 @@
         </div>
       </div>
 
-      <!-- שלב 1: שלד משימות (לקצין / פיקוד עליון / שלומי) -->
       <div id="officerSkeletonCard" class="card hidden" style="border-color:#38bdf8;">
         <h2>🆕 הגדרת משימות למחלקות (יום חדש)</h2>
         <div style="font-size:0.85rem;color:#94a3b8;margin-bottom:12px;">הגדר לכל משימה ומשמרת לאיזו מחלקה היא משויכת:</div>
@@ -279,23 +271,19 @@
         <div id="skeletonStatus" class="status-box"></div>
       </div>
 
-      <!-- שלב 2: סביבת שיבוץ מחלקתית -->
       <div id="shvWorkspaceWrap">
         <div id="shvAttendanceWarning" class="warning-banner hidden"></div>
         <div id="shvHighCmdWarnings" class="warning-banner hidden"></div>
 
         <div class="shv-workspace-grid">
-          <!-- צד ימין: חיילים נוכחים לשיבוץ -->
           <div class="shv-pool-panel">
             <h3 style="margin:0 0 6px;font-size:1.05rem;color:#38bdf8;">👥 חיילים נוכחים לשיבוץ</h3>
             <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:10px;">לחץ על חייל לבחירה, ולאחר מכן לחץ על משבצת פנויה בלוח:</div>
             <div id="shvAvailablePool"></div>
           </div>
 
-          <!-- מרכז המסך: לוח השבצ"ק -->
           <div>
             <div id="shvScheduleBoard"></div>
-
             <div id="shvActionButtons" class="card hidden">
               <div class="btn-row">
                 <button type="button" class="btn-action btn-primary" onclick="savePlatoonShavzak(false)">💾 שמור טיוטה למחלקה</button>
@@ -365,6 +353,8 @@
   <!-- ממשק 4: פיקוד עליון -->
   <!-- ========================================== -->
   <div id="viewHighCommand" class="narrow-wrap hidden">
+    <button type="button" class="btn-action btn-success" style="margin-bottom:12px;" onclick="openRoleWorkspace('קצין')">📋 מעבר לדיווח נוכחות (כלל הפלוגה)</button>
+
     <div class="card">
       <h2>📊 מרכז דוחות פלוגתי</h2>
       <div class="btn-tab-container">
@@ -413,6 +403,8 @@
   <!-- ממשק 5: שלומי (אדמין וניהול מערכת) -->
   <!-- ========================================== -->
   <div id="viewShlomi" class="narrow-wrap hidden">
+    <button type="button" class="btn-action btn-success" style="margin-bottom:12px;" onclick="openRoleWorkspace('קצין')">📋 מעבר לדיווח נוכחות (כלל הפלוגה)</button>
+
     <div class="card">
       <h2>✏️ תיקון דיווח לחייל</h2>
       <label>תאריך:</label><input type="date" id="uDate">
@@ -477,6 +469,28 @@
   const ALL_FRAMEWORKS = ["מחלקה 1", "מחלקה 2", "מחלקה 3", "חפ\"ק", "מפל\"ג", "חמ\"ל", "מסופחים"];
   const SHAVZAK_PLATOONS = ["מחלקה 1", "מחלקה 2", "מחלקה 3", "מסופחים"];
 
+  const DESIGNATED_ATTENDANCE_REPORTERS = {
+    "שי פאר": "מפל\"ג",
+    "רון נהרי": "מפל\"ג",
+    "ספיר אלול": "חפ\"ק",
+    "אופק סיאר": "חפ\"ק",
+    "לב גנדין": "חמ\"ל"
+  };
+
+  function normalizeName(name) {
+    return String(name || "").trim().replace(/\s+/g, " ");
+  }
+
+  function normalizeFramework(fw) {
+    const clean = String(fw || "").trim().replace(/[״׳']/g, "\"").replace(/\s+/g, " ");
+    if (!clean) return "";
+    const noQuotes = clean.replace(/"/g, "");
+    if (noQuotes === "חפק") return "חפ\"ק";
+    if (noQuotes === "מפלג") return "מפל\"ג";
+    if (noQuotes === "חמל") return "חמ\"ל";
+    return clean;
+  }
+
   let currentUser = null;
   let activeRole = null;
   let soldierGearData = null;
@@ -487,7 +501,6 @@
   let mafLoadedSoldier = null;
   let repDomain = "presence";
 
-  // משתני שבצ"ק
   let soldierShvOfficialBlock = null;
   let shvGeneratedDataUrl = null;
   let shvWorkspaceState = null;
@@ -517,10 +530,7 @@
     document.getElementById("modalBody").textContent = body;
     const btn = document.getElementById("modalOkBtn");
     btn.textContent = btnText || "OK";
-    btn.onclick = () => {
-      closeCustomModal();
-      if (onOk) onOk();
-    };
+    btn.onclick = () => { closeCustomModal(); if (onOk) onOk(); };
     document.getElementById("customModal").classList.remove("hidden");
   }
 
@@ -534,8 +544,13 @@
     });
   }
 
-  function normalizeClientRoles(rolesArr) {
+  function normalizeClientRoles(rolesArr, userName) {
     const set = new Set(["חייל"]);
+    const cleanName = normalizeName(userName);
+    if (cleanName && DESIGNATED_ATTENDANCE_REPORTERS[cleanName]) {
+      set.add("מפקד");
+    }
+
     (rolesArr || []).forEach(r => {
       const clean = String(r || "").trim().replace(/[״׳']/g, "\"");
       if (clean === "מפלג" || clean === "מפל\"ג") set.add("מפל\"ג");
@@ -551,9 +566,7 @@
       set.add("מפל\"ג");
       set.add("פיקוד עליון");
     }
-    if (set.has("קצין")) {
-      set.delete("מפקד");
-    }
+    if (set.has("קצין")) set.delete("מפקד");
 
     const order = ["חייל", "מפקד", "קצין", "נאמן כ\"א", "מפל\"ג", "פיקוד עליון", "שלומי"];
     const res = order.filter(r => set.has(r));
@@ -584,9 +597,13 @@
       }
 
       currentUser = res.user;
-      currentUser.roles = normalizeClientRoles(currentUser.roles);
+      currentUser.name = normalizeName(currentUser.name);
+      currentUser.framework = DESIGNATED_ATTENDANCE_REPORTERS[currentUser.name] || normalizeFramework(currentUser.framework);
+      currentUser.roles = normalizeClientRoles(currentUser.roles, currentUser.name);
 
-      if (!currentUser.requiresPassword && currentUser.roles.length === 1) {
+      const needsPass = currentUser.requiresPassword || currentUser.roles.length > 1;
+
+      if (!needsPass) {
         completeAuthentication(currentUser);
       } else if (!currentUser.hasPassword) {
         document.getElementById("welcomeNewAuth").innerText = `שלום ${currentUser.name}, זו כניסתך הראשונה בתפקיד. אנא הגדר סיסמה:`;
@@ -614,7 +631,9 @@
       btn.disabled = false; btn.innerText = "💾 שמור סיסמה והתחבר";
       if (res.status === "success") {
         currentUser = res.user;
-        currentUser.roles = normalizeClientRoles(currentUser.roles);
+        currentUser.name = normalizeName(currentUser.name);
+        currentUser.framework = DESIGNATED_ATTENDANCE_REPORTERS[currentUser.name] || normalizeFramework(currentUser.framework);
+        currentUser.roles = normalizeClientRoles(currentUser.roles, currentUser.name);
         completeAuthentication(currentUser);
       } else showBox("loginStatus", res.message, false);
     } catch (err) {
@@ -634,7 +653,9 @@
       btn.disabled = false; btn.innerText = "🔓 התחבר למערכת";
       if (res.status === "success" && res.authenticated) {
         currentUser = res.user;
-        currentUser.roles = normalizeClientRoles(currentUser.roles);
+        currentUser.name = normalizeName(currentUser.name);
+        currentUser.framework = DESIGNATED_ATTENDANCE_REPORTERS[currentUser.name] || normalizeFramework(currentUser.framework);
+        currentUser.roles = normalizeClientRoles(currentUser.roles, currentUser.name);
         completeAuthentication(currentUser);
       } else showBox("loginStatus", res.message || "סיסמה שגויה", false);
     } catch (err) {
@@ -720,7 +741,7 @@
   }
 
   // ==========================================
-  // ממשק 1: חייל (כולל משימת היום/מחר ותמונת שבצ"ק)
+  // ממשק 1: חייל
   // ==========================================
   function switchSoldierSubTab(tab) {
     document.getElementById("tabWpBtn").className = "btn-tab" + (tab === "weapons" ? " active" : "");
@@ -731,9 +752,7 @@
     document.getElementById("shavzakViewSection").classList.toggle("hidden", tab !== "shavzak");
     document.getElementById("soldierActionStatus").style.display = "none";
 
-    if (tab === "shavzak") {
-      loadSoldierShavzakTab();
-    }
+    if (tab === "shavzak") loadSoldierShavzakTab();
   }
 
   async function loadSoldierShavzakTab() {
@@ -782,54 +801,33 @@
     if (!soldierShvOfficialBlock) return;
     const b = soldierShvOfficialBlock;
     const canvas = document.createElement("canvas");
-    const rowH = 42;
-    const headerH = 110;
-    const width = 900;
+    const rowH = 42, headerH = 110, width = 900;
     const height = headerH + (b.rows.length + 1) * rowH + 30;
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = width; canvas.height = height;
     const ctx = canvas.getContext("2d");
 
-    // רקע
-    ctx.fillStyle = "#0f172a";
-    ctx.fillRect(0, 0, width, height);
-
-    // כותרת עליונה
-    ctx.fillStyle = "#38bdf8";
-    ctx.font = "bold 28px Arial";
-    ctx.textAlign = "center";
+    ctx.fillStyle = "#0f172a"; ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "#38bdf8"; ctx.font = "bold 28px Arial"; ctx.textAlign = "center";
     ctx.fillText(b.title, width / 2, 50);
-
-    ctx.fillStyle = "#94a3b8";
-    ctx.font = "18px Arial";
+    ctx.fillStyle = "#94a3b8"; ctx.font = "18px Arial";
     ctx.fillText("מסייעת 8109 • לו\"ז 06:00 עד 06:00 למחרת", width / 2, 82);
 
-    // עמודות RTL (מימין לשמאל)
     const cols = [
-      { label: "משימה", x: 870, w: 170 },
-      { label: "שעות", x: 690, w: 140 },
-      { label: "מחלקה", x: 540, w: 110 },
-      { label: "מפקדים", x: 420, w: 160 },
-      { label: "לוחמים", x: 250, w: 230 }
+      { label: "משימה", x: 870 }, { label: "שעות", x: 690 },
+      { label: "מחלקה", x: 540 }, { label: "מפקדים", x: 420 }, { label: "לוחמים", x: 250 }
     ];
 
     let y = headerH;
-    ctx.fillStyle = "#1e293b";
-    ctx.fillRect(20, y, width - 40, rowH);
-    ctx.fillStyle = "#38bdf8";
-    ctx.font = "bold 18px Arial";
-    ctx.textAlign = "right";
+    ctx.fillStyle = "#1e293b"; ctx.fillRect(20, y, width - 40, rowH);
+    ctx.fillStyle = "#38bdf8"; ctx.font = "bold 18px Arial"; ctx.textAlign = "right";
     cols.forEach(c => ctx.fillText(c.label, c.x, y + 28));
 
     y += rowH;
     b.rows.forEach((r, idx) => {
       ctx.fillStyle = idx % 2 === 0 ? "#162032" : "#0f172a";
       ctx.fillRect(20, y, width - 40, rowH);
-      ctx.strokeStyle = "#334155";
-      ctx.strokeRect(20, y, width - 40, rowH);
-
-      ctx.fillStyle = "#f8fafc";
-      ctx.font = "16px Arial";
+      ctx.strokeStyle = "#334155"; ctx.strokeRect(20, y, width - 40, rowH);
+      ctx.fillStyle = "#f8fafc"; ctx.font = "16px Arial";
       ctx.fillText(r.taskName, 870, y + 27);
       ctx.fillText(r.hoursLabel, 690, y + 27);
       ctx.fillText(r.platoon, 540, y + 27);
@@ -850,20 +848,14 @@
       const file = new File([blob], "shavzak_8109.png", { type: "image/png" });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: "שבצ\"ק מסייעת 8109" });
-      } else {
-        downloadShavzakImage();
-      }
-    } catch (e) {
-      downloadShavzakImage();
-    }
+      } else downloadShavzakImage();
+    } catch (e) { downloadShavzakImage(); }
   }
 
   function downloadShavzakImage() {
     if (!shvGeneratedDataUrl) return;
     const a = document.createElement("a");
-    a.href = shvGeneratedDataUrl;
-    a.download = "shavzak_8109.png";
-    a.click();
+    a.href = shvGeneratedDataUrl; a.download = "shavzak_8109.png"; a.click();
   }
 
   async function loadSoldierWorkspace() {
@@ -1014,7 +1006,7 @@
   }
 
   // ==========================================
-  // ממשק 2: מפקד / קצין / נאמן כ"א + פרויקט השבצ"ק
+  // ממשק 2: מפקד / קצין / נאמן כ"א + שבצ"ק
   // ==========================================
   function switchCmdSubTab(tab) {
     document.getElementById("tabCmdAttBtn").className = "btn-tab" + (tab === "att" ? " active" : "");
@@ -1023,7 +1015,6 @@
     document.getElementById("cmdShavzakSection").classList.toggle("hidden", tab !== "shv");
 
     if (tab === "shv") {
-      // פופאפ המלצה לעבור למחשב בעת כניסה מהפלאפון
       const isMobile = window.innerWidth <= 768 || /Mobi|Android|iPhone/i.test(navigator.userAgent);
       if (isMobile && !mobileWarningShown) {
         mobileWarningShown = true;
@@ -1055,7 +1046,6 @@
       }
     };
 
-    // אתחול תאריך השבצ"ק למחר כברירת מחדל
     document.getElementById("shvTargetDate").value = dStr;
     const shvPicker = document.getElementById("shvDatePicker");
     shvPicker.value = isoStr;
@@ -1067,7 +1057,6 @@
       }
     };
 
-    // הצגת כפתור בניית שבצ"ק ליום חדש לקצין / פיקוד עליון / שלומי בלבד
     const canBuildSkeleton = currentUser.roles.includes("קצין") || currentUser.roles.includes("פיקוד עליון") || currentUser.roles.includes("שלומי");
     document.getElementById("btnOfficerNewDay").classList.toggle("hidden", !canBuildSkeleton);
 
@@ -1078,15 +1067,17 @@
     const fwSel = document.getElementById("attFrameworkSelect");
     fwSel.innerHTML = "";
 
-    if (isRestrictedToOwnFw && currentUser.framework) {
+    const userEffectiveFw = DESIGNATED_ATTENDANCE_REPORTERS[currentUser.name] || normalizeFramework(currentUser.framework);
+
+    if (isRestrictedToOwnFw && userEffectiveFw) {
       const opt = document.createElement("option");
-      opt.value = currentUser.framework;
-      opt.textContent = currentUser.framework;
+      opt.value = userEffectiveFw;
+      opt.textContent = userEffectiveFw;
       fwSel.appendChild(opt);
-      fwSel.value = currentUser.framework;
+      fwSel.value = userEffectiveFw;
       fwSel.disabled = true;
 
-      const attRes = await apiCall({ action: "get_attendance_soldiers", filterFramework: currentUser.framework });
+      const attRes = await apiCall({ action: "get_attendance_soldiers", filterFramework: userEffectiveFw });
       attendanceSoldiers = attRes.soldiers || [];
       renderAttendanceSoldiers();
     } else {
@@ -1098,7 +1089,6 @@
     }
   }
 
-  // --- בניית שלד שבצ"ק (קצין / פיקוד עליון / שלומי) ---
   async function openOfficerSkeletonBuilder() {
     const card = document.getElementById("officerSkeletonCard");
     card.classList.remove("hidden");
@@ -1131,11 +1121,8 @@
     if (!targetDate) { alert("נא להזין תאריך"); return; }
 
     const assignments = shvSkeletonShifts.map((sh, idx) => ({
-      taskName: sh.taskName,
-      shiftNumber: sh.shiftNumber,
-      hoursLabel: sh.hoursLabel,
-      reqCmdrs: sh.reqCmdrs,
-      reqSoldiers: sh.reqSoldiers,
+      taskName: sh.taskName, shiftNumber: sh.shiftNumber, hoursLabel: sh.hoursLabel,
+      reqCmdrs: sh.reqCmdrs, reqSoldiers: sh.reqSoldiers,
       platoon: document.getElementById(`skelPlatoon_${idx}`).value
     }));
 
@@ -1150,7 +1137,6 @@
     }
   }
 
-  // --- טעינה וניהול סביבת השיבוץ ---
   async function loadShavzakWorkspace() {
     const targetDate = document.getElementById("shvTargetDate").value.trim();
     const isTopCommand = currentUser.roles.includes("פיקוד עליון") || currentUser.roles.includes("שלומי");
@@ -1170,7 +1156,6 @@
       return;
     }
 
-    // בניית מבנה משבצות בזיכרון
     shvWorkspaceState = {
       targetDate: res.targetDate,
       dayName: res.dayName,
@@ -1181,25 +1166,14 @@
       rows: (res.rows || []).map(r => {
         const savedCmdrs = r.assignedCmdrs ? r.assignedCmdrs.split(",").map(x => x.trim()).filter(Boolean) : [];
         const savedSoldiers = r.assignedSoldiers ? r.assignedSoldiers.split(",").map(x => x.trim()).filter(Boolean) : [];
-
         const cmdrSlots = [];
-        for (let c = 0; c < r.reqCmdrs; c++) {
-          cmdrSlots.push(savedCmdrs[c] || "");
-        }
+        for (let c = 0; c < r.reqCmdrs; c++) cmdrSlots.push(savedCmdrs[c] || "");
         const soldierSlots = [];
-        for (let s = 0; s < r.reqSoldiers; s++) {
-          soldierSlots.push(savedSoldiers[s] || "");
-        }
-
-        return {
-          ...r,
-          cmdrSlots,
-          soldierSlots
-        };
+        for (let s = 0; s < r.reqSoldiers; s++) soldierSlots.push(savedSoldiers[s] || "");
+        return { ...r, cmdrSlots, soldierSlots };
       })
     };
 
-    // התראת דוח נוכחות חסר למחלקה
     const attWarn = document.getElementById("shvAttendanceWarning");
     if (!isTopCommand && !res.attendanceReported) {
       attWarn.classList.remove("hidden");
@@ -1208,7 +1182,6 @@
       attWarn.classList.add("hidden");
     }
 
-    // התראות חוסרים לפיקוד עליון
     const hcWarn = document.getElementById("shvHighCmdWarnings");
     if (isTopCommand && res.allWarnings && res.allWarnings.length > 0) {
       hcWarn.classList.remove("hidden");
@@ -1237,7 +1210,6 @@
     if (!shvWorkspaceState) return;
     const assignedSet = getAssignedSoldiersSet();
 
-    // 1. רינדור רשימת חיילים פנויים בצד ימין
     const poolDiv = document.getElementById("shvAvailablePool");
     const unassignedSoldiers = shvWorkspaceState.allSoldiers.filter(s => !assignedSet.has(s.name));
 
@@ -1261,7 +1233,6 @@
       }).join("");
     }
 
-    // 2. רינדור לוח המשימות במרכז המסך
     const board = document.getElementById("shvScheduleBoard");
     const actionBox = document.getElementById("shvActionButtons");
 
@@ -1276,19 +1247,15 @@
     let allMySlotsFilled = true;
 
     board.innerHTML = shvWorkspaceState.rows.map((r, rIdx) => {
-      // משימה של מחלקה אחרת -> תצוגת מחלקה בלבד
       if (!r.canViewDetails) {
         return `<div class="shv-shift-locked">
-          <div>
-            <strong style="color:#e2e8f0;">${r.taskName}</strong> (משמרת ${r.shiftNumber}) • <span>🕒 ${r.hoursLabel}</span>
-          </div>
+          <div><strong style="color:#e2e8f0;">${r.taskName}</strong> (משמרת ${r.shiftNumber}) • <span>🕒 ${r.hoursLabel}</span></div>
           <span style="background:#334155;color:#cbd5e1;padding:4px 10px;border-radius:6px;font-weight:bold;">${r.platoon}</span>
         </div>`;
       }
 
       hasMyPlatoonRows = true;
 
-      // משבצות מפקדים
       let cmdrHtml = "";
       r.cmdrSlots.forEach((val, cIdx) => {
         if (!val) allMySlotsFilled = false;
@@ -1307,7 +1274,6 @@
         }
       });
 
-      // משבצות חיילים
       let soldiersHtml = "";
       r.soldierSlots.forEach((val, sIdx) => {
         if (!val) allMySlotsFilled = false;
@@ -1339,10 +1305,8 @@
       </div>`;
     }).join("");
 
-    // כפתור "שמירה לאישור" פעיל רק כשכל המשבצות של המחלקה מלאות
     const submitAppBtn = document.getElementById("btnSubmitShvApproval");
     submitAppBtn.disabled = !hasMyPlatoonRows || !allMySlotsFilled;
-    submitAppBtn.title = allMySlotsFilled ? "" : "יש למלא את כלל משבצות המחלקה (או לסמן 'ללא שיבוץ') לפני שליחה לאישור";
   }
 
   function selectSoldierFromPool(name) {
@@ -1351,17 +1315,10 @@
   }
 
   function assignSelectedToSlot(rIdx, slotType, sIdx) {
-    if (!shvSelectedSoldier) {
-      alert("בחר תחילה חייל מרשימת החיילים הנוכחים בצד ימין.");
-      return;
-    }
+    if (!shvSelectedSoldier) { alert("בחר תחילה חייל מרשימת החיילים הנוכחים בצד ימין."); return; }
     const row = shvWorkspaceState.rows[rIdx];
-    if (slotType === "cmdr") {
-      row.cmdrSlots[sIdx] = shvSelectedSoldier;
-    } else {
-      // ניתן לשבץ גם מפקד למשבצת חייל
-      row.soldierSlots[sIdx] = shvSelectedSoldier;
-    }
+    if (slotType === "cmdr") row.cmdrSlots[sIdx] = shvSelectedSoldier;
+    else row.soldierSlots[sIdx] = shvSelectedSoldier;
     shvSelectedSoldier = null;
     renderShavzakUI();
   }
@@ -1381,7 +1338,6 @@
   }
 
   function attemptSubmitForApproval() {
-    // בדיקה אם הוגדר שצריך מפקדים למשימה וסומנו רק חיילים / חסר מפקד
     let hasTaskWithoutCmdr = false;
     shvWorkspaceState.rows.forEach(r => {
       if (!r.canViewDetails) return;
@@ -1396,13 +1352,7 @@
     });
 
     if (hasTaskWithoutCmdr) {
-      openCustomModal(
-        "⚠️",
-        "התראת שיבוץ",
-        "אנא אשרו משימה ללא מפקד",
-        "OK",
-        () => savePlatoonShavzak(true)
-      );
+      openCustomModal("⚠️", "התראת שיבוץ", "אנא אשרו משימה ללא מפקד", "OK", () => savePlatoonShavzak(true));
     } else {
       savePlatoonShavzak(true);
     }
@@ -1429,22 +1379,16 @@
       const unassignedSoldiers = r.soldierSlots.filter(x => x === "ללא שיבוץ").length;
 
       updates.push({
-        taskName: r.taskName,
-        shiftNumber: r.shiftNumber,
-        cmdrsList: r.cmdrSlots.filter(Boolean),
-        soldiersList: r.soldierSlots.filter(Boolean),
-        missingCmdr,
-        unassignedCount: unassignedCmdrs + unassignedSoldiers
+        taskName: r.taskName, shiftNumber: r.shiftNumber,
+        cmdrsList: r.cmdrSlots.filter(Boolean), soldiersList: r.soldierSlots.filter(Boolean),
+        missingCmdr, unassignedCount: unassignedCmdrs + unassignedSoldiers
       });
     });
 
     showBox("shvSaveStatus", "שומר שיבוץ בגיליון 'שבצק בבניה'...", true);
     const res = await apiCall({
-      action: "shavzak_save_platoon",
-      targetDate: shvWorkspaceState.targetDate,
-      platoon,
-      submitForApproval,
-      updates
+      action: "shavzak_save_platoon", targetDate: shvWorkspaceState.targetDate,
+      platoon, submitForApproval, updates
     });
     showBox("shvSaveStatus", res.message, res.status === "success");
   }
@@ -1452,15 +1396,12 @@
   async function publishOfficialShavzak() {
     if (!confirm(`האם לאשר סופית ולפרסם את השבצ"ק לתאריך ${shvWorkspaceState.targetDate}?`)) return;
     showBox("shvSaveStatus", "מפרסם שבצ\"ק רשמי ושומר בארכיון...", true);
-    const res = await apiCall({
-      action: "shavzak_approve_official",
-      targetDate: shvWorkspaceState.targetDate
-    });
+    const res = await apiCall({ action: "shavzak_approve_official", targetDate: shvWorkspaceState.targetDate });
     showBox("shvSaveStatus", res.message, res.status === "success");
   }
 
   function renderAttendanceSoldiers() {
-    const fw = document.getElementById("attFrameworkSelect").value;
+    const fw = normalizeFramework(document.getElementById("attFrameworkSelect").value);
     const container = document.getElementById("attSoldiersContainer");
     const btn = document.getElementById("btnSubmitAtt");
     container.innerHTML = "";
@@ -1468,7 +1409,7 @@
 
     if (!fw) { btn.classList.add("hidden"); return; }
 
-    const list = attendanceSoldiers.filter(s => s.framework === fw);
+    const list = attendanceSoldiers.filter(s => normalizeFramework(s.framework) === fw);
     if (!list.length) {
       container.innerHTML = '<div class="card" style="text-align:center;">אין חיילים פעילים במסגרת זו.</div>';
       btn.classList.add("hidden"); return;
@@ -1516,7 +1457,7 @@
   }
 
   async function submitAttendanceReport() {
-    const fw = document.getElementById("attFrameworkSelect").value;
+    const fw = normalizeFramework(document.getElementById("attFrameworkSelect").value);
     const reporter = document.getElementById("attReporterName").value.trim();
     const rDate = document.getElementById("attReportDate").value.trim();
     if (!fw || !reporter || !rDate) { alert("נא למלא תאריך, מסגרת ושם מדווח"); return; }
@@ -1569,8 +1510,8 @@
     const sel = document.getElementById("mafSoldierSelect");
     sel.innerHTML = '<option value="">-- בחר לוחם --</option>';
     const ordMap = { "מחלקה 1":1, "מחלקה 2":2, "מחלקה 3":3, "חפ\"ק":4, "מפל\"ג":5, "חמ\"ל":6, "מסופחים":7 };
-    (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[a.framework]||99)-(ordMap[b.framework]||99) || a.name.localeCompare(b.name,'he')).forEach(s => {
-      const o = document.createElement("option"); o.value = s.personalNumber; o.textContent = `${s.framework} | ${s.name} (${s.personalNumber})`; sel.appendChild(o);
+    (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[normalizeFramework(a.framework)]||99)-(ordMap[normalizeFramework(b.framework)]||99) || a.name.localeCompare(b.name,'he')).forEach(s => {
+      const o = document.createElement("option"); o.value = s.personalNumber; o.textContent = `${normalizeFramework(s.framework)} | ${s.name} (${s.personalNumber})`; sel.appendChild(o);
     });
     const fwSel = document.getElementById("mafFwSelect"); fwSel.innerHTML = "";
     (sharedDB.canonicalFrameworks || []).forEach(fw => { const o = document.createElement("option"); o.value = fw; o.textContent = fw; fwSel.appendChild(o); });
@@ -1639,11 +1580,11 @@
     if (type === "all_company") {
       msg = "*דוח ציוד ואפסנאות - מסייעת 8109*\n\n";
       (sharedDB.canonicalFrameworks || []).forEach(fw => {
-        const grp = soldiers.filter(s => s.framework === fw && s.items.length);
+        const grp = soldiers.filter(s => normalizeFramework(s.framework) === normalizeFramework(fw) && s.items.length);
         if (grp.length) msg += `📌 *${fw}*\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName} (${it.quantityOrSerial})`).join(", ")}`).join("\n") + "\n\n";
       });
     } else if (type === "by_framework") {
-      const fw = document.getElementById("mafFwSelect").value, grp = soldiers.filter(s => s.framework === fw && s.items.length);
+      const fw = document.getElementById("mafFwSelect").value, grp = soldiers.filter(s => normalizeFramework(s.framework) === normalizeFramework(fw) && s.items.length);
       msg = `*דוח ציוד - ${fw}*\n\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName} (${it.quantityOrSerial})`).join(", ")}`).join("\n");
     } else if (type === "by_tool") {
       const tool = document.getElementById("mafToolSelect").value; let total = 0; const lines = [];
@@ -1695,9 +1636,9 @@
     (sharedDB.weaponsTools || []).forEach(t => { const o = document.createElement("option"); o.value = t; o.textContent = t; wToolSel.appendChild(o); });
 
     const ordMap = { "מחלקה 1":1, "מחלקה 2":2, "מחלקה 3":3, "חפ\"ק":4, "מפל\"ג":5, "חמ\"ל":6, "מסופחים":7 };
-    const sorted = (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[a.framework]||99)-(ordMap[b.framework]||99) || a.name.localeCompare(b.name,'he'));
+    const sorted = (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[normalizeFramework(a.framework)]||99)-(ordMap[normalizeFramework(b.framework)]||99) || a.name.localeCompare(b.name,'he'));
     const sSel = document.getElementById("repWpnSoldierSel"); sSel.innerHTML = "";
-    sorted.forEach(s => { const o = document.createElement("option"); o.value = s.personalNumber; o.textContent = `${s.framework} | ${s.name} (${s.personalNumber})`; sSel.appendChild(o); });
+    sorted.forEach(s => { const o = document.createElement("option"); o.value = s.personalNumber; o.textContent = `${normalizeFramework(s.framework)} | ${s.name} (${s.personalNumber})`; sSel.appendChild(o); });
   }
 
   function generateHighCommandReport() {
@@ -1708,15 +1649,15 @@
       if (type === "all_company") {
         msg = "*דוח נשק פלוגתי - מסייעת 8109*\n\n";
         (sharedDB.canonicalFrameworks || []).forEach(fw => {
-          const grp = soldiers.filter(s => s.framework === fw && s.items.length);
+          const grp = soldiers.filter(s => normalizeFramework(s.framework) === normalizeFramework(fw) && s.items.length);
           if (grp.length) msg += `📌 *${fw}*\n` + grp.map(s => `• ${s.name} (${s.personalNumber}): ${s.items.map(it=>`${it.toolName}: ${it.serialNumber}`).join(", ")}`).join("\n") + "\n\n";
         });
       } else if (type === "by_framework") {
-        const fw = document.getElementById("repWpnFwSel").value, grp = soldiers.filter(s => s.framework === fw && s.items.length);
+        const fw = document.getElementById("repWpnFwSel").value, grp = soldiers.filter(s => normalizeFramework(s.framework) === normalizeFramework(fw) && s.items.length);
         msg = `*דוח נשק - ${fw}*\n\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName}: ${it.serialNumber}`).join(", ")}`).join("\n");
       } else if (type === "by_tool") {
         const tool = document.getElementById("repWpnToolSel").value, holders = [];
-        soldiers.forEach(s => s.items.forEach(it => { if (it.toolName === tool) holders.push(`${s.name} (${s.framework}) - ${it.serialNumber}`); }));
+        soldiers.forEach(s => s.items.forEach(it => { if (it.toolName === tool) holders.push(`${s.name} (${normalizeFramework(s.framework)}) - ${it.serialNumber}`); }));
         msg = `*מצבת מחזיקים - ${tool}* (${holders.length})\n\n` + holders.join("\n");
       } else {
         const pn = document.getElementById("repWpnSoldierSel").value;
@@ -1740,11 +1681,11 @@
     if (rType === "detailed") {
       msg = `*דוח שמי מפורט [${eurDate}]*\n\n`;
       (sharedDB.canonicalFrameworks || []).forEach(fw => {
-        if (targetFw !== "ALL" && fw !== targetFw) return;
+        if (targetFw !== "ALL" && normalizeFramework(fw) !== normalizeFramework(targetFw)) return;
         const lines = [];
         for (let i = 0; i < sharedDB.names.length; i++) {
           const nm = sharedDB.names[i];
-          if (sharedDB.activeNames.indexOf(nm) === -1 || sharedDB.frameworks[i] !== fw) continue;
+          if (sharedDB.activeNames.indexOf(nm) === -1 || normalizeFramework(sharedDB.frameworks[i]) !== normalizeFramework(fw)) continue;
           const st = String(sharedDB.detailed[i][colIdx] || "לא דווח"), isP = String(sharedDB.presence[i][colIdx]) === "V";
           lines.push(`• ${nm} - ${isP ? "נוכח" : "אינו נוכח"} (${st})`);
         }
@@ -1755,7 +1696,7 @@
       for (let i = 0; i < sharedDB.names.length; i++) {
         const nm = sharedDB.names[i];
         if (sharedDB.activeNames.indexOf(nm) === -1) continue;
-        if (targetFw !== "ALL" && sharedDB.frameworks[i] !== targetFw) continue;
+        if (targetFw !== "ALL" && normalizeFramework(sharedDB.frameworks[i]) !== normalizeFramework(targetFw)) continue;
         tot++;
         const st = String(sharedDB.detailed[i][colIdx] || "");
         if (String(sharedDB.presence[i][colIdx]) === "V") pres++;
@@ -1785,10 +1726,10 @@
     });
 
     const ordMap = { "מחלקה 1":1, "מחלקה 2":2, "מחלקה 3":3, "חפ\"ק":4, "מפל\"ג":5, "חמ\"ל":6, "מסופחים":7 };
-    const sorted = (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[a.framework]||99)-(ordMap[b.framework]||99) || a.name.localeCompare(b.name,'he'));
+    const sorted = (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[normalizeFramework(a.framework)]||99)-(ordMap[normalizeFramework(b.framework)]||99) || a.name.localeCompare(b.name,'he'));
     ["uSoldier", "mSoldier"].forEach(id => {
       const el = document.getElementById(id); el.innerHTML = "";
-      sorted.forEach(s => { const o = document.createElement("option"); o.value = s.name; o.dataset.fw = s.framework; o.textContent = `${s.framework} | ${s.name}`; el.appendChild(o); });
+      sorted.forEach(s => { const o = document.createElement("option"); o.value = s.name; o.dataset.fw = normalizeFramework(s.framework); o.textContent = `${normalizeFramework(s.framework)} | ${s.name}`; el.appendChild(o); });
     });
     onAdmSoldierSelect();
   }
@@ -1840,7 +1781,7 @@
     const missing = attendanceSoldiers.filter(s => !pastedSet.has(String(s.personalNumber).trim()));
     let rep = `*דוח פערי התייצבות - מסייעת 8109*\n• סה"כ פעילים: ${attendanceSoldiers.length}\n• חסרים ברשימה: ${missing.length}\n\n`;
     (sharedDB.canonicalFrameworks || ALL_FRAMEWORKS).forEach(fw => {
-      const grp = missing.filter(s => s.framework === fw);
+      const grp = missing.filter(s => normalizeFramework(s.framework) === normalizeFramework(fw));
       if (grp.length) rep += `📌 *${fw}* (${grp.length}):\n` + grp.map(s => `• ${s.name} (${s.personalNumber})`).join("\n") + "\n\n";
     });
     document.getElementById("crossCheckText").value = rep;
