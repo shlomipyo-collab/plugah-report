@@ -159,7 +159,7 @@
 
   <!-- מודאל תמונת שבצ"ק -->
   <div id="shvImageModal" class="modal-overlay hidden">
-    <div class="modal-box" style="max-width:680px;max-height:92vh;overflow-y:auto;">
+    <div class="modal-box" style="max-width:min(1100px,96vw);max-height:92vh;overflow:auto;">
       <h3 style="margin:0 0 10px;color:#38bdf8;">📋 שבצ"ק פלוגתי רשמי</h3>
       <img id="shvGeneratedImg" style="width:100%;border-radius:8px;border:1px solid #475569;margin-bottom:12px;" alt="שבצק">
       <div class="btn-row">
@@ -613,7 +613,7 @@
   function hrsT(label) { return "\u2066" + label + "\u2069"; }
   function hrs(label) { return `<span class="ltr">${escapeHtml(label)}</span>`; }
 
-  function timeToMinutes(t) { const m = String(t || "").match(/^(\d{1,2}):(\d{2})/); return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : 360; }
+  function timeToMinutes(t) { const m = String(t || "").trim().match(/^(\d{1,2})(?::(\d{2}))?/); return m ? parseInt(m[1], 10) * 60 + parseInt(m[2] || "0", 10) : 360; }
   function shiftRange(label) {
     const m = String(label || "").match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
     if (!m) return null;
@@ -1001,64 +1001,196 @@
     document.getElementById("btnOpenShvImage").classList.toggle("hidden", !soldierShvOfficialBlock);
   }
 
-  // ציור טקסט שנחתך אם הוא ארוך מדי לעמודה
-  function fitText(ctx, text, maxW) {
-    let t = String(text || "");
-    if (ctx.measureText(t).width <= maxW) return [t];
-    // שבירה לשתי שורות לפי פסיקים / רווחים
-    const words = t.split(/(,\s*|\s+)/).filter(Boolean);
-    const lines = [""];
+  // ==========================================
+  // תמונת שבצ"ק - בסגנון טבלת אקסל:
+  // עמודה לכל משימה, ציר שעות 06:00 עד 06:00, כל משמרת = תא בגובה השעות שלה
+  // ==========================================
+  function minutesToTime(mins) {
+    const n = ((mins % 1440) + 1440) % 1440;
+    return `${String(Math.floor(n / 60)).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
+  }
+
+  function splitNames(str) {
+    return String(str || "").split(",").map(x => x.trim()).filter(x => x && x !== SHV_NONE && x !== "-");
+  }
+
+  // שבירת טקסט לשורות לפי רוחב
+  function wrapWords(ctx, text, maxW) {
+    const words = String(text).split(/\s+/).filter(Boolean);
+    const lines = [];
+    let cur = "";
     words.forEach(w => {
-      const cur = lines[lines.length - 1];
-      if (ctx.measureText(cur + w).width > maxW && cur) lines.push(w.trim());
-      else lines[lines.length - 1] = cur + w;
+      const test = cur ? cur + " " + w : w;
+      if (ctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = w; }
+      else cur = test;
     });
-    return lines.slice(0, 3);
+    if (cur) lines.push(cur);
+    return lines.length ? lines : [""];
+  }
+
+  function buildShavzakCanvas(b) {
+    const FONT = "Arial, 'Segoe UI', Tahoma, sans-serif";
+    const DAY_START = 360, DAY_END = 1800;           // 06:00 עד 06:00 למחרת
+    const SCALE = 2;                                  // תמונה חדה בטלפון
+    const C = { border: "#000000", thin: "#7f7f7f", head: "#f2f2f2", empty: "#e7e6e6", text: "#000000", muted: "#595959", red: "#c00000" };
+
+    // קיבוץ המשמרות לפי משימה (לפי הסדר בגיליון "משימות")
+    const tasks = [], byTask = {};
+    b.rows.forEach(r => {
+      if (!byTask[r.taskName]) { byTask[r.taskName] = []; tasks.push(r.taskName); }
+      const rg = shiftRange(r.hoursLabel) || { s: DAY_START, e: DAY_END };
+      const hm = String(r.hoursLabel || "").match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
+      byTask[r.taskName].push({
+        r, s: Math.max(DAY_START, rg.s), e: Math.min(DAY_END, rg.e),
+        from: hm ? hm[1] : "", to: hm ? hm[2] : "",
+        cmdrs: splitNames(r.cmdrs), soldiers: splitNames(r.soldiers)
+      });
+    });
+
+    const m = document.createElement("canvas").getContext("2d");
+    m.direction = "rtl";
+
+    // רוחב עמודה לפי שם המשימה והשם הארוך ביותר
+    const colW = {};
+    tasks.forEach(t => {
+      m.font = `bold 15px ${FONT}`;
+      let w = m.measureText(t).width + 26;
+      m.font = `bold 14px ${FONT}`;
+      byTask[t].forEach(bk => bk.cmdrs.concat(bk.soldiers).forEach(n => { w = Math.max(w, m.measureText(n).width + 22); }));
+      colW[t] = Math.min(190, Math.max(105, Math.ceil(w)));
+    });
+
+    // תוכן כל תא + גובה שעה שנדרש כדי שהכל ייכנס
+    let hourH = 26;
+    const blocks = [];
+    tasks.forEach(t => {
+      const multi = byTask[t].length > 1 || byTask[t][0].e - byTask[t][0].s < 1440;
+      byTask[t].forEach(bk => {
+        const lines = [];
+        if (multi && bk.from) lines.push({ text: `${bk.from} עד ${bk.to}`, kind: "hours" });
+        bk.cmdrs.forEach(n => lines.push({ text: n, kind: "cmdr" }));
+        bk.soldiers.forEach(n => lines.push({ text: n, kind: "soldier" }));
+        if (!bk.cmdrs.length && !bk.soldiers.length) lines.push({ text: "לא שובץ", kind: "missing" });
+        bk.lines = lines;
+        bk.task = t;
+        blocks.push(bk);
+        const hours = (bk.e - bk.s) / 60;
+        if (hours > 0) hourH = Math.max(hourH, (lines.length * 18 + 10) / hours);
+      });
+    });
+    hourH = Math.min(Math.ceil(hourH), 60);
+
+    const margin = 16, titleH = 54, headH = 40, dateW = 74, timeW = 66, footH = 24;
+    const gridH = 24 * hourH;
+    const tableW = dateW + timeW * 2 + tasks.reduce((a, t) => a + colW[t], 0);
+    const W = margin * 2 + tableW;
+    const H = margin + titleH + headH + gridH + footH + margin;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = W * SCALE; canvas.height = H * SCALE;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(SCALE, SCALE);
+    ctx.direction = "rtl";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, W, H);
+
+    // כותרת
+    ctx.fillStyle = C.text; ctx.textAlign = "center";
+    ctx.font = `bold 22px ${FONT}`;
+    ctx.fillText(b.title || "שבצ\"ק", W / 2, margin + 20);
+    ctx.font = `13px ${FONT}`; ctx.fillStyle = C.muted;
+    ctx.fillText("לו\"ז 06:00 עד 06:00 למחרת", W / 2, margin + 42);
+
+    const top = margin + titleH, gridTop = top + headH, gridBottom = gridTop + gridH;
+    const yOf = min => gridTop + (min - DAY_START) / 60 * hourH;
+
+    // עמודות מימין לשמאל: תאריך | שעת עלייה | שעת ירידה | משימות...
+    const cols = [{ key: "date", w: dateW, label: "" }, { key: "up", w: timeW, label: "שעת עלייה" }, { key: "down", w: timeW, label: "שעת ירידה" }]
+      .concat(tasks.map(t => ({ key: "task", task: t, w: colW[t], label: t })));
+    let xR = W - margin;
+    cols.forEach(c => { c.x2 = xR; c.x1 = xR - c.w; xR = c.x1; });
+
+    const cellRect = (x1, y1, x2, y2, fill, lw, stroke) => {
+      if (fill) { ctx.fillStyle = fill; ctx.fillRect(x1, y1, x2 - x1, y2 - y1); }
+      ctx.lineWidth = lw || 1; ctx.strokeStyle = stroke || C.border;
+      ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+    };
+
+    // שורת כותרות
+    cols.forEach(c => {
+      cellRect(c.x1, top, c.x2, gridTop, C.head, 1);
+      if (!c.label) return;
+      ctx.fillStyle = C.text; ctx.textAlign = "center";
+      let fs = 14;
+      ctx.font = `bold ${fs}px ${FONT}`;
+      while (ctx.measureText(c.label).width > c.w - 8 && fs > 10) { fs--; ctx.font = `bold ${fs}px ${FONT}`; }
+      ctx.fillText(c.label, (c.x1 + c.x2) / 2, (top + gridTop) / 2);
+    });
+
+    // עמודת תאריך
+    const dc = cols[0];
+    cellRect(dc.x1, gridTop, dc.x2, gridBottom, "#ffffff", 1);
+    const dParts = String(b.date || "").split("/");
+    ctx.fillStyle = C.text; ctx.textAlign = "center";
+    ctx.font = `bold 17px ${FONT}`;
+    ctx.fillText(dParts.length === 3 ? `${dParts[0]}.${dParts[1]}` : (b.date || ""), (dc.x1 + dc.x2) / 2, (gridTop + gridBottom) / 2 - 11);
+    ctx.font = `15px ${FONT}`;
+    ctx.fillText(String(b.dayName || "").replace(/^יום\s+/, ""), (dc.x1 + dc.x2) / 2, (gridTop + gridBottom) / 2 + 11);
+
+    // עמודות שעות
+    ctx.font = `14px ${FONT}`;
+    for (let h = 0; h < 24; h++) {
+      const y1 = gridTop + h * hourH, y2 = y1 + hourH;
+      const start = DAY_START + h * 60;
+      [[cols[1], start], [cols[2], start + 60]].forEach(([c, mins]) => {
+        cellRect(c.x1, y1, c.x2, y2, "#ffffff", 0.8, C.thin);
+        ctx.fillStyle = C.text; ctx.textAlign = "center";
+        ctx.fillText(minutesToTime(mins), (c.x1 + c.x2) / 2, (y1 + y2) / 2);
+      });
+    }
+
+    // עמודות משימות: רקע אפור = אין משמרת, תא לבן = משמרת
+    cols.slice(3).forEach(c => cellRect(c.x1, gridTop, c.x2, gridBottom, C.empty, 1));
+    blocks.forEach(bk => {
+      const c = cols.find(x => x.task === bk.task);
+      const y1 = yOf(bk.s), y2 = yOf(bk.e);
+      cellRect(c.x1, y1, c.x2, y2, "#ffffff", 1);
+
+      // התאמת גודל גופן כך שכל השורות ייכנסו לתא
+      let fs = 14, lh = 18;
+      const avail = y2 - y1 - 6;
+      while (bk.lines.length * lh > avail && fs > 9) { fs--; lh = Math.round(fs * 1.28); }
+      const total = bk.lines.length * lh;
+      let y = (y1 + y2) / 2 - total / 2 + lh / 2;
+      const cx = (c.x1 + c.x2) / 2;
+      ctx.textAlign = "center";
+      bk.lines.forEach(ln => {
+        if (ln.kind === "hours") { ctx.font = `${fs - 1}px ${FONT}`; ctx.fillStyle = C.muted; }
+        else if (ln.kind === "cmdr") { ctx.font = `bold ${fs}px ${FONT}`; ctx.fillStyle = C.text; }
+        else if (ln.kind === "missing") { ctx.font = `bold ${fs - 1}px ${FONT}`; ctx.fillStyle = C.red; }
+        else { ctx.font = `${fs}px ${FONT}`; ctx.fillStyle = C.text; }
+        let txt = ln.text;
+        while (ctx.measureText(txt).width > c.w - 6 && txt.length > 3) txt = txt.slice(0, -2) + "…";
+        ctx.fillText(txt, cx, y);
+        y += lh;
+      });
+    });
+
+    // מסגרת חיצונית עבה + קווים מודגשים בין עמודות
+    ctx.lineWidth = 2; ctx.strokeStyle = C.border;
+    cols.forEach(c => { ctx.beginPath(); ctx.moveTo(c.x1, top); ctx.lineTo(c.x1, gridBottom); ctx.stroke(); });
+    ctx.strokeRect(margin, top, tableW, headH + gridH);
+    ctx.beginPath(); ctx.moveTo(margin, gridTop); ctx.lineTo(margin + tableW, gridTop); ctx.stroke();
+
+    // שורת תחתית
+    ctx.font = `11px ${FONT}`; ctx.fillStyle = C.muted; ctx.textAlign = "right";
+    ctx.fillText("מסייעת 8109 • שמות מודגשים = מפקדי משימה", W - margin, gridBottom + footH / 2 + 4);
+    return canvas;
   }
 
   function openShavzakImageModal() {
     if (!soldierShvOfficialBlock) return;
-    const b = soldierShvOfficialBlock;
-    const width = 1000, headerH = 110, lineH = 22, pad = 12;
-    const cols = [
-      { key: "taskName", label: "משימה", x: 975, w: 170 },
-      { key: "hoursLabel", label: "שעות", x: 795, w: 120 },
-      { key: "platoon", label: "מחלקה", x: 665, w: 95 },
-      { key: "cmdrs", label: "מפקדים", x: 560, w: 170 },
-      { key: "soldiers", label: "לוחמים", x: 380, w: 355 }
-    ];
-    const measure = document.createElement("canvas").getContext("2d");
-    measure.font = "16px Arial";
-    const rowsLines = b.rows.map(r => cols.map(c => fitText(measure, r[c.key] || "-", c.w)));
-    const rowHeights = rowsLines.map(cl => Math.max(...cl.map(l => l.length)) * lineH + pad * 2);
-    const height = headerH + 44 + rowHeights.reduce((a, h) => a + h, 0) + 30;
-
-    const canvas = document.createElement("canvas");
-    canvas.width = width; canvas.height = height;
-    const ctx = canvas.getContext("2d");
-    ctx.direction = "rtl";
-    ctx.fillStyle = "#0f172a"; ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = "#38bdf8"; ctx.font = "bold 28px Arial"; ctx.textAlign = "center";
-    ctx.fillText(b.title, width / 2, 50);
-    ctx.fillStyle = "#94a3b8"; ctx.font = "18px Arial";
-    ctx.fillText("מסייעת 8109 • לו\"ז 06:00 עד 06:00 למחרת", width / 2, 82);
-
-    let y = headerH;
-    ctx.fillStyle = "#1e293b"; ctx.fillRect(20, y, width - 40, 44);
-    ctx.fillStyle = "#38bdf8"; ctx.font = "bold 18px Arial"; ctx.textAlign = "right";
-    cols.forEach(c => ctx.fillText(c.label, c.x, y + 29));
-    y += 44;
-
-    rowsLines.forEach((cl, idx) => {
-      const h = rowHeights[idx];
-      ctx.fillStyle = idx % 2 === 0 ? "#162032" : "#0f172a";
-      ctx.fillRect(20, y, width - 40, h);
-      ctx.strokeStyle = "#334155"; ctx.strokeRect(20, y, width - 40, h);
-      ctx.fillStyle = "#f8fafc"; ctx.font = "16px Arial";
-      cl.forEach((lines, ci) => lines.forEach((ln, li) => ctx.fillText(ln, cols[ci].x, y + pad + 16 + li * lineH)));
-      y += h;
-    });
-
+    const canvas = buildShavzakCanvas(soldierShvOfficialBlock);
     shvGeneratedDataUrl = canvas.toDataURL("image/png");
     document.getElementById("shvGeneratedImg").src = shvGeneratedDataUrl;
     document.getElementById("shvImageModal").classList.remove("hidden");
