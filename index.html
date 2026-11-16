@@ -69,7 +69,10 @@
     .hidden { display: none !important; }
     .date-input-group { display: flex; gap: 8px; margin-bottom: 12px; }
     .date-input-group input[type="text"] { margin-bottom: 0; font-weight: bold; text-align: center; }
-    .date-input-group input[type="date"] { width: 52px; padding: 10px; margin-bottom: 0; flex-shrink: 0; }
+    .date-pick-btn { position: relative; width: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; border: 1px solid #475569; border-radius: 8px; background: #0f172a; cursor: pointer; margin: 0; overflow: hidden; }
+    .date-pick-btn:hover { border-color: #38bdf8; }
+    .date-pick-btn input[type="date"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; margin: 0; padding: 0; border: none; cursor: pointer; }
+    .unreported-box { background: #451a03; border: 1px solid #d97706; color: #fde68a; border-radius: 8px; padding: 8px 10px; font-size: 0.8rem; margin-bottom: 10px; line-height: 1.5; }
     .radio-group { display: flex; gap: 8px; margin-bottom: 10px; }
     .radio-card { flex: 1; text-align: center; padding: 10px 4px; border: 1px solid #334155; border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: #0f172a; user-select: none; }
     .radio-card input { display: none; }
@@ -267,7 +270,7 @@
       <label>תאריך תוקף הדוח (dd/mm/yyyy):</label>
       <div class="date-input-group">
         <input type="text" id="attReportDate" placeholder="dd/mm/yyyy">
-        <input type="date" id="attDatePicker">
+        <label class="date-pick-btn" title="בחר תאריך"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M7 13h2M11 13h2M15 13h2M7 17h2M11 17h2"/></svg><input type="date" id="attDatePicker" onclick="openNativePicker(this)"></label>
       </div>
       <label>מסגרת:</label>
       <select id="attFrameworkSelect" onchange="loadAndRenderAttendanceSoldiers()"></select>
@@ -394,7 +397,7 @@
       <label>תאריך השבצ"ק (לו"ז 06:00 עד 06:00 למחרת):</label>
       <div class="date-input-group">
         <input type="text" id="shvTargetDate" placeholder="dd/mm/yyyy">
-        <input type="date" id="shvDatePicker">
+        <label class="date-pick-btn" title="בחר תאריך"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M7 13h2M11 13h2M15 13h2M7 17h2M11 17h2"/></svg><input type="date" id="shvDatePicker" onclick="openNativePicker(this)"></label>
         <button type="button" class="btn-mini" style="background:#0284c7;color:#fff;border:none;padding:0 14px;" onclick="confirmLeaveShavzak(() => loadShavzakWorkspace())">טען</button>
       </div>
     </div>
@@ -439,6 +442,7 @@
           </div>
           <input type="text" id="shvPoolSearch" placeholder="🔍 חיפוש חייל..." style="padding:8px;font-size:0.9rem;margin-bottom:8px;" oninput="renderShavzakPool()">
           <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:10px;">לחץ על חייל ואז על משבצת פנויה. 📌 = כבר משובץ (אפשר לשבץ שוב).</div>
+          <div id="shvUnreported"></div>
           <div id="shvAvailablePool"></div>
         </div>
 
@@ -604,6 +608,8 @@
   function sortSoldiersByFw(list) {
     return list.slice().sort((a, b) => (FW_ORDER[normalizeFramework(a.framework)] || 99) - (FW_ORDER[normalizeFramework(b.framework)] || 99) || a.name.localeCompare(b.name, "he"));
   }
+
+  function openNativePicker(inp) { try { if (inp.showPicker) inp.showPicker(); } catch (e) {} }
 
   function dateToEur(d) { return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`; }
   function dateToIso(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
@@ -1304,9 +1310,13 @@
         toggleBtn.classList.remove("hidden");
         toggleBtn.textContent = "↩️ חזרה ללוח השיבוץ";
       }
-      if (missing.length) {
+      const unrep = res.unreportedSoldiers || [];
+      if (missing.length || unrep.length) {
+        const byFw = {};
+        unrep.forEach(u => { byFw[u.framework] = (byFw[u.framework] || 0) + 1; });
         stageBanner.classList.remove("hidden");
-        stageBanner.textContent = `שים לב: ${missing.join(", ")} עדיין לא דיווחו נוכחות.`;
+        stageBanner.textContent = `שים לב - נוכחות לתאריך ${res.targetDate} לא דווחה במלואה: ` +
+          Object.keys(byFw).map(fw => `${fw} (${byFw[fw]} חיילים)`).join(", ");
       }
       renderStage1SummaryTable(res.frameworkSummary || []);
       await renderStage1TasksList(res.rows || []);
@@ -1331,6 +1341,7 @@
       isOfficialApproved: res.isOfficialApproved,
       myPlatoonSubmitted: res.myPlatoonSubmitted,
       allSoldiers: res.availableSoldiers || [],
+      unreported: res.unreportedSoldiers || [],
       soldiersByPn,
       rows: (res.rows || []).map(r => {
         const pad = (saved, n) => { const out = []; for (let i = 0; i < n; i++) out.push(saved[i] || null); return out; };
@@ -1504,6 +1515,14 @@
     } else {
       pool = pool.filter(s => s.framework === shvState.userFramework);
     }
+    // חיילים פעילים שלא דווחה להם נוכחות לתאריך הזה (לא יופיעו לשיבוץ)
+    const unrep = (shvState.unreported || []).filter(u => seeAll
+      ? (document.getElementById("shvPoolFwFilter").value === "ALL" || u.framework === document.getElementById("shvPoolFwFilter").value)
+      : u.framework === shvState.userFramework);
+    document.getElementById("shvUnreported").innerHTML = unrep.length
+      ? `<div class="unreported-box">⚠️ <strong>${unrep.length} חיילים לא דווחו לתאריך ${escapeHtml(shvState.targetDate)}</strong> ולכן לא מופיעים לשיבוץ:<br>${unrep.map(u => escapeHtml(u.name) + (seeAll ? ` (${escapeHtml(u.framework)})` : "")).join(", ")}<br><span style="opacity:.85;">דווח עליהם במסך "דיווח נוכחות" לתאריך הזה ולחץ "טען".</span></div>`
+      : "";
+
     const term = cleanHebrewText(document.getElementById("shvPoolSearch").value).toLowerCase();
     if (term) pool = pool.filter(s => s.name.toLowerCase().includes(term));
 
