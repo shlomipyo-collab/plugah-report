@@ -1,1996 +1,1930 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>מסייעת 8109 - פורטל פלוגתי</title>
-  <style>
-    :root { --primary: #0284c7; --bg: #0f172a; --card: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --success: #16a34a; --danger: #dc2626; --warning: #d97706; }
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0 auto; padding: 14px; max-width: 980px; }
-    .narrow-wrap { max-width: 560px; margin: 0 auto; }
-    .brand-header { text-align: center; margin-bottom: 14px; padding-bottom: 8px; }
-    .brand-header img { max-width: 100px; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 6px; border: 1px solid #475569; }
-    .brand-title { font-size: 1.45rem; font-weight: 900; letter-spacing: 1px; }
-    .brand-line { height: 3px; width: 60px; background: #38bdf8; margin: 6px auto 0; border-radius: 2px; }
+/***************************************************************
+ * מסייעת 8109 - שרת Apps Script (גרסה 2.0)
+ *
+ * מה השתנה מול הגרסה הקודמת:
+ * - כל פעולה (חוץ מהתחברות) דורשת טוקן התחברות שנבדק בשרת + בדיקת הרשאות בשרת.
+ * - סיסמאות נשמרות מוצפנות (SHA-256 + salt). סיסמאות ישנות מוצפנות אוטומטית בכניסה הבאה.
+ * - נעילה (LockService) על כל פעולת כתיבה - שמירות במקביל לא דורסות זו את זו.
+ * - כתיבה מרוכזת לגיליון (במקום תא-תא), מטמון לרשימות שלא משתנות הרבה.
+ * - זיהוי לפי מספר אישי (ולא לפי שם) בשבצ"ק, באדמין ובנשקייה.
+ * - שבצ"ק: חייל יכול להיות משובץ ליותר ממשימה אחת, עם התראה על שעות חופפות.
+ ***************************************************************/
 
-    .user-profile-bar { background: #1e293b; padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #38bdf8; max-width: 640px; margin-left: auto; margin-right: auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .profile-info-main { font-size: 1.05rem; font-weight: bold; color: #fff; }
-    .profile-info-sub { font-size: 0.85rem; color: #7dd3fc; margin-top: 3px; }
-    .top-bar-actions { display: flex; gap: 6px; }
-    .btn-mini { padding: 7px 11px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #e2e8f0; font-size: 0.82rem; font-weight: bold; cursor: pointer; }
-    .btn-mini.home { border-color: #38bdf8; color: #38bdf8; }
-    .btn-mini.danger { border-color: #dc2626; color: #fca5a5; }
+// ==========================================
+// הגדרות
+// ==========================================
+const COMPANY_LOGO_ID = "1Suw_VFwFdSaiBw1-zRJ8sBzTTINynRvm";
 
-    .card { background: var(--card); border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 1px solid var(--border); }
-    h2 { margin: 0 0 12px; font-size: 1.2rem; color: #38bdf8; }
-    label { display: block; font-weight: bold; margin: 8px 0 5px; font-size: 0.9rem; color: #cbd5e1; }
-    input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 11px; margin-bottom: 12px; border: 1px solid #475569; border-radius: 8px; font-size: 1rem; background: #0f172a; color: #fff; font-family: inherit; }
-    select:disabled { opacity: 0.9; background: #1e293b; color: #38bdf8; font-weight: bold; }
-    textarea { resize: vertical; }
-    .btn-action { width: 100%; border: none; padding: 13px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; color: #fff; margin-top: 4px; }
-    .btn-primary { background: var(--primary); }
-    .btn-success { background: var(--success); }
-    .btn-danger { background: var(--danger); }
-    .btn-warning { background: var(--warning); }
-    .btn-purple { background: #8b5cf6; }
-    .btn-wa { background: #25D366; }
-    .btn-action:disabled { background: #475569; cursor: not-allowed; }
-    .btn-add-line { background: transparent; border: 1px dashed #38bdf8; color: #38bdf8; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 12px; }
-    .btn-tab-container { display: flex; gap: 8px; margin-bottom: 16px; }
-    .btn-tab { flex: 1; padding: 11px 6px; border: 1px solid #475569; border-radius: 8px; background: #1e293b; color: #94a3b8; font-weight: bold; cursor: pointer; text-align: center; font-size: 0.9rem; }
-    .btn-tab.active { background: #0284c7; color: #fff; border-color: #0284c7; }
+const DESIGNATED_ATTENDANCE_REPORTERS = {
+  "שי פאר": "מפל\"ג",
+  "רון נהרי": "מפל\"ג",
+  "ספיר אלול": "חפ\"ק",
+  "אופק סיאר": "חפ\"ק",
+  "לב גנדין": "חמ\"ל"
+};
 
-    .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .hub-tile { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.15s; }
-    .hub-tile:hover, .hub-tile:active { border-color: #38bdf8; background: #172554; transform: translateY(-2px); }
-    .hub-icon { font-size: 2rem; margin-bottom: 8px; }
-    .hub-title { font-weight: bold; font-size: 1.05rem; color: #f8fafc; }
-    .hub-desc { font-size: 0.78rem; color: #94a3b8; margin-top: 4px; }
+const ALL_COMPANY_FRAMEWORKS = ["מחלקה 1", "מחלקה 2", "מחלקה 3", "חפ\"ק", "מפל\"ג", "חמ\"ל", "מסופחים"];
+const SHAVZAK_FRAMEWORKS = ["מחלקה 1", "מחלקה 2", "מחלקה 3", "מסופחים"];
 
-    .status-box { padding: 10px; border-radius: 8px; margin-top: 10px; display: none; text-align: center; font-weight: bold; font-size: 0.9rem; white-space: pre-line; }
-    .status-ok { background: #064e3b; color: #a7f3d0; border: 1px solid #059669; }
-    .status-err { background: #7f1d1d; color: #fecaca; border: 1px solid #dc2626; }
-    .item-box { background: #0f172a; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #334155; }
-    .hidden { display: none !important; }
-    .date-input-group { display: flex; gap: 8px; margin-bottom: 12px; }
-    .date-input-group input[type="text"] { margin-bottom: 0; font-weight: bold; text-align: center; }
-    .date-input-group input[type="date"] { width: 52px; padding: 10px; margin-bottom: 0; flex-shrink: 0; }
-    .radio-group { display: flex; gap: 8px; margin-bottom: 10px; }
-    .radio-card { flex: 1; text-align: center; padding: 10px 4px; border: 1px solid #334155; border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: #0f172a; user-select: none; }
-    .radio-card input { display: none; }
-    .radio-card.active-green { background: #166534; border-color: #22c55e; color: #fff; font-weight: bold; }
-    .radio-card.active-red { background: #991b1b; border-color: #ef4444; color: #fff; font-weight: bold; }
-    .wp-kit-container { display: none; margin-top: 10px; padding: 12px; background: #1e293b; border-radius: 8px; border: 1px solid #475569; }
-    .kit-check, .return-check { display: flex; align-items: center; gap: 8px; margin-top: 8px; cursor: pointer; font-size: 0.95rem; }
-    .return-check { color: #f87171; font-weight: bold; }
-    .checkbox-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .checkbox-row input { width: 20px; height: 20px; margin: 0; }
-    .btn-row { display: flex; gap: 8px; margin-top: 8px; }
+// true = גם חייל רגיל חייב להגדיר סיסמה (מומלץ מבחינת אבטחה)
+const REQUIRE_PASSWORD_FOR_ALL = false;
 
-    /* שבצ"ק */
-    .shv-mission-hero { background: linear-gradient(135deg, #1e3a8a, #0f172a); border: 2px solid #38bdf8; border-radius: 12px; padding: 18px; margin-bottom: 14px; text-align: center; }
-    .shv-hero-day { font-size: 0.9rem; color: #7dd3fc; font-weight: bold; margin-bottom: 4px; }
-    .shv-hero-task { font-size: 1.5rem; font-weight: 900; color: #fff; margin: 4px 0; }
-    .shv-hero-hours { font-size: 1.15rem; color: #fde047; font-weight: bold; }
-    .shv-workspace-grid { display: grid; grid-template-columns: 280px 1fr; gap: 14px; align-items: start; }
-    @media (max-width: 768px) { .shv-workspace-grid { grid-template-columns: 1fr; } }
-    .shv-pool-panel { background: #1e293b; border: 1px solid #38bdf8; border-radius: 12px; padding: 14px; position: sticky; top: 10px; }
-    .shv-soldier-chip { display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1px solid #475569; padding: 9px 11px; border-radius: 8px; margin-bottom: 7px; cursor: pointer; }
-    .shv-soldier-chip.selected-chip { border: 2px solid #22c55e; background: #14532d; }
-    .chip-badge { font-size: 0.72rem; padding: 2px 6px; border-radius: 5px; font-weight: bold; }
-    .badge-cmdr { background: #0369a1; color: #e0f2fe; }
-    .badge-arrive { background: #065f46; color: #6ee7b7; }
-    .badge-leave { background: #92400e; color: #fde68a; }
-    .shv-shift-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
-    .shv-shift-locked { background: #161e2e; border: 1px dashed #334155; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: #94a3b8; }
-    .shv-slot-row { display: flex; justify-content: space-between; align-items: center; background: #1e293b; border: 1px solid #475569; padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; gap: 6px; }
-    .shv-slot-empty { border: 1px dashed #64748b; background: #0f172a; }
-    .btn-trash { background: #7f1d1d; color: #fecaca; border: 1px solid #dc2626; border-radius: 6px; padding: 5px 9px; cursor: pointer; font-size: 0.9rem; }
-    .btn-unassigned { background: #334155; color: #cbd5e1; border: 1px solid #64748b; border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 0.78rem; white-space: nowrap; }
-    .warning-banner { background: #7f1d1d; border: 1px solid #ef4444; color: #fecaca; padding: 14px; border-radius: 10px; margin-bottom: 14px; font-size: 0.95rem; text-align: center; }
-    .info-banner { background: #064e3b; border: 1px solid #10b981; color: #a7f3d0; padding: 14px; border-radius: 10px; margin-bottom: 14px; font-size: 0.95rem; text-align: center; }
-    .summary-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 8px; }
-    .summary-table th, .summary-table td { border: 1px solid #334155; padding: 7px 5px; text-align: center; }
-    .summary-table th { background: #0f172a; color: #38bdf8; }
-    .summary-table tr:nth-child(even) { background: #162032; }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.78); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
-    .modal-box { background: #1e293b; border: 2px solid #38bdf8; border-radius: 14px; padding: 22px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
-  </style>
-</head>
-<body>
+const SESSION_TTL_SEC = 6 * 60 * 60;   // תוקף התחברות (מתחדש בכל פעולה)
+const SOLDIERS_CACHE_SEC = 10 * 60;    // מטמון רשימת חיילים
+const LISTS_CACHE_SEC = 60 * 60;       // מטמון רשימות כלים / משימות
+const MAX_LOGIN_FAILS = 5;
+const LOGIN_LOCK_SEC = 10 * 60;
+const SHARED_DATES_LIMIT = 90;         // כמה ימים אחורה נשלחים לממשק הדוחות
 
-  <div class="brand-header">
-    <img src="https://drive.google.com/thumbnail?id=1Suw_VFwFdSaiBw1-zRJ8sBzTTINynRvm&sz=w600" alt="מסייעת 8109">
-    <div class="brand-title">מסייעת 8109</div>
-    <div class="brand-line"></div>
-  </div>
+const SHV = {
+  OPEN: "פתוח לשיבוץ",
+  DRAFT: "טיוטה שמורה",
+  SUBMITTED: "הועבר לאישור קצינים",
+  PENDING_MP: "ממתין לאישור מ\"פ",
+  PUBLISHED: "מאושר ופורסם"
+};
+const SHV_NONE = "ללא שיבוץ";
+const SHV_NONE_PN = "__NONE__";
+const OVERLAP_PREFIX = "כפל שיבוץ:";
+const BUILD_COLS = 14; // A-N (M,N = מספרים אישיים של המשובצים)
 
-  <!-- סרגל פרופיל משתמש קבוע בראש המסך -->
-  <div id="userProfileBar" class="user-profile-bar hidden">
-    <div>
-      <div class="profile-info-main" id="barUserNamePn"></div>
-      <div class="profile-info-sub" id="barUserPermissions"></div>
-    </div>
-    <div class="top-bar-actions">
-      <button type="button" id="btnBackToHub" class="btn-mini home hidden" onclick="openMainHub()">🏠 תפריט ראשי</button>
-      <button type="button" class="btn-mini danger" onclick="logoutUser()">יציאה</button>
-    </div>
-  </div>
+const CK = {
+  SOLDIERS: "soldiers_idx_v2",
+  TOOLS_WP: "tools_wp_v2",
+  TOOLS_LG: "tools_lg_v2",
+  TASKS: "shv_tasks_v2"
+};
 
-  <!-- פופאפ התראות -->
-  <div id="customModal" class="modal-overlay hidden">
-    <div class="modal-box">
-      <div style="font-size:2.2rem;margin-bottom:8px;" id="modalIcon">💻</div>
-      <h3 style="margin:0 0 10px;color:#38bdf8;" id="modalTitle">הודעת מערכת</h3>
-      <p style="color:#e2e8f0;font-size:1rem;line-height:1.5;margin-bottom:18px;" id="modalBody"></p>
-      <button type="button" class="btn-action btn-primary" id="modalOkBtn" onclick="closeCustomModal()">תודה</button>
-    </div>
-  </div>
+// ==========================================
+// כלי עזר כלליים
+// ==========================================
+function getSS_() { return SpreadsheetApp.getActiveSpreadsheet(); }
 
-  <!-- מודאל תמונת שבצ"ק -->
-  <div id="shvImageModal" class="modal-overlay hidden">
-    <div class="modal-box" style="max-width:680px;max-height:92vh;overflow-y:auto;">
-      <h3 style="margin:0 0 10px;color:#38bdf8;">📋 שבצ"ק פלוגתי רשמי</h3>
-      <img id="shvGeneratedImg" style="width:100%;border-radius:8px;border:1px solid #475569;margin-bottom:12px;" alt="שבצק">
-      <div class="btn-row">
-        <button type="button" class="btn-action btn-wa" onclick="shareShavzakImage()">📱 שתף תמונה לחבר</button>
-        <button type="button" class="btn-action btn-primary" onclick="downloadShavzakImage()">⬇️ הורד תמונה</button>
-      </div>
-      <button type="button" class="btn-action btn-danger" style="margin-top:8px;" onclick="document.getElementById('shvImageModal').classList.add('hidden')">סגור</button>
-    </div>
-  </div>
+function cleanPn(val) {
+  return String(val === null || val === undefined ? "" : val).replace(/[​-‏‪-‮﻿]/g, "").trim().replace(/\.0$/, "");
+}
 
-  <!-- מסך 1: הזדהות -->
-  <div id="screenLogin" class="card narrow-wrap">
-    <h2 style="text-align:center;">🔐 כניסה לפורטל הפלוגתי</h2>
-    <label>הקש מספר אישי:</label>
-    <input type="text" id="loginPn" placeholder="מספר אישי..." inputmode="numeric">
-    <button type="button" id="btnCheckPn" class="btn-action btn-primary" onclick="checkPersonalNumber()">המשך</button>
+function cleanHebrewText(val) {
+  return String(val === null || val === undefined ? "" : val)
+    .replace(/[​-‏‪-‮﻿]/g, "")
+    .replace(/ /g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-    <div id="setPasswordBox" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid #334155;">
-      <div style="color:#38bdf8;font-weight:bold;margin-bottom:8px;" id="welcomeNewAuth"></div>
-      <label>בחר סיסמה אישית לכניסות הבאות (לפחות 4 תווים):</label>
-      <input type="password" id="newPassInput" placeholder="הזן סיסמה חדשה...">
-      <label>אימות סיסמה:</label>
-      <input type="password" id="confirmPassInput" placeholder="הזן שוב לאימות...">
-      <button type="button" id="btnSavePass" class="btn-action btn-success" onclick="saveNewPassword()">💾 שמור סיסמה והתחבר</button>
-    </div>
+function normalizeName(name) { return cleanHebrewText(name); }
 
-    <div id="verifyPasswordBox" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid #334155;">
-      <div style="color:#cbd5e1;font-weight:bold;margin-bottom:8px;" id="welcomeReturningAuth"></div>
-      <label>הזן סיסמה:</label>
-      <input type="password" id="loginPassInput" placeholder="סיסמה...">
-      <button type="button" id="btnVerifyPass" class="btn-action btn-primary" onclick="verifyExistingPassword()">🔓 התחבר למערכת</button>
-    </div>
+function normalizeFramework(fw) {
+  const clean = cleanHebrewText(fw).replace(/[״׳'“”„‟]/g, "\"");
+  if (!clean) return "";
+  const noQuotes = clean.replace(/"/g, "");
+  if (noQuotes === "חפק") return "חפ\"ק";
+  if (noQuotes === "מפלג") return "מפל\"ג";
+  if (noQuotes === "חמל") return "חמ\"ל";
+  if (noQuotes.includes("מסופח")) return "מסופחים";
+  return clean;
+}
 
-    <div id="loginStatus" class="status-box"></div>
-  </div>
+function isActiveValue(v) {
+  if (v === true) return true;
+  const a = cleanHebrewText(v).toLowerCase();
+  return a === "כן" || a === "true" || a === "v" || a === "פעיל";
+}
 
-  <!-- מסך 2: דשבורד ראשי -->
-  <div id="screenHub" class="card narrow-wrap hidden">
-    <h2 style="text-align:center;margin-bottom:14px;">בחר מסך פעולה:</h2>
-    <div id="hubTilesGrid" class="hub-grid"></div>
-  </div>
+function formatToEuropeanDate(d) {
+  if (!d) return "";
+  if (d instanceof Date) return Utilities.formatDate(d, "Asia/Jerusalem", "dd/MM/yyyy");
+  const str = cleanHebrewText(d);
+  const mIso = str.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+  if (mIso) return `${mIso[3].padStart(2, '0')}/${mIso[2].padStart(2, '0')}/${mIso[1]}`;
+  const mEur = str.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+  if (mEur) return `${mEur[1].padStart(2, '0')}/${mEur[2].padStart(2, '0')}/${mEur[3]}`;
+  return str;
+}
 
-  <!-- מסך 3: שבצק - צפיה -->
-  <div id="screenShavzakView" class="narrow-wrap hidden">
-    <div class="card">
-      <h2>📅 שבצק - צפיה</h2>
-      <div id="soldierShvLoading" style="text-align:center;color:#94a3b8;padding:14px;">טוען משימות שבצ"ק...</div>
-      <div id="soldierShvContent" class="hidden">
-        <div id="todayMissionCard"></div>
-        <div id="tomorrowMissionCard"></div>
-        <button type="button" id="btnOpenShvImage" class="btn-action btn-primary hidden" onclick="openShavzakImageModal()">🖼️ פתח שבצ"ק בקובץ תמונה סגור / שתף לחבר</button>
-      </div>
-    </div>
-  </div>
+function getHebrewDayName(eurDateStr) {
+  const m = String(eurDateStr || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return "";
+  const d = new Date(parseInt(m[3], 10), parseInt(m[2], 10) - 1, parseInt(m[1], 10));
+  const days = ["יום ראשון", "יום שני", "יום שלישי", "יום רביעי", "יום חמישי", "יום שישי", "שבת"];
+  return days[d.getDay()] || "";
+}
 
-  <!-- מסך 4: טופס חתימות -->
-  <div id="screenSignatures" class="narrow-wrap hidden">
-    <div class="card">
-      <h2>✍️ טופס חתימות</h2>
-      <div class="btn-tab-container">
-        <div id="tabWpBtn" class="btn-tab active" onclick="switchGearSubTab('weapons')">🔫 נשקייה</div>
-        <div id="tabLgBtn" class="btn-tab" onclick="switchGearSubTab('logistics')">📦 אפסנאות</div>
-      </div>
+function timeToMinutes(tStr) {
+  const m = String(tStr || "").match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return 360;
+  return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+}
 
-      <div id="weaponsSection">
-        <div id="licenseBox" class="hidden">
-          <label>רישיון נהיגה:</label>
-          <select id="soldierLicense" onchange="document.getElementById('licenseOther').style.display=(this.value==='אחר'?'block':'none')">
-            <option value="ללא">ללא רישיון</option>
-            <option value="B">B (פרטי)</option>
-            <option value="C1">C1 (עד 12 טון)</option>
-            <option value="C">C (משא כבד)</option>
-            <option value="אחר">אחר (פרט)</option>
-          </select>
-          <input type="text" id="licenseOther" style="display:none;" placeholder="פרט רישיון...">
-        </div>
-        <label style="color:#f87171;">נשק נוכחי (סמן כדי להזדכות):</label>
-        <div id="weaponsCurrentList"></div>
-        <label style="color:#38bdf8;margin-top:10px;">הוספת נשק/אמל"ח לחתימה:</label>
-        <div id="weaponsNewContainer"></div>
-        <button type="button" class="btn-add-line" onclick="addWeaponRow()">+ הוסף נשק/אמל"ח</button>
-        <button type="button" class="btn-action btn-success" onclick="submitWeaponsAction()">💾 שמור נשקייה</button>
-      </div>
+function minutesToTime(mins) {
+  const normalized = ((mins % 1440) + 1440) % 1440;
+  const h = Math.floor(normalized / 60);
+  const m = normalized % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
 
-      <div id="logisticsSection" class="hidden">
-        <label style="color:#38bdf8;">ציוד אפסנאות עליו אתה חתום כרגע:</label>
-        <div id="logisticsCurrentList" style="margin-bottom:12px;"></div>
-        <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:12px;">* זיכוי ציוד אפסנאות מתבצע בטופס זיכויים מול המפל"ג.</div>
-        <label style="color:#38bdf8;">חתימה על ציוד אפסנאות נוסף:</label>
-        <div id="logisticsNewContainer"></div>
-        <button type="button" class="btn-add-line" onclick="addLogisticsRow()">+ הוסף פריט אפסנאות</button>
-        <button type="button" class="btn-action btn-success" onclick="submitLogisticsAction()">💾 חתום על ציוד אפסנאות</button>
-      </div>
+// טווח משמרת בדקות, יחסית ליום שבצ"ק שמתחיל ב-06:00
+function shiftRange(hoursLabel) {
+  const m = String(hoursLabel || "").match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
+  if (!m) return null;
+  let s = timeToMinutes(m[1]);
+  let e = timeToMinutes(m[2]);
+  if (s < 360) s += 1440;
+  if (e < 360) e += 1440;
+  if (e <= s) e += 1440;
+  return { s, e };
+}
 
-      <div id="soldierActionStatus" class="status-box"></div>
-    </div>
-  </div>
+function rangesOverlap(a, b) {
+  return Boolean(a && b && a.s < b.e && b.s < a.e);
+}
 
-  <!-- מסך 5: דיווח נוכחות -->
-  <div id="screenAttendance" class="narrow-wrap hidden">
-    <div class="card">
-      <h2>📋 דיווח נוכחות</h2>
-      <label>תאריך תוקף הדוח (dd/mm/yyyy):</label>
-      <div class="date-input-group">
-        <input type="text" id="attReportDate" placeholder="dd/mm/yyyy">
-        <input type="date" id="attDatePicker">
-      </div>
-      <label>מסגרת:</label>
-      <select id="attFrameworkSelect" onchange="loadAndRenderAttendanceSoldiers()"></select>
-      <label>שם המדווח:</label>
-      <input type="text" id="attReporterName">
-    </div>
-    <div id="attSoldiersContainer"></div>
-    <div id="attStatusBox" class="status-box"></div>
-    <button type="button" id="btnSubmitAtt" class="btn-action btn-success hidden" onclick="submitAttendanceReport()">🚀 שלח דיווח נוכחות</button>
-  </div>
+function isWeaponKitTool(toolName) {
+  if (!toolName) return false;
+  const clean = cleanHebrewText(toolName).replace(/["״׳'\s]/g, "");
+  return clean === "מחסניות" || clean === "מקפורק" || clean.includes("רצועה") || clean.includes("שומראחי");
+}
 
-  <!-- מסך 6: טופס זיכויים (מפל"ג) -->
-  <div id="screenMaflag" class="narrow-wrap hidden">
-    <div class="btn-tab-container">
-      <div id="tabMafCardBtn" class="btn-tab active" onclick="switchMafSubTab('card')">🎖️ כרטיס לוחם וזיכויים</div>
-      <div id="tabMafRepBtn" class="btn-tab" onclick="switchMafSubTab('rep')">📦 דוחות אפסנאות</div>
-    </div>
+function getLogisticsMatrixSheet(ss) { return ss.getSheetByName("מצבת_ציוד") || ss.getSheetByName("מצבת ציוד") || ss.getSheetByName("ציוד"); }
+function getWeaponsMatrixSheet(ss) { return ss.getSheetByName("מצבת_נשק") || ss.getSheetByName("מצבת נשק") || ss.getSheetByName("נשק"); }
+function getLogisticsLedgerSheet(ss) { return ss.getSheetByName("תנועות_ציוד") || ss.getSheetByName("תנועות ציוד"); }
+function getWeaponsLedgerSheet(ss) { return ss.getSheetByName("תנועות_נשק") || ss.getSheetByName("תנועות נשק"); }
+function getDetailedSheet_(ss) { return ss.getSheetByName("מטריצה") || ss.getSheetByName("פירוט"); }
+function getYamamSheet_(ss) { return ss.getSheetByName("יממים") || ss.getSheetByName("ימ\"מים"); }
+function getWeaponsToolsSheet_(ss) { return ss.getSheetByName("הגדרות_נשק_אמל\"ח") || ss.getSheetByName("הגדרות_כלים"); }
+function getLogisticsToolsSheet_(ss) {
+  return ss.getSheetByName("הגדרות_ציוד_לוגיסטי") || ss.getSheetByName("הגדרת_ציוד_לוגיסטי") || ss.getSheetByName("הגדרת_ציוד_לוגיסיטי");
+}
 
-    <div id="mafCardSection" class="card">
-      <h2>📦 טופס זיכויים - כרטיס לוחם</h2>
-      <label>חיפוש חייל (שם או מ"א):</label>
-      <input type="text" placeholder="הקלד שם או מ&quot;א..." oninput="filterSelectOptions('mafSoldierSelect', this.value, onMafSoldierSelected)">
-      <label>בחר לוחם:</label>
-      <select id="mafSoldierSelect" onchange="onMafSoldierSelected()"></select>
+function getFrameworkOrderMap() {
+  return { "מחלקה 1": 1, "מחלקה 2": 2, "מחלקה 3": 3, "חפ\"ק": 4, "מפל\"ג": 5, "חמ\"ל": 6, "מסופחים": 7 };
+}
 
-      <div id="mafSoldierDetails" class="hidden" style="margin-top:14px;">
-        <div style="background:#0f172a;padding:12px;border-radius:8px;margin-bottom:12px;border:1px solid #475569;">
-          <div style="font-weight:bold;color:#38bdf8;font-size:1.1rem;" id="mafSName"></div>
-          <div style="color:#cbd5e1;font-size:0.9rem;" id="mafSMeta"></div>
-        </div>
-        <label style="color:#38bdf8;">📦 ציוד אפסנאות וציוד נלווה:</label>
-        <div id="mafLogisticsList"></div>
-        <label style="color:#f87171;margin-top:10px;">🔫 נשק ואמצעי לחימה:</label>
-        <div id="mafWeaponsList"></div>
+// מיון מצבת נשק/ציוד (עמודה A = מ"א, B = שם, C = מסגרת)
+function sortGearMatrixSheet_(sheet) {
+  if (!sheet || sheet.getLastRow() < 3) return;
+  const orderMap = getFrameworkOrderMap();
+  const lastRow = sheet.getLastRow();
+  const lastCol = sheet.getLastColumn();
+  if (lastCol < 3) return;
+  const range = sheet.getRange(2, 1, lastRow - 1, lastCol);
+  const values = range.getValues();
+  values.sort((a, b) => {
+    const oA = orderMap[normalizeFramework(a[2])] || 99;
+    const oB = orderMap[normalizeFramework(b[2])] || 99;
+    if (oA !== oB) return oA - oB;
+    return normalizeName(a[1]).localeCompare(normalizeName(b[1]), "he");
+  });
+  range.setValues(values);
+}
 
-        <button type="button" class="btn-action btn-danger" onclick="submitMaflagReturns()">🔴 בצע זיכוי לפריטים המסומנים</button>
-        <button type="button" class="btn-action btn-wa" style="margin-top:8px;" onclick="sendMaflagSoldierWa()">📱 שלח כרטיס מלא לוואטסאפ</button>
-        <div id="mafActionStatus" class="status-box"></div>
-      </div>
-    </div>
+// ==========================================
+// מטמון
+// ==========================================
+function cacheGetJson_(key) {
+  try { const v = CacheService.getScriptCache().get(key); return v ? JSON.parse(v) : null; } catch (e) { return null; }
+}
+function cachePutJson_(key, obj, sec) {
+  try { CacheService.getScriptCache().put(key, JSON.stringify(obj), sec); } catch (e) { /* גדול מדי למטמון - לא נורא */ }
+}
+function cacheRemove_(keys) {
+  try { CacheService.getScriptCache().removeAll([].concat(keys)); } catch (e) {}
+}
+function clearAllCaches_() {
+  cacheRemove_([CK.SOLDIERS, CK.TOOLS_WP, CK.TOOLS_LG, CK.TASKS]);
+}
 
-    <div id="mafRepSection" class="card hidden">
-      <h2>📦 דוחות ציוד ואפסנאות</h2>
-      <label>סוג דוח:</label>
-      <select id="mafRepType" onchange="onMafRepTypeChange()">
-        <option value="all_company">כלל הפלוגה - דוח ציוד מפורט</option>
-        <option value="by_framework">דוח ציוד לפי מסגרת</option>
-        <option value="by_tool">דוח לפי פריט</option>
-        <option value="summary_tools">דוח מרכז לפי פריטים</option>
-      </select>
-      <div id="boxMafFw" class="hidden"><label>בחר מסגרת:</label><select id="mafFwSelect"></select></div>
-      <div id="boxMafTool" class="hidden"><label>בחר פריט:</label><select id="mafToolSelect"></select></div>
-      <button type="button" class="btn-action btn-primary" onclick="generateMafReport()">🔍 הפק דוח ציוד</button>
-      <div id="mafRepOut" class="hidden" style="margin-top:12px;">
-        <textarea id="mafRepText" rows="10" readonly></textarea>
-        <button type="button" class="btn-action btn-wa" onclick="openWaText('mafRepText')">📱 פתח בוואטסאפ</button>
-      </div>
-    </div>
-  </div>
+// עריכה ידנית בגיליון מנקה את המטמון הרלוונטי
+function onEdit(e) {
+  try {
+    const name = e && e.range ? e.range.getSheet().getName() : "";
+    if (name === "חיילים") cacheRemove_(CK.SOLDIERS);
+    else if (name === "משימות") cacheRemove_(CK.TASKS);
+    else if (name.indexOf("הגדרות") === 0 || name.indexOf("הגדרת") === 0) cacheRemove_([CK.TOOLS_WP, CK.TOOLS_LG]);
+  } catch (err) {}
+}
 
-  <!-- מסך 7: ממשק דוחות (פיקוד עליון) -->
-  <div id="screenReports" class="narrow-wrap hidden">
-    <div class="card">
-      <h2>📊 ממשק דוחות</h2>
-      <div class="btn-tab-container">
-        <div id="tabSubPres" class="btn-tab active" onclick="switchRepDomain('presence')">נוכחות</div>
-        <div id="tabSubWpn" class="btn-tab" onclick="switchRepDomain('weapons')">נשקייה וצל"ם</div>
-      </div>
+// ==========================================
+// חיילים והרשאות
+// ==========================================
+function ensureAuthColumns(soldiersSheet) {
+  const lastCol = Math.max(soldiersSheet.getLastColumn(), 6);
+  const headers = soldiersSheet.getRange(1, 1, 1, lastCol).getValues()[0].map(h => cleanHebrewText(h));
 
-      <div id="repPresenceControls">
-        <label>סוג דוח נוכחות:</label>
-        <select id="repPresType">
-          <option value="summary">סיכום סטטיסטי</option>
-          <option value="detailed">דוח שמי מפורט</option>
-        </select>
-        <label>תאריך הדוח:</label>
-        <input type="date" id="repPresDate">
-        <label>מסגרת:</label>
-        <select id="repPresFw"><option value="ALL">כלל הפלוגה</option></select>
-      </div>
-
-      <div id="repWeaponsControls" class="hidden">
-        <label>סוג דוח נשק:</label>
-        <select id="repWpnType" onchange="onRepWpnTypeChange()">
-          <option value="all_company">דוח נשק פלוגתי</option>
-          <option value="by_framework">דוח נשק לפי מסגרות</option>
-          <option value="by_tool">דוח נשק לפי סוג נשק</option>
-          <option value="by_soldier">דוח אישי לחייל (כולל ציוד אפסנאות)</option>
-        </select>
-        <div id="boxRepWpnFw" class="hidden"><label>מסגרת:</label><select id="repWpnFwSel"></select></div>
-        <div id="boxRepWpnTool" class="hidden"><label>סוג נשק:</label><select id="repWpnToolSel"></select></div>
-        <div id="boxRepWpnSoldier" class="hidden"><label>חייל:</label><select id="repWpnSoldierSel"></select></div>
-      </div>
-
-      <button type="button" class="btn-action btn-primary" onclick="generateHighCommandReport()">🔍 הפק דוח</button>
-      <div id="hcRepErr" class="status-box status-err"></div>
-      <div id="hcRepOut" class="hidden" style="margin-top:12px;">
-        <textarea id="hcRepText" rows="11" readonly></textarea>
-        <div class="btn-row">
-          <button type="button" class="btn-action btn-wa" onclick="openWaText('hcRepText')">📱 וואטסאפ</button>
-          <button type="button" class="btn-action btn-primary" onclick="copyTextArea('hcRepText')">📋 העתק</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מסך 8: מרכז בנייה ואישור שבצ"ק (מחלקות / קצינים / אישור סופי) -->
-  <div id="screenShavzakBuilder" class="hidden">
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-        <h2 style="margin:0;" id="shvBuilderTitle">📅 בניית שבצ"ק</h2>
-        <button type="button" id="btnToggleSkeletonMode" class="btn-mini hidden" style="border-color:#38bdf8;color:#38bdf8;" onclick="toggleSkeletonEditMode()">🔄 ערוך חלוקת משימות למחלקות</button>
-      </div>
-
-      <label>תאריך השבצ"ק (לו"ז 06:00 עד 06:00 למחרת):</label>
-      <div class="date-input-group">
-        <input type="text" id="shvTargetDate" placeholder="dd/mm/yyyy">
-        <input type="date" id="shvDatePicker">
-        <button type="button" class="btn-mini" style="background:#0284c7;color:#fff;border:none;padding:0 14px;" onclick="loadShavzakWorkspace()">טען</button>
-      </div>
-    </div>
-
-    <!-- הודעת חסימה / סטטוס מרכזית -->
-    <div id="shvBlockingMessage" class="warning-banner hidden"></div>
-    <div id="shvStageStatusBanner" class="info-banner hidden"></div>
-    <div id="shvHighCmdWarnings" class="warning-banner hidden"></div>
-
-    <!-- שלב 1: חלוקת משימות למחלקות (קצינים / פיקוד עליון / שלומי) -->
-    <div id="shvStage1Wrap" class="hidden">
-      <div class="shv-workspace-grid">
-        <!-- צד ימין: טבלה מסכמת קטנה לפי מחלקה 1, מחלקה 2, מחלקה 3 ומסופחים -->
-        <div class="shv-pool-panel">
-          <h3 style="margin:0 0 6px;font-size:1.05rem;color:#38bdf8;">📊 מצבת נוכחים לשבצ"ק</h3>
-          <div style="font-size:0.78rem;color:#94a3b8;margin-bottom:8px;">מחלקות 1-3 ומסופחים בלבד:</div>
-          <div id="shvSummaryTableContainer"></div>
-        </div>
-
-        <!-- מרכז המסך: רשימת המשימות לחלוקה למחלקות -->
-        <div class="card">
-          <h2>🆕 חלוקת משימות למחלקות</h2>
-          <div style="font-size:0.85rem;color:#94a3b8;margin-bottom:12px;">שייך כל משימה ומשמרת לאחת המסגרות (מחלקות 1-3 או מסופחים):</div>
-          <div id="skeletonTasksList"></div>
-          <button type="button" class="btn-action btn-success" onclick="saveOfficerSkeleton()">💾 שמור חלוקת משימות ופתח למחלקות</button>
-          <div id="skeletonStatus" class="status-box"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- שלב 2-4: סביבת שיבוץ חיילים ואישורים -->
-    <div id="shvStage2Wrap" class="hidden">
-      <div class="shv-workspace-grid">
-        <!-- צד ימין: רשימת החיילים הנוכחים -->
-        <div class="shv-pool-panel">
-          <h3 style="margin:0 0 6px;font-size:1.05rem;color:#38bdf8;">👥 חיילים נוכחים לשיבוץ</h3>
-          <div id="shvPoolFilterWrap" class="hidden">
-            <select id="shvPoolFwFilter" style="padding:7px;font-size:0.85rem;margin-bottom:8px;" onchange="renderShavzakUI()">
-              <option value="ALL">כלל המחלקות והמסופחים</option>
-              <option value="מחלקה 1">מחלקה 1</option>
-              <option value="מחלקה 2">מחלקה 2</option>
-              <option value="מחלקה 3">מחלקה 3</option>
-              <option value="מסופחים">מסופחים</option>
-            </select>
-          </div>
-          <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:10px;">לחץ על חייל לבחירה, ולאחר מכן לחץ על משבצת פנויה:</div>
-          <div id="shvAvailablePool"></div>
-        </div>
-
-        <!-- מרכז המסך: לוח השבצ"ק -->
-        <div>
-          <div id="shvScheduleBoard"></div>
-
-          <div id="shvActionButtons" class="card hidden">
-            <!-- כפתורי מפקד מחלקה -->
-            <div id="platoonBtnsRow" class="btn-row hidden">
-              <button type="button" class="btn-action btn-primary" onclick="savePlatoonShavzak(false)">💾 שמירה (טיוטה)</button>
-              <button type="button" id="btnSubmitPlatoonApproval" class="btn-action btn-success" onclick="attemptSubmitPlatoonApproval()">✅ שמירה והעברה לאישור</button>
-            </div>
-
-            <!-- כפתורי קצין -->
-            <div id="officerBtnsWrap" class="hidden">
-              <div class="btn-row">
-                <button type="button" class="btn-action btn-primary" onclick="savePlatoonShavzak(false)">💾 שמירה</button>
-                <button type="button" id="btnOfficerSubmitMyPlatoon" class="btn-action btn-success" onclick="attemptSubmitPlatoonApproval()">✅ שמירה והעברה לאישור</button>
-              </div>
-              <button type="button" id="btnForwardToMp" class="btn-action btn-warning hidden" style="margin-top:10px;" onclick="forwardToMpApproval()">📤 שמירה והעברה לאישור מ"פ</button>
-            </div>
-
-            <!-- כפתורי פיקוד עליון / שלומי -->
-            <div id="finalMpBtnsWrap" class="hidden">
-              <div class="btn-row">
-                <button type="button" class="btn-action btn-primary" onclick="savePlatoonShavzak(false)">💾 שמור תיקונים</button>
-                <button type="button" class="btn-action btn-success" onclick="publishOfficialShavzak()">🎖️ שבצק מאושר</button>
-              </div>
-            </div>
-
-            <div id="shvSaveStatus" class="status-box"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- מסך 9: ממשק אדמין (שלומי) -->
-  <div id="screenAdmin" class="narrow-wrap hidden">
-    <div class="card">
-      <h2>✏️ תיקון דיווח לחייל</h2>
-      <label>תאריך:</label><input type="date" id="uDate">
-      <label>חיפוש חייל:</label><input type="text" placeholder="סנן שם..." oninput="filterSelectOptions('uSoldier', this.value, onAdmSoldierSelect)">
-      <label>בחר חייל:</label><select id="uSoldier" onchange="onAdmSoldierSelect()"></select>
-      <label>סטטוס ראשי:</label>
-      <select id="uMainStatus" onchange="syncAdmSubOptions()">
-        <option value="נוכח">נוכח</option>
-        <option value="אינו נוכח">אינו נוכח</option>
-        <option value="לא פעיל">⛔ העבר ללא פעיל</option>
-      </select>
-      <label>סטטוס משני:</label><select id="uSubStatus"></select>
-      <label>הערה:</label><input type="text" id="uNotes">
-      <button type="button" class="btn-action btn-primary" onclick="submitAdmSingleUpdate()">💾 עדכן חייל</button>
-      <div id="uStatus" class="status-box"></div>
-    </div>
-
-    <div class="card">
-      <h2>➕ הוספת חייל חדש</h2>
-      <label>שם מלא: *</label><input type="text" id="aName" placeholder="ישראל ישראלי">
-      <label>מספר אישי: *</label><input type="text" id="aPn" placeholder="8123456" inputmode="numeric">
-      <label>מסגרת: *</label><select id="aFw"></select>
-      <label>הרשאה (ניתן להפריד בפסיק):</label>
-      <input type="text" id="aRole" value="חייל" placeholder="חייל / מפקד / קצין / מפל&quot;ג / פיקוד עליון / שלומי">
-      <div class="checkbox-row"><input type="checkbox" id="aActive" checked><label for="aActive">פעיל בשמ"פ?</label></div>
-      <button type="button" class="btn-action btn-success" onclick="submitAdmAddSoldier()">🚀 שמור והוסף</button>
-      <div id="aStatus" class="status-box"></div>
-    </div>
-
-    <div class="card">
-      <h2>🔀 העברת חייל בין מסגרות</h2>
-      <label>חיפוש חייל:</label><input type="text" placeholder="סנן..." oninput="filterSelectOptions('mSoldier', this.value)">
-      <label>חייל:</label><select id="mSoldier"></select>
-      <label>מסגרת יעד:</label><select id="mNewFw"></select>
-      <button type="button" class="btn-action btn-purple" onclick="submitAdmMoveSoldier()">🔀 העבר מסגרת</button>
-      <div id="mStatus" class="status-box"></div>
-    </div>
-
-    <div class="card" style="border-color:#0284c7;">
-      <h2>🔍 בדיקת פערים (עבור ירוק בעיינים)</h2>
-      <label>הדבק רשימת מספרים אישיים:</label>
-      <textarea id="pastedPnInput" rows="4" placeholder="הדבק כאן מ&quot;א מאקסל או וואטסאפ..."></textarea>
-      <button type="button" class="btn-action btn-primary" onclick="runPnCrossCheck()">⚡ בצע הצלבה</button>
-      <div id="crossCheckOut" class="hidden" style="margin-top:12px;">
-        <textarea id="crossCheckText" rows="9" readonly></textarea>
-        <div class="btn-row">
-          <button type="button" class="btn-action btn-wa" onclick="openWaText('crossCheckText')">📱 וואטסאפ</button>
-          <button type="button" class="btn-action btn-primary" onclick="copyTextArea('crossCheckText')">📋 העתק</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>🔄 סנכרון מבנה מטריצות</h2>
-      <button type="button" class="btn-action btn-warning" onclick="submitAdmSync()">🔄 סנכרן מטריצות עכשיו</button>
-      <div id="syncStatus" class="status-box"></div>
-    </div>
-  </div>
-
-<script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlc5o7RAZbAJjnvotxPunwiZ4yCEmFNo6RgP3pgJn4JzGqecSnJU_u0XCimnlRfOH-/exec";
-  const ALL_FRAMEWORKS = ["מחלקה 1", "מחלקה 2", "מחלקה 3", "חפ\"ק", "מפל\"ג", "חמ\"ל", "מסופחים"];
-  const SHAVZAK_PLATOONS = ["מחלקה 1", "מחלקה 2", "מחלקה 3", "מסופחים"];
-
-  function escapeHtml(str) {
-    return String(str || "")
-      .replace(/&/g, "&amp;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+  let roleColIdx = headers.indexOf("הרשאה");
+  if (roleColIdx === -1) {
+    roleColIdx = headers.length;
+    soldiersSheet.getRange(1, roleColIdx + 1).setValue("הרשאה").setFontWeight("bold");
+    headers.push("הרשאה");
   }
-
-  function cleanHebrewText(val) {
-    return String(val || "")
-      .replace(/[\u200B-\u200F\u202A-\u202E\uFEFF]/g, "")
-      .replace(/\u00A0/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
+  let passColIdx = headers.indexOf("סיסמה");
+  if (passColIdx === -1) {
+    passColIdx = headers.length;
+    soldiersSheet.getRange(1, passColIdx + 1).setValue("סיסמה").setFontWeight("bold");
+    headers.push("סיסמה");
   }
+  return { roleCol: roleColIdx + 1, passCol: passColIdx + 1 };
+}
 
-  function normalizeFramework(fw) {
-    const clean = cleanHebrewText(fw).replace(/[״׳'“”„‟]/g, "\"");
-    if (!clean) return "";
-    const noQuotes = clean.replace(/"/g, "");
-    if (noQuotes === "חפק") return "חפ\"ק";
-    if (noQuotes === "מפלג") return "מפל\"ג";
-    if (noQuotes === "חמל") return "חמ\"ל";
-    if (noQuotes.includes("מסופח")) return "מסופחים";
-    return clean;
-  }
+function computeUserPermissions(rawRoleStr, legacyCommanderCol, soldierName, soldierFramework) {
+  const cleanName = normalizeName(soldierName);
+  const homeFw = normalizeFramework(soldierFramework);
+  const str = cleanHebrewText(rawRoleStr);
+  const legacyIsCmdr = ["כן", "true"].includes(cleanHebrewText(legacyCommanderCol).toLowerCase());
 
-  let currentUser = null;
-  let soldierGearData = null;
-  let wpToolsList = [];
-  let lgToolsList = [];
-  let attendanceSoldiers = [];
-  let sharedDB = null;
-  let mafLoadedSoldier = null;
-  let repDomain = "presence";
-
-  let soldierShvOfficialBlock = null;
-  let shvGeneratedDataUrl = null;
-  let shvWorkspaceState = null;
-  let shvSelectedSoldier = null;
-  let shvSkeletonShifts = [];
-  let shvViewMode = "platoon"; // "platoon" | "officers" | "final_approval"
-  let shvForceSkeletonEdit = false;
-  let mobileWarningShown = false;
-
-  async function apiCall(payload) {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload)
+  const explicitRoles = [];
+  if (!str) {
+    explicitRoles.push(legacyIsCmdr ? "מפקד" : "חייל");
+  } else {
+    str.split(",").forEach(raw => {
+      const clean = cleanHebrewText(raw).replace(/[״׳'“”]/g, "\"");
+      if (!clean) return;
+      const noQ = clean.replace(/"/g, "");
+      if (noQ === "מפלג") explicitRoles.push("מפל\"ג");
+      else if (noQ === "פיקוד עליון" || noQ === "הנהלה") explicitRoles.push("פיקוד עליון");
+      else if (noQ === "נאמן כא" || noQ === "נאמן כח אדם") explicitRoles.push("נאמן כ\"א");
+      else if (noQ === "שלומי") explicitRoles.push("שלומי");
+      else if (noQ === "קצין") explicitRoles.push("קצין");
+      else if (noQ === "מפקד") explicitRoles.push("מפקד");
+      else if (noQ === "חייל") explicitRoles.push("חייל");
+      else explicitRoles.push(clean);
     });
-    return await res.json();
   }
 
-  function showBox(id, text, isOk) {
-    const el = document.getElementById(id);
-    el.style.display = "block";
-    el.className = "status-box " + (isOk ? "status-ok" : "status-err");
-    el.innerText = text;
+  const roleSet = new Set(explicitRoles);
+  if (roleSet.size === 0) roleSet.add("חייל");
+
+  const isShlomi = roleSet.has("שלומי");
+  const isPikudElyon = roleSet.has("פיקוד עליון") || isShlomi;
+  const isKatzin = roleSet.has("קצין") || isPikudElyon;
+  const isMefaked = roleSet.has("מפקד") || roleSet.has("נאמן כ\"א") || isKatzin;
+  const isMaflag = roleSet.has("מפל\"ג") || isShlomi;
+  const designatedFw = DESIGNATED_ATTENDANCE_REPORTERS[cleanName] || "";
+  const isCommander = roleSet.has("מפקד") || roleSet.has("קצין") || legacyIsCmdr;
+
+  let attendanceAllCompany = false;
+  const allowedFrameworksSet = new Set();
+  if (isPikudElyon) {
+    attendanceAllCompany = true;
+    ALL_COMPANY_FRAMEWORKS.forEach(f => allowedFrameworksSet.add(f));
+  } else {
+    if (designatedFw) allowedFrameworksSet.add(designatedFw);
+    if (isMefaked && homeFw) allowedFrameworksSet.add(homeFw);
   }
+  const allowedAttendanceFrameworks = Array.from(allowedFrameworksSet);
+  const canReportAttendance = attendanceAllCompany || allowedAttendanceFrameworks.length > 0;
+  const isPlainSoldierOnly = (roleSet.size === 1 && roleSet.has("חייל") && !designatedFw);
 
-  function openCustomModal(icon, title, body, btnText, onOk) {
-    document.getElementById("modalIcon").textContent = icon;
-    document.getElementById("modalTitle").textContent = title;
-    document.getElementById("modalBody").textContent = body;
-    const btn = document.getElementById("modalOkBtn");
-    btn.textContent = btnText || "OK";
-    btn.onclick = () => { closeCustomModal(); if (onOk) onOk(); };
-    document.getElementById("customModal").classList.remove("hidden");
+  return {
+    roles: Array.from(roleSet),
+    roleDisplayLabel: explicitRoles.join(", ") || "חייל",
+    requiresPassword: REQUIRE_PASSWORD_FOR_ALL || !isPlainSoldierOnly,
+    isCommander: isCommander,
+    permissions: {
+      viewShavzak: true,
+      signGear: true,
+      maflagReturns: isMaflag,
+      reportsCenter: isPikudElyon,
+      attendanceReport: canReportAttendance,
+      attendanceAllCompany: attendanceAllCompany,
+      allowedAttendanceFrameworks: allowedAttendanceFrameworks,
+      shavzakPlatoon: isMefaked && SHAVZAK_FRAMEWORKS.includes(homeFw),
+      shavzakOfficers: isKatzin,
+      shavzakFinalApproval: isPikudElyon,
+      adminPanel: isShlomi
+    }
+  };
+}
+
+// אינדקס חיילים (נשמר במטמון, בלי סיסמאות)
+function getSoldiersIndex_(forceReload) {
+  if (!forceReload) {
+    const cached = cacheGetJson_(CK.SOLDIERS);
+    if (cached) return cached;
   }
+  const sheet = getSS_().getSheetByName("חיילים");
+  if (!sheet || sheet.getLastRow() < 2) return { roleCol: 0, passCol: 0, list: [] };
+  const { roleCol, passCol } = ensureAuthColumns(sheet);
+  const width = Math.max(sheet.getLastColumn(), passCol);
+  const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, width).getValues();
+  const list = [];
+  data.forEach((r, i) => {
+    const name = normalizeName(r[1]);
+    const pn = cleanPn(r[2]);
+    if (!name && !pn) return;
+    list.push({
+      row: i + 2,
+      fw: normalizeFramework(r[0]),
+      name: name,
+      pn: pn,
+      active: isActiveValue(r[3]),
+      legacy: cleanHebrewText(r[4]),
+      role: cleanHebrewText(r[roleCol - 1]),
+      hasPass: cleanHebrewText(r[passCol - 1]).length > 0
+    });
+  });
+  const idx = { roleCol, passCol, list };
+  cachePutJson_(CK.SOLDIERS, idx, SOLDIERS_CACHE_SEC);
+  return idx;
+}
 
-  function closeCustomModal() {
-    document.getElementById("customModal").classList.add("hidden");
+function findSoldierByPn_(pn) {
+  const target = cleanPn(pn);
+  if (!target) return null;
+  return getSoldiersIndex_().list.find(s => s.pn === target) || null;
+}
+
+function soldiersByPnMap_() {
+  const map = {};
+  getSoldiersIndex_().list.forEach(s => { if (s.pn) map[s.pn] = s; });
+  return map;
+}
+
+// מוודא שמספר השורה במטמון עדיין נכון (אם מישהו מיין את הגיליון ידנית)
+function verifiedSoldierRow_(s) {
+  const sheet = getSS_().getSheetByName("חיילים");
+  if (cleanPn(sheet.getRange(s.row, 3).getValue()) === s.pn) return s.row;
+  const fresh = getSoldiersIndex_(true).list.find(x => x.pn === s.pn);
+  if (!fresh) throw new Error("החייל לא נמצא בגיליון חיילים");
+  return fresh.row;
+}
+
+function soldierIsCommander_(s) {
+  return computeUserPermissions(s.role, s.legacy, s.name, s.fw).isCommander;
+}
+
+function buildUser_(s) {
+  const p = computeUserPermissions(s.role, s.legacy, s.name, s.fw);
+  return {
+    personalNumber: s.pn,
+    name: s.name,
+    framework: s.fw,
+    isActive: s.active,
+    roles: p.roles,
+    roleDisplayLabel: p.roleDisplayLabel,
+    permissions: p.permissions,
+    requiresPassword: p.requiresPassword,
+    hasPassword: s.hasPass,
+    isCommander: p.isCommander
+  };
+}
+
+// ==========================================
+// סיסמאות וטוקנים
+// ==========================================
+function hashPassword_(pass, salt) {
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + "|" + pass, Utilities.Charset.UTF_8);
+  return bytes.map(b => ((b + 256) % 256).toString(16).padStart(2, "0")).join("");
+}
+
+function makeStoredPassword_(pass) {
+  const salt = Utilities.getUuid().replace(/-/g, "").slice(0, 16);
+  return "h$" + salt + "$" + hashPassword_(pass, salt);
+}
+
+function checkPassword_(stored, input) {
+  const st = String(stored || "").trim();
+  if (!st) return false;
+  if (st.indexOf("h$") === 0) {
+    const parts = st.split("$");
+    return parts.length === 3 && hashPassword_(input, parts[1]) === parts[2];
   }
+  return cleanHebrewText(st) === input; // סיסמה ישנה (טקסט גלוי)
+}
 
-  function hideAllScreens() {
-    [
-      "screenLogin", "screenHub", "screenShavzakView", "screenSignatures",
-      "screenAttendance", "screenMaflag", "screenReports", "screenShavzakBuilder", "screenAdmin"
-    ].forEach(id => document.getElementById(id).classList.add("hidden"));
+function createSession_(pn) {
+  const token = Utilities.getUuid().replace(/-/g, "") + Utilities.getUuid().replace(/-/g, "");
+  CacheService.getScriptCache().put("sess_" + token, pn, SESSION_TTL_SEC);
+  return token;
+}
+
+function resolveSession_(token) {
+  if (!token || typeof token !== "string" || token.length < 20) return null;
+  const cache = CacheService.getScriptCache();
+  const pn = cache.get("sess_" + token);
+  if (!pn) return null;
+  cache.put("sess_" + token, pn, SESSION_TTL_SEC); // חידוש תוקף
+  return pn;
+}
+
+function destroySession_(token) {
+  if (token) CacheService.getScriptCache().remove("sess_" + token);
+}
+
+function handleAuthCheck_(data) {
+  const s = findSoldierByPn_(data.personalNumber);
+  if (!s) return { status: "not_found", found: false, message: "מספר אישי " + cleanPn(data.personalNumber) + " אינו מופיע ברשימת הפלוגה!" };
+  if (!s.active) return { status: "error", found: false, message: "המשתמש אינו מוגדר כפעיל. פנה לאדמין." };
+  const user = buildUser_(s);
+  const res = { status: "success", found: true, user: user };
+  if (!user.requiresPassword) res.token = createSession_(s.pn);
+  return res;
+}
+
+function handleAuthSetPassword_(data) {
+  const pass = cleanHebrewText(data.password);
+  if (pass.length < 4) return { status: "error", message: "הסיסמה חייבת להכיל לפחות 4 תווים" };
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(15000)) return { status: "error", message: "המערכת עמוסה, נסה שוב" };
+  try {
+    const s = findSoldierByPn_(data.personalNumber);
+    if (!s) return { status: "error", message: "משתמש לא נמצא" };
+    if (!s.active) return { status: "error", message: "המשתמש אינו מוגדר כפעיל" };
+    const idx = getSoldiersIndex_();
+    const sheet = getSS_().getSheetByName("חיילים");
+    const row = verifiedSoldierRow_(s);
+    const cell = sheet.getRange(row, idx.passCol);
+    if (cleanHebrewText(cell.getValue())) {
+      return { status: "error", message: "כבר הוגדרה סיסמה למשתמש זה. לאיפוס סיסמה פנה לאדמין." };
+    }
+    cell.setNumberFormat("@").setValue(makeStoredPassword_(pass));
+    cacheRemove_(CK.SOLDIERS);
+    s.hasPass = true;
+    return { status: "success", user: buildUser_(s), token: createSession_(s.pn) };
+  } finally {
+    lock.releaseLock();
   }
+}
 
-  // ==========================================
-  // הזדהות ופתיחת הדשבורד הראשי
-  // ==========================================
-  async function checkPersonalNumber() {
-    const pn = document.getElementById("loginPn").value.trim();
-    if (!pn) { alert("נא להזין מספר אישי"); return; }
+function handleAuthVerifyPassword_(data) {
+  const pn = cleanPn(data.personalNumber);
+  const cache = CacheService.getScriptCache();
+  const failKey = "fail_" + pn;
+  const fails = parseInt(cache.get(failKey) || "0", 10);
+  if (fails >= MAX_LOGIN_FAILS) {
+    return { status: "error", authenticated: false, message: "יותר מדי ניסיונות שגויים. נסה שוב בעוד 10 דקות." };
+  }
+  const s = findSoldierByPn_(pn);
+  if (!s) return { status: "error", message: "משתמש לא נמצא" };
+  if (!s.active) return { status: "error", message: "המשתמש אינו מוגדר כפעיל" };
 
-    const btn = document.getElementById("btnCheckPn");
-    btn.disabled = true; btn.innerText = "בודק פרטים...";
-    document.getElementById("loginStatus").style.display = "none";
-    document.getElementById("setPasswordBox").classList.add("hidden");
-    document.getElementById("verifyPasswordBox").classList.add("hidden");
+  const idx = getSoldiersIndex_();
+  const sheet = getSS_().getSheetByName("חיילים");
+  const row = verifiedSoldierRow_(s);
+  const stored = sheet.getRange(row, idx.passCol).getValue();
+  const input = cleanHebrewText(data.password);
 
-    try {
-      const res = await apiCall({ action: "auth_check", personalNumber: pn });
-      btn.disabled = false; btn.innerText = "המשך";
+  if (!checkPassword_(stored, input)) {
+    cache.put(failKey, String(fails + 1), LOGIN_LOCK_SEC);
+    return { status: "error", authenticated: false, message: "סיסמה שגויה, נסה שוב" };
+  }
+  cache.remove(failKey);
 
-      if (res.status !== "success" || !res.found) {
-        showBox("loginStatus", res.message || "מספר אישי לא נמצא", false);
-        return;
+  // שדרוג סיסמה ישנה (טקסט גלוי) לסיסמה מוצפנת
+  if (String(stored).trim().indexOf("h$") !== 0) {
+    const lock = LockService.getScriptLock();
+    if (lock.tryLock(5000)) {
+      try { sheet.getRange(row, idx.passCol).setNumberFormat("@").setValue(makeStoredPassword_(input)); }
+      finally { lock.releaseLock(); }
+    }
+  }
+  return { status: "success", authenticated: true, user: buildUser_(s), token: createSession_(s.pn) };
+}
+
+// ==========================================
+// נקודות כניסה
+// ==========================================
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu("🎖️ מסייעת 8109")
+    .addItem("🔄 סנכרן מבנה חיילים למטריצות", "menuSyncSoldiers")
+    .addItem("🧹 נקה מטמון מערכת", "menuClearCache")
+    .addToUi();
+}
+
+function menuSyncSoldiers() {
+  syncSoldiersToMatrices();
+  SpreadsheetApp.getUi().alert("הסנכרון הושלם בהצלחה!");
+}
+
+function menuClearCache() {
+  clearAllCaches_();
+  SpreadsheetApp.getUi().alert("המטמון נוקה.");
+}
+
+function jsonResponse(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+// GET משמש רק ל"חימום" השרת - לא מחזיר שום מידע
+function doGet(e) {
+  return jsonResponse({ status: "ok", app: "8109" });
+}
+
+const P = {
+  any: () => true,
+  maflag: p => p.maflagReturns,
+  sharedData: p => p.maflagReturns || p.reportsCenter || p.adminPanel,
+  officers: p => p.shavzakOfficers || p.shavzakFinalApproval,
+  shavzakAny: p => p.shavzakPlatoon || p.shavzakOfficers || p.shavzakFinalApproval,
+  finalApproval: p => p.shavzakFinalApproval,
+  admin: p => p.adminPanel,
+  attendance: p => p.attendanceReport || p.adminPanel
+};
+
+const ROUTES = {
+  get_soldier_gear:       { fn: apiGetSoldierGear_, perm: P.any },
+  submit_weapons:         { fn: apiSubmitWeapons_, perm: P.any, write: true },
+  submit_logistics:       { fn: apiSubmitLogistics_, perm: P.any, write: true },
+  get_soldier_shavzak:    { fn: (d, u) => getSoldierShavzakView(u), perm: P.any },
+  get_attendance_soldiers:{ fn: apiGetAttendanceSoldiers_, perm: P.attendance },
+  submit_attendance:      { fn: handleAttendanceSubmit_, perm: P.attendance, write: true },
+  shavzak_get_tasks:      { fn: () => getShavzakTasksCatalog(), perm: P.officers },
+  shavzak_init_skeleton:  { fn: initShavzakSkeleton, perm: P.officers, write: true },
+  shavzak_get_workspace:  { fn: getShavzakWorkspaceData, perm: P.shavzakAny },
+  shavzak_save_platoon:   { fn: saveShavzakPlatoonAssignments, perm: P.shavzakAny, write: true },
+  shavzak_transfer_shift: { fn: transferShavzakShiftPlatoon, perm: P.officers, write: true },
+  shavzak_forward_to_mp:  { fn: forwardShavzakToMpApproval, perm: P.officers, write: true },
+  shavzak_approve_official:{ fn: approveAndPublishOfficialShavzak, perm: P.finalApproval, write: true },
+  get_shared_dataset:     { fn: () => getSharedDataset(), perm: P.sharedData },
+  maflag_return:          { fn: maflagReturnLogisticsItems, perm: P.maflag, write: true },
+  admin_sync:             { fn: adminSyncMatrices, perm: P.admin, write: true },
+  admin_update_soldier:   { fn: adminUpdateSingleSoldier, perm: P.admin, write: true },
+  admin_add_soldier:      { fn: adminAddNewSoldier, perm: P.admin, write: true },
+  admin_move_soldier:     { fn: adminMoveSoldierFramework, perm: P.admin, write: true },
+  admin_reset_password:   { fn: adminResetPassword, perm: P.admin, write: true },
+  logout:                 { fn: (d) => { destroySession_(d.token); return { status: "success" }; }, perm: P.any }
+};
+
+function doPost(e) {
+  let data;
+  try {
+    data = JSON.parse(e.postData.contents);
+  } catch (err) {
+    return jsonResponse({ status: "error", message: "בקשה לא תקינה" });
+  }
+  const action = String(data.action || "");
+
+  try {
+    if (action === "ping") return jsonResponse({ status: "ok" });
+    if (action === "auth_check") return jsonResponse(handleAuthCheck_(data));
+    if (action === "auth_set_password") return jsonResponse(handleAuthSetPassword_(data));
+    if (action === "auth_verify_password") return jsonResponse(handleAuthVerifyPassword_(data));
+
+    const route = ROUTES[action];
+    if (!route) return jsonResponse({ status: "error", message: "פעולה לא מוכרת: " + action });
+
+    const pn = resolveSession_(data.token);
+    if (!pn) return jsonResponse({ status: "auth_required", message: "פג תוקף ההתחברות. יש להתחבר מחדש." });
+    const s = findSoldierByPn_(pn);
+    if (!s || !s.active) return jsonResponse({ status: "auth_required", message: "המשתמש אינו פעיל. יש להתחבר מחדש." });
+    const user = buildUser_(s);
+
+    if (route.perm && !route.perm(user.permissions)) {
+      return jsonResponse({ status: "error", message: "אין לך הרשאה לפעולה זו" });
+    }
+
+    if (route.write) {
+      const lock = LockService.getScriptLock();
+      if (!lock.tryLock(25000)) return jsonResponse({ status: "error", message: "המערכת עמוסה כרגע, נסה שוב בעוד רגע" });
+      try {
+        return jsonResponse(route.fn(data, user));
+      } finally {
+        SpreadsheetApp.flush();
+        lock.releaseLock();
       }
+    }
+    return jsonResponse(route.fn(data, user));
+  } catch (err) {
+    return jsonResponse({ status: "error", message: (err && err.message) ? err.message : String(err) });
+  }
+}
 
-      currentUser = res.user;
+// ==========================================
+// דיווח נוכחות
+// ==========================================
+function apiGetAttendanceSoldiers_(data, user) {
+  const fw = normalizeFramework(data.filterFramework || "");
+  const p = user.permissions;
+  if (!fw) {
+    if (!p.adminPanel && !p.attendanceAllCompany) return { status: "error", message: "יש לבחור מסגרת" };
+  } else if (!p.adminPanel && !p.attendanceAllCompany && !p.allowedAttendanceFrameworks.includes(fw)) {
+    return { status: "error", message: "אין לך הרשאה לצפות במסגרת " + fw };
+  }
+  return getSoldiersDataset(fw);
+}
 
-      if (!currentUser.requiresPassword) {
-        completeAuthentication(currentUser);
-      } else if (!currentUser.hasPassword) {
-        document.getElementById("welcomeNewAuth").innerText = `שלום ${currentUser.name}, זו כניסתך הראשונה. אנא הגדר סיסמה:`;
-        document.getElementById("setPasswordBox").classList.remove("hidden");
+function parseDetailedCell_(rawCell) {
+  let mSt = "נוכח", sSt = rawCell, nts = "";
+  if (rawCell.includes("חופשה")) { mSt = "אינו נוכח"; sSt = "חופשה"; }
+  else if (rawCell.includes("גימלים") || rawCell.includes("ג'")) { mSt = "אינו נוכח"; sSt = "גימלים"; }
+  else if (rawCell.includes("שוחרר")) { mSt = "אינו נוכח"; sSt = "שוחרר"; }
+  else if (rawCell.includes("מגיע היום")) { sSt = "מגיע היום"; }
+  else if (rawCell.includes("יוצא היום")) { sSt = "יוצא היום"; }
+  else if (rawCell.includes("נוכחות מלאה") || rawCell === "V") { sSt = "נוכחות מלאה"; }
+  else if (rawCell.startsWith("אחר")) { sSt = "אחר"; nts = rawCell.replace(/^אחר\s*[-:]?\s*/, "").trim(); }
+  return { mainStatus: mSt, subStatus: sSt, notes: nts };
+}
+
+function getSoldiersDataset(filterFramework) {
+  const ss = getSS_();
+  const targetFw = normalizeFramework(filterFramework);
+  const soldiers = getSoldiersIndex_().list.filter(s => s.active && s.name && (!targetFw || s.fw === targetFw));
+  const wanted = new Set(soldiers.map(s => s.name));
+  const lastStatus = {};
+
+  // 1. מטריצה מפורטת - רק 21 העמודות האחרונות (במקום כל ההיסטוריה)
+  const det = getDetailedSheet_(ss);
+  if (det && det.getLastRow() >= 2 && det.getLastColumn() >= 3) {
+    const lastC = det.getLastColumn();
+    const span = Math.min(21, lastC - 2);
+    const startC = lastC - span + 1;
+    const n = det.getLastRow() - 1;
+    const names = det.getRange(2, 2, n, 1).getValues();
+    const grid = det.getRange(2, startC, n, span).getValues();
+    names.forEach((nr, i) => {
+      const nm = normalizeName(nr[0]);
+      if (!wanted.has(nm)) return;
+      for (let c = span - 1; c >= 0; c--) {
+        const raw = cleanHebrewText(grid[i][c]);
+        if (raw && raw !== "-") { lastStatus[nm] = parseDetailedCell_(raw); break; }
+      }
+    });
+  }
+
+  // 2. יומן דיווחים - רק 3000 השורות האחרונות
+  const rep = ss.getSheetByName("דיווחים");
+  if (rep && rep.getLastRow() >= 2) {
+    const n = Math.min(3000, rep.getLastRow() - 1);
+    const start = rep.getLastRow() - n + 1;
+    const vals = rep.getRange(start, 5, n, 4).getValues();
+    const seen = new Set();
+    for (let r = vals.length - 1; r >= 0; r--) {
+      const nm = normalizeName(vals[r][0]);
+      if (!wanted.has(nm) || seen.has(nm)) continue;
+      const m = cleanHebrewText(vals[r][1]);
+      if (!m || m === "חייל חדש" || m === "העברת מסגרת" || m === "לא פעיל") continue;
+      seen.add(nm);
+      lastStatus[nm] = { mainStatus: m, subStatus: cleanHebrewText(vals[r][2]), notes: cleanHebrewText(vals[r][3]) };
+    }
+  }
+
+  return {
+    status: "success",
+    soldiers: soldiers.map(s => {
+      const st = lastStatus[s.name] || { mainStatus: "נוכח", subStatus: "נוכחות מלאה", notes: "" };
+      return { framework: s.fw, name: s.name, personalNumber: s.pn, mainStatus: st.mainStatus, subStatus: st.subStatus, notes: st.notes || "" };
+    })
+  };
+}
+
+function handleAttendanceSubmit_(data, user) {
+  const ss = getSS_();
+  const framework = normalizeFramework(data.framework);
+  const p = user.permissions;
+  if (!framework) return { status: "error", message: "נא לבחור מסגרת לדיווח" };
+  if (!p.adminPanel && !p.attendanceAllCompany && !p.allowedAttendanceFrameworks.includes(framework)) {
+    return { status: "error", message: "אין לך הרשאה לדווח עבור מסגרת " + framework };
+  }
+  const rawRecords = data.records || [];
+  if (!rawRecords.length) return { status: "error", message: "לא נמצאו רשומות חיילים לשליחה עבור מסגרת " + framework };
+
+  // שם החייל נלקח מגיליון החיילים לפי מ"א (ולא ממה שהדפדפן שלח)
+  const byPn = soldiersByPnMap_();
+  const records = rawRecords.map(r => {
+    const s = r.personalNumber ? byPn[cleanPn(r.personalNumber)] : null;
+    return {
+      name: s ? s.name : normalizeName(r.name),
+      mainStatus: cleanHebrewText(r.mainStatus),
+      subStatus: cleanHebrewText(r.subStatus),
+      notes: cleanHebrewText(r.notes || "")
+    };
+  }).filter(r => r.name);
+
+  const timestamp = new Date();
+  const reportDate = data.reportDate ? formatToEuropeanDate(data.reportDate) : Utilities.formatDate(timestamp, "Asia/Jerusalem", "dd/MM/yyyy");
+  const reporterName = cleanHebrewText(data.reporterName) || user.name;
+
+  const sheet = ss.getSheetByName("דיווחים");
+  if (sheet) {
+    const rows = records.map(r => [timestamp, reportDate, framework, reporterName, r.name, r.mainStatus, r.subStatus, r.notes]);
+    sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
+  }
+  updateAllMatrices(reportDate, records);
+  return { status: "success", message: `הדיווח עבור ${framework} (${records.length} לוחמים) לתאריך ${reportDate} נקלט בהצלחה!` };
+}
+
+function matrixValueFor_(type, rec) {
+  if (type === "detailed") {
+    if (rec.subStatus === "אחר") return rec.notes ? (rec.notes.startsWith("אחר") ? rec.notes : "אחר - " + rec.notes) : "אחר";
+    return rec.notes ? `${rec.subStatus} (${rec.notes})` : rec.subStatus;
+  }
+  if (type === "presence") return rec.mainStatus === "נוכח" ? "V" : "X";
+  return rec.subStatus === "שוחרר" ? "X" : "V";
+}
+
+// כתיבה לשלוש המטריצות - עמודה שלמה בפעולה אחת לכל גיליון
+function updateAllMatrices(reportDate, records) {
+  const ss = getSS_();
+  const dateEur = formatToEuropeanDate(reportDate);
+  const targets = [
+    { sheet: getDetailedSheet_(ss), type: "detailed" },
+    { sheet: ss.getSheetByName("נוכחות"), type: "presence" },
+    { sheet: getYamamSheet_(ss), type: "yamam" }
+  ].filter(t => t.sheet);
+
+  let synced = false;
+  targets.forEach(({ sheet, type }) => {
+    const readNames = () => sheet.getLastRow() >= 2
+      ? sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).getValues().map(r => normalizeName(r[0]))
+      : [];
+    let names = readNames();
+    const isMissing = records.some(rec => names.indexOf(rec.name) === -1);
+    if (isMissing) {
+      if (!synced) { syncSoldiersToMatrices(); synced = true; }
+      names = readNames();
+    }
+    if (!names.length) return;
+
+    const lastCol = sheet.getLastColumn();
+    let targetCol = -1;
+    if (lastCol >= 3) {
+      const headers = sheet.getRange(1, 3, 1, lastCol - 2).getValues()[0];
+      for (let c = headers.length - 1; c >= 0; c--) {
+        if (formatToEuropeanDate(headers[c]) === dateEur) { targetCol = c + 3; break; }
+      }
+    }
+    if (targetCol === -1) {
+      targetCol = Math.max(lastCol, 2) + 1;
+      sheet.getRange(1, targetCol).setNumberFormat("@").setValue(dateEur).setFontWeight("bold");
+    }
+
+    const colRange = sheet.getRange(2, targetCol, names.length, 1);
+    const colVals = colRange.getValues();
+    const rowOf = {};
+    names.forEach((n, i) => { if (n && rowOf[n] === undefined) rowOf[n] = i; });
+    records.forEach(rec => {
+      const i = rowOf[rec.name];
+      if (i !== undefined) colVals[i][0] = matrixValueFor_(type, rec);
+    });
+    colRange.setValues(colVals);
+  });
+}
+
+function syncSoldiersToMatrices() {
+  const ss = getSS_();
+  const targets = [getDetailedSheet_(ss), ss.getSheetByName("נוכחות"), getYamamSheet_(ss)].filter(Boolean);
+  const master = getSoldiersIndex_(true).list.filter(s => s.fw && s.name).map(s => ({ framework: s.fw, name: s.name }));
+
+  targets.forEach(sheet => {
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) {
+      sheet.getRange(1, 1, 1, 2).setValues([["מסגרת", "שם החייל"]]).setFontWeight("bold");
+      if (master.length) sheet.getRange(2, 1, master.length, 2).setValues(master.map(s => [s.framework, s.name]));
+      return;
+    }
+    const fws = sheet.getRange(2, 1, lastRow - 1, 1).getValues().map(r => normalizeFramework(r[0]));
+    const names = sheet.getRange(2, 2, lastRow - 1, 1).getValues().map(r => normalizeName(r[0]));
+    master.forEach(ms => {
+      if (names.includes(ms.name)) return;
+      let ins = -1;
+      for (let r = fws.length - 1; r >= 0; r--) { if (fws[r] === ms.framework) { ins = r + 2; break; } }
+      if (ins !== -1) {
+        sheet.insertRowAfter(ins);
+        sheet.getRange(ins + 1, 1, 1, 2).setValues([[ms.framework, ms.name]]);
+        fws.splice(ins - 1, 0, ms.framework);
+        names.splice(ins - 1, 0, ms.name);
       } else {
-        document.getElementById("welcomeReturningAuth").innerText = `שלום ${currentUser.name}, הזן סיסמה להמשך:`;
-        document.getElementById("verifyPasswordBox").classList.remove("hidden");
+        sheet.getRange(sheet.getLastRow() + 1, 1, 1, 2).setValues([[ms.framework, ms.name]]);
+        fws.push(ms.framework);
+        names.push(ms.name);
       }
-    } catch (err) {
-      btn.disabled = false; btn.innerText = "המשך";
-      showBox("loginStatus", "שגיאת תקשורת מול השרת: " + err, false);
+    });
+  });
+}
+
+// ==========================================
+// שבצ"ק - מבנה הגיליונות
+// ==========================================
+function ensureShavzakSheets(ss) {
+  let tasksSheet = ss.getSheetByName("משימות");
+  if (!tasksSheet) {
+    tasksSheet = ss.insertSheet("משימות");
+    tasksSheet.getRange(1, 1, 1, 6).setValues([["משימה", "שעת התחלה יומית", "שעת סיום", "מספר משמרות", "מפקדים נדרשים", "חיילים נדרשים"]]).setFontWeight("bold");
+  }
+  let buildSheet = ss.getSheetByName("שבצק בבניה");
+  if (!buildSheet) {
+    buildSheet = ss.insertSheet("שבצק בבניה");
+  }
+  const head = buildSheet.getRange(1, 1, 1, BUILD_COLS).getValues()[0];
+  if (!cleanHebrewText(head[0]) || !cleanHebrewText(head[12])) {
+    buildSheet.getRange(1, 1, 1, BUILD_COLS).setValues([[
+      "תאריך", "יום בשבוע", "משימה", "מספר משמרת", "שעות", "מחלקה",
+      "מפקדים נדרשים", "חיילים נדרשים", "מפקדים משובצים", "חיילים משובצים",
+      "סטטוס מחלקה", "הערות וחוסרים", "מ\"א מפקדים", "מ\"א חיילים"
+    ]]).setFontWeight("bold");
+  }
+  const officialSheet = ss.getSheetByName("שבצק רשמי") || ss.insertSheet("שבצק רשמי");
+  const archiveSheet = ss.getSheetByName("ארכיון שבצקים") || ss.insertSheet("ארכיון שבצקים");
+  return { tasksSheet, buildSheet, officialSheet, archiveSheet };
+}
+
+// מחזיר את בלוק השורות של תאריך מסוים (קורא רק את עמודת התאריך + הבלוק)
+function findDateBlock_(sheet, dateEur) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return { start: -1, values: [], idxs: [] };
+  const col = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  let first = -1, last = -1;
+  for (let i = 0; i < col.length; i++) {
+    if (formatToEuropeanDate(col[i][0]) === dateEur) { if (first === -1) first = i; last = i; }
+  }
+  if (first === -1) return { start: -1, values: [], idxs: [] };
+  const values = sheet.getRange(first + 2, 1, last - first + 1, BUILD_COLS).getValues();
+  const idxs = [];
+  values.forEach((r, i) => { if (formatToEuropeanDate(r[0]) === dateEur) idxs.push(i); });
+  return { start: first + 2, values, idxs };
+}
+
+function writeDateBlock_(sheet, block) {
+  if (block.start === -1 || !block.values.length) return;
+  sheet.getRange(block.start, 1, block.values.length, BUILD_COLS).setValues(block.values);
+}
+
+function splitList_(str, sep) {
+  return cleanHebrewText(str).split(sep || ",").map(x => cleanHebrewText(x)).filter(Boolean);
+}
+
+// בונה רשימת משבצות [{pn,name}] מתוך שורת גיליון (תומך גם בשורות ישנות בלי מ"א)
+function slotsFromRow_(namesCell, pnsCell, nameToPn) {
+  const names = splitList_(namesCell, ",");
+  const pns = splitList_(pnsCell, ",");
+  return names.map((nm, i) => {
+    if (nm === SHV_NONE) return { pn: SHV_NONE_PN, name: SHV_NONE };
+    let pn = (pns.length === names.length) ? pns[i] : "";
+    if (!pn || pn === "-") pn = nameToPn[nm] || "";
+    return { pn: pn, name: nm };
+  });
+}
+
+function getShavzakTasksCatalog() {
+  const cached = cacheGetJson_(CK.TASKS);
+  if (cached) return cached;
+  const { tasksSheet } = ensureShavzakSheets(getSS_());
+  const lastRow = tasksSheet.getLastRow();
+  if (lastRow < 2) return { status: "success", tasks: [], shifts: [] };
+
+  const data = tasksSheet.getRange(2, 1, lastRow - 1, 6).getDisplayValues();
+  const tasks = [], expandedShifts = [];
+  data.forEach((row, idx) => {
+    const taskName = cleanHebrewText(row[0]);
+    if (!taskName) return;
+    const startStr = cleanHebrewText(row[1]) || "06:00";
+    const endStr = cleanHebrewText(row[2]) || "06:00";
+    const numShifts = Math.max(1, parseInt(row[3], 10) || 1);
+    const reqCmdrs = Math.max(0, parseInt(row[4], 10) || 0);
+    const reqSoldiers = Math.max(0, parseInt(row[5], 10) || 0);
+    tasks.push({ rowIdx: idx + 2, taskName, startStr, endStr, numShifts, reqCmdrs, reqSoldiers });
+
+    const startMin = timeToMinutes(startStr);
+    let endMin = timeToMinutes(endStr);
+    if (endMin <= startMin) endMin += 1440;
+    const shiftDuration = Math.round((endMin - startMin) / numShifts);
+    for (let s = 0; s < numShifts; s++) {
+      const sStart = startMin + s * shiftDuration;
+      const sEnd = (s === numShifts - 1) ? endMin : (startMin + (s + 1) * shiftDuration);
+      expandedShifts.push({
+        shiftKey: `${taskName}__${s + 1}`, taskName, shiftNumber: s + 1, totalShifts: numShifts,
+        hoursLabel: `${minutesToTime(sStart)} - ${minutesToTime(sEnd)}`, reqCmdrs, reqSoldiers, platoon: "מחלקה 1"
+      });
+    }
+  });
+  const result = { status: "success", tasks, shifts: expandedShifts };
+  cachePutJson_(CK.TASKS, result, LISTS_CACHE_SEC);
+  return result;
+}
+
+function initShavzakSkeleton(data) {
+  const ss = getSS_();
+  const { buildSheet } = ensureShavzakSheets(ss);
+  const targetDate = formatToEuropeanDate(data.targetDate);
+  const dayName = getHebrewDayName(targetDate);
+  const assignments = data.assignments || [];
+  if (!targetDate) return { status: "error", message: "נא לבחור תאריך לשבצ\"ק" };
+  if (!assignments.length) return { status: "error", message: "לא נמצאו משימות לשיבוץ. ודא שגיליון 'משימות' מלא." };
+
+  for (const a of assignments) {
+    if (!SHAVZAK_FRAMEWORKS.includes(normalizeFramework(a.platoon))) {
+      return { status: "error", message: "ניתן לשייך משימה רק למחלקות 1-3 או מסופחים" };
     }
   }
 
-  async function saveNewPassword() {
-    const p1 = document.getElementById("newPassInput").value.trim();
-    const p2 = document.getElementById("confirmPassInput").value.trim();
-    if (p1.length < 4) { alert("הסיסמה חייבת להכיל לפחות 4 תווים"); return; }
-    if (p1 !== p2) { alert("הסיסמאות אינן תואמות"); return; }
+  const block = findDateBlock_(buildSheet, targetDate);
+  const existingMap = {};
+  block.idxs.forEach(i => {
+    const r = block.values[i];
+    existingMap[`${cleanHebrewText(r[2])}__${cleanHebrewText(r[3])}`] = r;
+  });
 
-    const btn = document.getElementById("btnSavePass");
-    btn.disabled = true; btn.innerText = "שומר סיסמה...";
-    try {
-      const res = await apiCall({ action: "auth_set_password", personalNumber: currentUser.personalNumber, password: p1 });
-      btn.disabled = false; btn.innerText = "💾 שמור סיסמה והתחבר";
-      if (res.status === "success") {
-        currentUser = res.user;
-        completeAuthentication(currentUser);
-      } else showBox("loginStatus", res.message, false);
-    } catch (err) {
-      btn.disabled = false; btn.innerText = "💾 שמור סיסמה והתחבר";
-      showBox("loginStatus", "שגיאת שרת: " + err, false);
-    }
-  }
-
-  async function verifyExistingPassword() {
-    const pass = document.getElementById("loginPassInput").value.trim();
-    if (!pass) { alert("נא להזין סיסמה"); return; }
-
-    const btn = document.getElementById("btnVerifyPass");
-    btn.disabled = true; btn.innerText = "מאמת...";
-    try {
-      const res = await apiCall({ action: "auth_verify_password", personalNumber: currentUser.personalNumber, password: pass });
-      btn.disabled = false; btn.innerText = "🔓 התחבר למערכת";
-      if (res.status === "success" && res.authenticated) {
-        currentUser = res.user;
-        completeAuthentication(currentUser);
-      } else showBox("loginStatus", res.message || "סיסמה שגויה", false);
-    } catch (err) {
-      btn.disabled = false; btn.innerText = "🔓 התחבר למערכת";
-      showBox("loginStatus", "שגיאת שרת: " + err, false);
-    }
-  }
-
-  function completeAuthentication(user) {
-    document.getElementById("userProfileBar").classList.remove("hidden");
-    document.getElementById("barUserNamePn").textContent = `${user.name} | מ"א: ${user.personalNumber}`;
-    document.getElementById("barUserPermissions").textContent = `הרשאה: ${user.roleDisplayLabel} (${user.framework})`;
-    openMainHub();
-  }
-
-  function openMainHub() {
-    hideAllScreens();
-    document.getElementById("btnBackToHub").classList.add("hidden");
-    const grid = document.getElementById("hubTilesGrid");
-    grid.innerHTML = "";
-
-    const perms = currentUser.permissions || {};
-
-    const tiles = [
-      { show: true, icon: "📅", title: "שבצק - צפיה", desc: "משימות היום ומחר ותמונת שבצ\"ק", action: () => openScreen("shavzak_view") },
-      { show: true, icon: "✍️", title: "טופס חתימות", desc: "נשקייה ואפסנאות אישית", action: () => openScreen("signatures") },
-      { show: Boolean(perms.attendanceReport), icon: "📋", title: "דיווח נוכחות", desc: perms.attendanceAllCompany ? "כלל הפלוגה" : (perms.allowedAttendanceFrameworks || []).join(", "), action: () => openScreen("attendance") },
-      { show: Boolean(perms.maflagReturns), icon: "📦", title: "טופס זיכויים", desc: "זיכוי ציוד ודוחות מפל\"ג", action: () => openScreen("maflag") },
-      { show: Boolean(perms.reportsCenter), icon: "📊", title: "ממשק דוחות", desc: "דוחות נוכחות ונשקייה לפיקוד", action: () => openScreen("reports") },
-      { show: Boolean(perms.shavzakPlatoon && !perms.shavzakOfficers), icon: "🪖", title: "בניית שבצק", desc: `שיבוץ חיילי ${currentUser.framework}`, action: () => openScreen("shavzak_platoon") },
-      { show: Boolean(perms.shavzakOfficers), icon: "⭐", title: "שבצק - קצינים", desc: "חלוקת משימות למחלקות ושיבוץ", action: () => openScreen("shavzak_officers") },
-      { show: Boolean(perms.shavzakFinalApproval), icon: "🎖️", title: "שבצק - אישור סופי", desc: "בקרה ואישור מ\"פ לשבצ\"ק", action: () => openScreen("shavzak_final") },
-      { show: Boolean(perms.adminPanel), icon: "🛠️", title: "ממשק אדמין", desc: "ניהול חיילים, העברות והצלבות", action: () => openScreen("admin") }
+  const newRows = assignments.map(item => {
+    const key = `${cleanHebrewText(item.taskName)}__${cleanHebrewText(item.shiftNumber)}`;
+    const prev = existingMap[key];
+    const normPlatoon = normalizeFramework(item.platoon);
+    const keep = prev && normalizeFramework(prev[5]) === normPlatoon;
+    return [
+      targetDate, dayName, cleanHebrewText(item.taskName), item.shiftNumber, cleanHebrewText(item.hoursLabel), normPlatoon,
+      item.reqCmdrs, item.reqSoldiers,
+      keep ? prev[8] : "", keep ? prev[9] : "",
+      keep ? prev[10] : SHV.OPEN, keep ? prev[11] : "",
+      keep ? prev[12] : "", keep ? prev[13] : ""
     ];
+  });
 
-    tiles.filter(t => t.show).forEach(t => {
-      const card = document.createElement("div");
-      card.className = "hub-tile";
-      card.onclick = t.action;
-      card.innerHTML = `<div class="hub-icon">${t.icon}</div><div class="hub-title">${escapeHtml(t.title)}</div><div class="hub-desc">${escapeHtml(t.desc)}</div>`;
-      grid.appendChild(card);
-    });
-
-    document.getElementById("screenHub").classList.remove("hidden");
+  // מחיקת השורות הישנות של התאריך (ושמירת שורות של תאריכים אחרים אם היו באמצע)
+  let kept = [];
+  if (block.start !== -1) {
+    kept = block.values.filter(r => formatToEuropeanDate(r[0]) !== targetDate);
+    buildSheet.deleteRows(block.start, block.values.length);
   }
+  const allNew = kept.concat(newRows);
+  const startRow = Math.max(buildSheet.getLastRow(), 1) + 1;
+  buildSheet.getRange(startRow, 1, allNew.length, 1).setNumberFormat("@");
+  buildSheet.getRange(startRow, 1, allNew.length, BUILD_COLS).setValues(allNew);
+  cacheRemove_("pub_" + targetDate);
 
-  function logoutUser() {
-    currentUser = null; mobileWarningShown = false; shvForceSkeletonEdit = false;
-    document.getElementById("userProfileBar").classList.add("hidden");
-    document.getElementById("loginPn").value = "";
-    document.getElementById("loginPassInput").value = "";
-    document.getElementById("setPasswordBox").classList.add("hidden");
-    document.getElementById("verifyPasswordBox").classList.add("hidden");
-    document.getElementById("loginStatus").style.display = "none";
-    hideAllScreens();
-    document.getElementById("screenLogin").classList.remove("hidden");
+  return { status: "success", message: `חלוקת המשימות לתאריך ${targetDate} (${dayName}) נשמרה ונפתחה למחלקות!` };
+}
+
+function resolveViewMode_(requested, perms) {
+  const m = String(requested || "platoon");
+  if (m === "final_approval") return perms.shavzakFinalApproval ? m : null;
+  if (m === "officers") return perms.shavzakOfficers ? m : null;
+  return (perms.shavzakPlatoon || perms.shavzakOfficers) ? "platoon" : null;
+}
+
+// קורא עמודת תאריך אחת ממטריצה (שם -> ערך). null אם אין עמודה לתאריך
+function readMatrixDateColumn_(sheet, dateEur) {
+  if (!sheet || sheet.getLastRow() < 2 || sheet.getLastColumn() < 3) return null;
+  const headers = sheet.getRange(1, 3, 1, sheet.getLastColumn() - 2).getValues()[0];
+  let col = -1;
+  for (let c = headers.length - 1; c >= 0; c--) {
+    if (formatToEuropeanDate(headers[c]) === dateEur) { col = c + 3; break; }
   }
+  if (col === -1) return null;
+  const n = sheet.getLastRow() - 1;
+  const names = sheet.getRange(2, 2, n, 1).getValues();
+  const vals = sheet.getRange(2, col, n, 1).getValues();
+  const map = {};
+  names.forEach((r, i) => {
+    const nm = normalizeName(r[0]);
+    if (nm && map[nm] === undefined) map[nm] = cleanHebrewText(vals[i][0]);
+  });
+  return map;
+}
 
-  async function openScreen(screenKey) {
-    hideAllScreens();
-    document.getElementById("btnBackToHub").classList.remove("hidden");
+function getShavzakWorkspaceData(data, user) {
+  const ss = getSS_();
+  const { buildSheet } = ensureShavzakSheets(ss);
+  const viewMode = resolveViewMode_(data.viewMode, user.permissions);
+  if (!viewMode) return { status: "error", message: "אין לך הרשאה למסך זה" };
 
-    if (screenKey === "shavzak_view") {
-      document.getElementById("screenShavzakView").classList.remove("hidden");
-      await loadSoldierShavzakTab();
-    } else if (screenKey === "signatures") {
-      document.getElementById("screenSignatures").classList.remove("hidden");
-      await loadSoldierGearScreen();
-    } else if (screenKey === "attendance") {
-      document.getElementById("screenAttendance").classList.remove("hidden");
-      await loadAttendanceScreen();
-    } else if (screenKey === "maflag") {
-      document.getElementById("screenMaflag").classList.remove("hidden");
-      await loadMaflagWorkspace();
-    } else if (screenKey === "reports") {
-      document.getElementById("screenReports").classList.remove("hidden");
-      await loadHighCommandWorkspace();
-    } else if (screenKey === "shavzak_platoon" || screenKey === "shavzak_officers" || screenKey === "shavzak_final") {
-      shvForceSkeletonEdit = false;
-      if (screenKey === "shavzak_final") {
-        shvViewMode = "final_approval";
-        document.getElementById("shvBuilderTitle").textContent = "🎖️ שבצק - אישור סופי (פיקוד עליון)";
-      } else if (screenKey === "shavzak_officers") {
-        shvViewMode = "officers";
-        document.getElementById("shvBuilderTitle").textContent = "⭐ שבצק - קצינים";
-      } else {
-        shvViewMode = "platoon";
-        document.getElementById("shvBuilderTitle").textContent = `🪖 בניית שבצ"ק - ${currentUser.framework}`;
-      }
-      document.getElementById("screenShavzakBuilder").classList.remove("hidden");
-      initShavzakBuilderScreen();
-    } else if (screenKey === "admin") {
-      document.getElementById("screenAdmin").classList.remove("hidden");
-      await loadShlomiWorkspace();
-    }
-  }
+  const targetDate = formatToEuropeanDate(data.targetDate);
+  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(targetDate)) return { status: "error", message: "תאריך לא תקין. יש להזין בפורמט dd/mm/yyyy" };
+  const dayName = getHebrewDayName(targetDate);
+  const userFramework = user.framework;
 
-  // ==========================================
-  // מסך: שבצק - צפיה (לכלל חיילי הפלוגה)
-  // ==========================================
-  async function loadSoldierShavzakTab() {
-    document.getElementById("soldierShvLoading").classList.remove("hidden");
-    document.getElementById("soldierShvContent").classList.add("hidden");
+  const idx = getSoldiersIndex_();
+  const nameToPn = {};
+  idx.list.forEach(s => { if (s.name && !nameToPn[s.name]) nameToPn[s.name] = s.pn; });
 
-    const res = await apiCall({ action: "get_soldier_shavzak", personalNumber: currentUser.personalNumber });
-    document.getElementById("soldierShvLoading").classList.add("hidden");
-    document.getElementById("soldierShvContent").classList.remove("hidden");
-
-    const todayDiv = document.getElementById("todayMissionCard");
-    if (res.todayMissions && res.todayMissions.length > 0) {
-      todayDiv.innerHTML = res.todayMissions.map(m => `
-        <div class="shv-mission-hero">
-          <div class="shv-hero-day">📌 המשימה שלך היום (${escapeHtml(res.todayDate)})</div>
-          <div class="shv-hero-task">${escapeHtml(m.taskName)}</div>
-          <div class="shv-hero-hours">🕒 ${escapeHtml(m.hoursLabel)} (${escapeHtml(m.roleInTask)})</div>
-        </div>
-      `).join("");
-    } else {
-      todayDiv.innerHTML = `<div class="item-box" style="text-align:center;color:#94a3b8;">אין משימה רשומה עבורך להיום (${escapeHtml(res.todayDate)}).</div>`;
-    }
-
-    const tmrDiv = document.getElementById("tomorrowMissionCard");
-    if (res.hasTomorrowShavzak) {
-      if (res.tomorrowMissions && res.tomorrowMissions.length > 0) {
-        tmrDiv.innerHTML = res.tomorrowMissions.map(m => `
-          <div class="shv-mission-hero" style="border-color:#22c55e;background:linear-gradient(135deg,#064e3b,#0f172a);">
-            <div class="shv-hero-day" style="color:#6ee7b7;">⏭️ המשימה שלך למחר (${escapeHtml(res.tomorrowDate)})</div>
-            <div class="shv-hero-task">${escapeHtml(m.taskName)}</div>
-            <div class="shv-hero-hours">🕒 ${escapeHtml(m.hoursLabel)} (${escapeHtml(m.roleInTask)})</div>
-          </div>
-        `).join("");
-      } else {
-        tmrDiv.innerHTML = `<div class="item-box" style="text-align:center;color:#94a3b8;">פורסם שבצ"ק למחר (${escapeHtml(res.tomorrowDate)}) - אינך משובץ למשימה.</div>`;
-      }
-    } else {
-      tmrDiv.innerHTML = "";
-    }
-
-    soldierShvOfficialBlock = res.officialBlockForImage;
-    document.getElementById("btnOpenShvImage").classList.toggle("hidden", !soldierShvOfficialBlock);
-  }
-
-  function openShavzakImageModal() {
-    if (!soldierShvOfficialBlock) return;
-    const b = soldierShvOfficialBlock;
-    const canvas = document.createElement("canvas");
-    const rowH = 42, headerH = 110, width = 900;
-    const height = headerH + (b.rows.length + 1) * rowH + 30;
-    canvas.width = width; canvas.height = height;
-    const ctx = canvas.getContext("2d");
-
-    ctx.fillStyle = "#0f172a"; ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = "#38bdf8"; ctx.font = "bold 28px Arial"; ctx.textAlign = "center";
-    ctx.fillText(b.title, width / 2, 50);
-    ctx.fillStyle = "#94a3b8"; ctx.font = "18px Arial";
-    ctx.fillText("מסייעת 8109 • לו\"ז 06:00 עד 06:00 למחרת", width / 2, 82);
-
-    const cols = [
-      { label: "משימה", x: 870 }, { label: "שעות", x: 690 },
-      { label: "מחלקה", x: 540 }, { label: "מפקדים", x: 420 }, { label: "לוחמים", x: 250 }
-    ];
-
-    let y = headerH;
-    ctx.fillStyle = "#1e293b"; ctx.fillRect(20, y, width - 40, rowH);
-    ctx.fillStyle = "#38bdf8"; ctx.font = "bold 18px Arial"; ctx.textAlign = "right";
-    cols.forEach(c => ctx.fillText(c.label, c.x, y + 28));
-
-    y += rowH;
-    b.rows.forEach((r, idx) => {
-      ctx.fillStyle = idx % 2 === 0 ? "#162032" : "#0f172a";
-      ctx.fillRect(20, y, width - 40, rowH);
-      ctx.strokeStyle = "#334155"; ctx.strokeRect(20, y, width - 40, rowH);
-      ctx.fillStyle = "#f8fafc"; ctx.font = "16px Arial";
-      ctx.fillText(r.taskName, 870, y + 27);
-      ctx.fillText(r.hoursLabel, 690, y + 27);
-      ctx.fillText(r.platoon, 540, y + 27);
-      ctx.fillText(r.cmdrs || "-", 420, y + 27);
-      ctx.fillText(r.soldiers || "-", 250, y + 27);
-      y += rowH;
-    });
-
-    shvGeneratedDataUrl = canvas.toDataURL("image/png");
-    document.getElementById("shvGeneratedImg").src = shvGeneratedDataUrl;
-    document.getElementById("shvImageModal").classList.remove("hidden");
-  }
-
-  async function shareShavzakImage() {
-    if (!shvGeneratedDataUrl) return;
-    try {
-      const blob = await (await fetch(shvGeneratedDataUrl)).blob();
-      const file = new File([blob], "shavzak_8109.png", { type: "image/png" });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: "שבצ\"ק מסייעת 8109" });
-      } else downloadShavzakImage();
-    } catch (e) { downloadShavzakImage(); }
-  }
-
-  function downloadShavzakImage() {
-    if (!shvGeneratedDataUrl) return;
-    const a = document.createElement("a");
-    a.href = shvGeneratedDataUrl; a.download = "shavzak_8109.png"; a.click();
-  }
-
-  // ==========================================
-  // מסך: בנייה, שיבוץ ואישור שבצ"ק (לפי 4 השלבים)
-  // ==========================================
-  function initShavzakBuilderScreen() {
-    const tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
-    const dStr = `${String(tmr.getDate()).padStart(2,'0')}/${String(tmr.getMonth()+1).padStart(2,'0')}/${tmr.getFullYear()}`;
-    const isoStr = `${tmr.getFullYear()}-${String(tmr.getMonth()+1).padStart(2,'0')}-${String(tmr.getDate()).padStart(2,'0')}`;
-
-    document.getElementById("shvTargetDate").value = dStr;
-    const shvPicker = document.getElementById("shvDatePicker");
-    shvPicker.value = isoStr;
-    shvPicker.onchange = function() {
-      if (this.value) {
-        const p = this.value.split("-");
-        document.getElementById("shvTargetDate").value = `${p[2]}/${p[1]}/${p[0]}`;
-        shvForceSkeletonEdit = false;
-        loadShavzakWorkspace();
-      }
+  // 1. שורות השבצ"ק לתאריך
+  const block = findDateBlock_(buildSheet, targetDate);
+  const rows = block.idxs.map(i => {
+    const r = block.values[i];
+    const platoon = normalizeFramework(r[5]);
+    return {
+      taskName: cleanHebrewText(r[2]),
+      shiftNumber: parseInt(r[3], 10) || 1,
+      hoursLabel: cleanHebrewText(r[4]),
+      platoon: platoon,
+      isMyPlatoon: platoon === userFramework,
+      reqCmdrs: parseInt(r[6], 10) || 0,
+      reqSoldiers: parseInt(r[7], 10) || 0,
+      cmdrSlots: slotsFromRow_(r[8], r[12], nameToPn),
+      soldierSlots: slotsFromRow_(r[9], r[13], nameToPn),
+      platoonStatus: cleanHebrewText(r[10]) || SHV.OPEN,
+      warningsText: cleanHebrewText(r[11])
     };
+  });
 
-    const isMobile = window.innerWidth <= 768 || /Mobi|Android|iPhone/i.test(navigator.userAgent);
-    if (isMobile && !mobileWarningShown) {
-      mobileWarningShown = true;
-      openCustomModal(
-        "💻",
-        "מומלץ למלא שבצ\"ק מהמחשב",
-        "מילוי ושיבוץ לוחמים בשבצ\"ק נוח ומהיר הרבה יותר ממסך מחשב. באפשרותך להמשיך גם מהנייד בלחיצה על תודה.",
-        "תודה",
-        () => loadShavzakWorkspace()
-      );
+  const hasSkeleton = rows.length > 0;
+  const submittedStatuses = [SHV.SUBMITTED, SHV.PENDING_MP, SHV.PUBLISHED];
+  const allPlatoonsSubmitted = hasSkeleton && rows.every(r => submittedStatuses.includes(r.platoonStatus));
+  const isPendingMpApproval = hasSkeleton && rows.some(r => r.platoonStatus === SHV.PENDING_MP);
+  const isOfficialApproved = hasSkeleton && rows.every(r => r.platoonStatus === SHV.PUBLISHED);
+  const myPlatoonSubmitted = hasSkeleton && rows.filter(r => r.isMyPlatoon).length > 0 &&
+    rows.filter(r => r.isMyPlatoon).every(r => submittedStatuses.includes(r.platoonStatus));
+
+  rows.forEach(r => {
+    if (viewMode === "final_approval") {
+      r.canViewDetails = true;
+      r.canEdit = true;
+    } else if (viewMode === "officers") {
+      r.canViewDetails = r.isMyPlatoon || allPlatoonsSubmitted;
+      r.canEdit = r.canViewDetails && !isOfficialApproved;
     } else {
-      loadShavzakWorkspace();
+      r.canViewDetails = r.isMyPlatoon;
+      r.canEdit = r.isMyPlatoon && !isPendingMpApproval && !isOfficialApproved;
     }
-  }
+    if (!r.canViewDetails) {
+      r.cmdrSlots = [];
+      r.soldierSlots = [];
+      r.warningsText = "";
+    }
+  });
 
-  function toggleSkeletonEditMode() {
-    shvForceSkeletonEdit = !shvForceSkeletonEdit;
-    loadShavzakWorkspace();
-  }
+  // 2. נוכחות לתאריך (רק העמודה של התאריך)
+  const presMap = readMatrixDateColumn_(ss.getSheetByName("נוכחות"), targetDate);
+  const detMap = readMatrixDateColumn_(getDetailedSheet_(ss), targetDate);
 
-  async function loadShavzakWorkspace() {
-    const targetDate = document.getElementById("shvTargetDate").value.trim();
-    const blockBox = document.getElementById("shvBlockingMessage");
-    const stageBanner = document.getElementById("shvStageStatusBanner");
-    const hcWarn = document.getElementById("shvHighCmdWarnings");
-    const stage1Wrap = document.getElementById("shvStage1Wrap");
-    const stage2Wrap = document.getElementById("shvStage2Wrap");
-    const toggleBtn = document.getElementById("btnToggleSkeletonMode");
+  const summaryMap = {};
+  SHAVZAK_FRAMEWORKS.forEach(fw => { summaryMap[fw] = { framework: fw, soldiersCount: 0, cmdrsCount: 0, totalCount: 0 }; });
+  const reportedFrameworks = new Set();
+  const availableSoldiers = [];
 
-    blockBox.classList.add("hidden");
-    stageBanner.classList.add("hidden");
-    hcWarn.classList.add("hidden");
-    stage1Wrap.classList.add("hidden");
-    stage2Wrap.classList.add("hidden");
-    toggleBtn.classList.add("hidden");
+  idx.list.forEach(s => {
+    if (!SHAVZAK_FRAMEWORKS.includes(s.fw) || !s.active || !s.name) return;
+    const isCmdr = soldierIsCommander_(s);
+    let present = false;
+    let subStatus = "נוכחות מלאה";
 
-    const res = await apiCall({
-      action: "shavzak_get_workspace",
-      targetDate,
-      userFramework: currentUser.framework,
-      viewMode: shvViewMode
+    if (presMap) {
+      const pVal = presMap[s.name] || "";
+      if (pVal === "V" || pVal === "X") reportedFrameworks.add(s.fw);
+      if (pVal === "V") present = true;
+    }
+    if (detMap) {
+      const dVal = detMap[s.name] || "";
+      if (dVal) {
+        reportedFrameworks.add(s.fw);
+        subStatus = dVal;
+        if (!presMap) present = !(dVal.includes("חופשה") || dVal.includes("גימלים") || dVal.includes("שוחרר"));
+      }
+    }
+    if (present) {
+      if (isCmdr) summaryMap[s.fw].cmdrsCount++; else summaryMap[s.fw].soldiersCount++;
+      summaryMap[s.fw].totalCount++;
+      availableSoldiers.push({ name: s.name, personalNumber: s.pn, framework: s.fw, isCommander: isCmdr, subStatus });
+    }
+  });
+
+  const allWarnings = [];
+  rows.forEach(r => {
+    if (r.warningsText) r.warningsText.split(" | ").forEach(w => { if (w.trim()) allWarnings.push(w.trim()); });
+  });
+
+  return {
+    status: "success",
+    targetDate, dayName, viewMode,
+    hasSkeleton, allPlatoonsSubmitted, isPendingMpApproval, isOfficialApproved, myPlatoonSubmitted,
+    missingAttendanceFrameworks: SHAVZAK_FRAMEWORKS.filter(fw => !reportedFrameworks.has(fw)),
+    frameworkSummary: SHAVZAK_FRAMEWORKS.map(fw => summaryMap[fw]),
+    rows, availableSoldiers, allWarnings
+  };
+}
+
+// חישוב התראות כפל שיבוץ לכל שורות התאריך (שעות חופפות לאותו חייל)
+function recomputeOverlapWarnings_(block) {
+  const assignments = {}; // pn -> [{i, label, range}]
+  block.idxs.forEach(i => {
+    const r = block.values[i];
+    const range = shiftRange(r[4]);
+    const label = `${cleanHebrewText(r[2])} (${cleanHebrewText(r[4])})`;
+    const pns = splitList_(r[12], ",").concat(splitList_(r[13], ","));
+    const names = splitList_(r[8], ",").concat(splitList_(r[9], ","));
+    pns.forEach((pn, k) => {
+      if (!pn || pn === "-" || pn === SHV_NONE_PN) return;
+      (assignments[pn] = assignments[pn] || []).push({ i, label, range, name: names[k] || pn });
     });
+  });
 
-    if (res.status !== "success") {
-      blockBox.classList.remove("hidden");
-      blockBox.textContent = res.message;
-      return;
+  const overlapByRow = {};
+  Object.keys(assignments).forEach(pn => {
+    const list = assignments[pn];
+    for (let a = 0; a < list.length; a++) {
+      for (let b = a + 1; b < list.length; b++) {
+        if (list[a].i !== list[b].i && rangesOverlap(list[a].range, list[b].range)) {
+          const msg = `${OVERLAP_PREFIX} ${list[a].name} משובץ ב-${list[a].label} וגם ב-${list[b].label}`;
+          (overlapByRow[list[a].i] = overlapByRow[list[a].i] || []).push(msg);
+        }
+      }
     }
+  });
 
-    const missing = res.missingAttendanceFrameworks || [];
+  let total = 0;
+  block.idxs.forEach(i => {
+    const base = cleanHebrewText(block.values[i][11]).split(" | ").map(w => w.trim()).filter(w => w && w.indexOf(OVERLAP_PREFIX) !== 0);
+    const extra = overlapByRow[i] || [];
+    total += extra.length;
+    block.values[i][11] = base.concat(extra).join(" | ");
+  });
+  return total;
+}
 
-    // 1. אם מדובר במפקד מחלקה ועדיין לא חולקו משימות למחלקות:
-    if (shvViewMode === "platoon" && !res.hasSkeleton) {
-      blockBox.classList.remove("hidden");
-      blockBox.textContent = "נא לבקש מהקצינים לחלק משימות";
-      return;
+function saveShavzakPlatoonAssignments(data, user) {
+  const ss = getSS_();
+  const { buildSheet } = ensureShavzakSheets(ss);
+  const viewMode = resolveViewMode_(data.viewMode, user.permissions);
+  if (!viewMode) return { status: "error", message: "אין לך הרשאה לשמור שבצ\"ק" };
+
+  const targetDate = formatToEuropeanDate(data.targetDate);
+  const submitForApproval = Boolean(data.submitForApproval);
+  const updates = data.updates || [];
+  const myFw = user.framework;
+
+  const block = findDateBlock_(buildSheet, targetDate);
+  if (block.start === -1) return { status: "error", message: "לא נמצא שלד שבצ\"ק לתאריך זה" };
+
+  const statuses = block.idxs.map(i => cleanHebrewText(block.values[i][10]));
+  const submittedStatuses = [SHV.SUBMITTED, SHV.PENDING_MP, SHV.PUBLISHED];
+  const allSubmitted = statuses.every(s => submittedStatuses.includes(s));
+  const isLocked = statuses.some(s => s === SHV.PENDING_MP) || statuses.every(s => s === SHV.PUBLISHED);
+  const canEditAll = viewMode === "final_approval" || (viewMode === "officers" && allSubmitted);
+
+  if (!canEditAll && isLocked) {
+    return { status: "error", message: "השבצ\"ק כבר הועבר לאישור מ\"פ ולא ניתן לערוך אותו מכאן." };
+  }
+
+  const byPn = soldiersByPnMap_();
+  const toEntries = (list) => (list || []).map(pn => {
+    const p = cleanPn(pn);
+    if (p === SHV_NONE_PN) return { pn: SHV_NONE_PN, name: SHV_NONE, isCmdr: false, none: true };
+    const s = byPn[p];
+    return s ? { pn: s.pn, name: s.name, isCmdr: soldierIsCommander_(s), none: false } : null;
+  }).filter(Boolean);
+
+  let totalUnassigned = 0, skipped = 0, applied = 0;
+
+  updates.forEach(upd => {
+    const tName = cleanHebrewText(upd.taskName);
+    const sNum = parseInt(upd.shiftNumber, 10) || 1;
+    const i = block.idxs.find(k => cleanHebrewText(block.values[k][2]) === tName && (parseInt(block.values[k][3], 10) || 1) === sNum);
+    if (i === undefined) { skipped++; return; }
+    const row = block.values[i];
+    const rowFw = normalizeFramework(row[5]);
+    if (!canEditAll && rowFw !== myFw) { skipped++; return; }
+
+    const cmdrs = toEntries(upd.cmdrs);
+    const soldiers = toEntries(upd.soldiers);
+    const reqC = parseInt(row[6], 10) || 0;
+    const reqS = parseInt(row[7], 10) || 0;
+    const realC = cmdrs.filter(x => !x.none);
+    const realS = soldiers.filter(x => !x.none);
+    const hoursLabel = cleanHebrewText(row[4]);
+
+    const warnings = [];
+    if (reqC > 0 && !realC.some(x => x.isCmdr)) warnings.push(`חסר מפקד ב${rowFw} במשימה ${tName} בשעה ${hoursLabel}`);
+    const missing = Math.max(0, reqC - realC.length) + Math.max(0, reqS - realS.length);
+    if (missing > 0) warnings.push(`חסרים ${missing} משובצים ב${rowFw} במשימה ${tName} בשעה ${hoursLabel}`);
+    totalUnassigned += missing;
+
+    row[8] = cmdrs.map(x => x.name).join(", ");
+    row[9] = soldiers.map(x => x.name).join(", ");
+    row[12] = cmdrs.map(x => x.none ? "-" : x.pn).join(",");
+    row[13] = soldiers.map(x => x.none ? "-" : x.pn).join(",");
+    row[11] = warnings.join(" | ");
+    if (!submitForApproval && cleanHebrewText(row[10]) === SHV.OPEN) row[10] = SHV.DRAFT;
+    applied++;
+  });
+
+  if (submitForApproval) {
+    block.idxs.forEach(i => {
+      const rowFw = normalizeFramework(block.values[i][5]);
+      const st = cleanHebrewText(block.values[i][10]);
+      if (rowFw === myFw && st !== SHV.PENDING_MP && st !== SHV.PUBLISHED) block.values[i][10] = SHV.SUBMITTED;
+    });
+  }
+
+  // ספירת משבצות חסרות בכל השורות שבאחריות המשתמש (ולא רק בשורות ששונו)
+  totalUnassigned = 0;
+  block.idxs.forEach(i => {
+    const row = block.values[i];
+    if (!canEditAll && normalizeFramework(row[5]) !== myFw) return;
+    const realC = splitList_(row[8], ",").filter(n => n !== SHV_NONE).length;
+    const realS = splitList_(row[9], ",").filter(n => n !== SHV_NONE).length;
+    totalUnassigned += Math.max(0, (parseInt(row[6], 10) || 0) - realC) + Math.max(0, (parseInt(row[7], 10) || 0) - realS);
+  });
+
+  const overlaps = recomputeOverlapWarnings_(block);
+  writeDateBlock_(buildSheet, block);
+  cacheRemove_("pub_" + targetDate);
+
+  let msg = submitForApproval ? "השיבוץ נשמר והועבר לאישור!" : "הטיוטה נשמרה בהצלחה!";
+  if (totalUnassigned > 0) msg += `\n⚠️ ${totalUnassigned} משבצות עדיין ללא שיבוץ.`;
+  if (overlaps > 0) msg += `\n⚠️ נמצאו ${overlaps} שיבוצים כפולים בשעות חופפות.`;
+  if (skipped > 0 && applied === 0) return { status: "error", message: "לא נשמר דבר - אין הרשאה לשורות שנשלחו או שהן לא קיימות." };
+  return { status: "success", message: msg, unassignedCount: totalUnassigned, overlaps };
+}
+
+function transferShavzakShiftPlatoon(data) {
+  const { buildSheet } = ensureShavzakSheets(getSS_());
+  const targetDate = formatToEuropeanDate(data.targetDate);
+  const taskName = cleanHebrewText(data.taskName);
+  const shiftNumber = parseInt(data.shiftNumber, 10) || 1;
+  const newPlatoon = normalizeFramework(data.newPlatoon);
+  if (!SHAVZAK_FRAMEWORKS.includes(newPlatoon)) return { status: "error", message: "ניתן לשייך משימה רק למחלקות 1-3 או מסופחים" };
+
+  const block = findDateBlock_(buildSheet, targetDate);
+  const i = block.idxs.find(k => cleanHebrewText(block.values[k][2]) === taskName && (parseInt(block.values[k][3], 10) || 1) === shiftNumber);
+  if (i === undefined) return { status: "error", message: "המשמרת לא נמצאה" };
+
+  const row = block.values[i];
+  if (normalizeFramework(row[5]) !== newPlatoon) {
+    row[5] = newPlatoon;
+    row[8] = ""; row[9] = ""; row[12] = ""; row[13] = "";
+    row[10] = SHV.OPEN;
+    row[11] = "";
+    buildSheet.getRange(block.start + i, 1, 1, BUILD_COLS).setValues([row]);
+    cacheRemove_("pub_" + targetDate);
+  }
+  return { status: "success", message: `המשימה הועברה בהצלחה ל${newPlatoon}!` };
+}
+
+function forwardShavzakToMpApproval(data) {
+  const { buildSheet } = ensureShavzakSheets(getSS_());
+  const targetDate = formatToEuropeanDate(data.targetDate);
+  const block = findDateBlock_(buildSheet, targetDate);
+  if (!block.idxs.length) return { status: "error", message: "לא נמצאו משימות לתאריך זה" };
+  block.idxs.forEach(i => { block.values[i][10] = SHV.PENDING_MP; });
+  writeDateBlock_(buildSheet, block);
+  return { status: "success", message: `השבצ"ק לתאריך ${targetDate} הועבר לאישור מ"פ!` };
+}
+
+function approveAndPublishOfficialShavzak(data) {
+  const ss = getSS_();
+  const { buildSheet, officialSheet, archiveSheet } = ensureShavzakSheets(ss);
+  const targetDate = formatToEuropeanDate(data.targetDate);
+  const dayName = getHebrewDayName(targetDate);
+
+  const block = findDateBlock_(buildSheet, targetDate);
+  if (!block.idxs.length) return { status: "error", message: `לא נמצא שבצ"ק בבניה לתאריך ${targetDate}` };
+  block.idxs.forEach(i => { block.values[i][10] = SHV.PUBLISHED; });
+  writeDateBlock_(buildSheet, block);
+
+  const dayRows = block.idxs.map(i => block.values[i]);
+  const bannerTitle = `שבצ"ק פלוגתי - מסייעת 8109 | ${dayName} ${targetDate}`;
+  const tableHeaders = ["משימה", "משמרת", "שעות", "מחלקה", "מפקדים", "לוחמים", "הערות"];
+  const tableRows = dayRows.map(r => [
+    cleanHebrewText(r[2]), cleanHebrewText(r[3]), cleanHebrewText(r[4]),
+    normalizeFramework(r[5]), cleanHebrewText(r[8]) || "-", cleanHebrewText(r[9]) || "-", cleanHebrewText(r[11])
+  ]);
+
+  officialSheet.clear();
+  officialSheet.getRange(1, 1).setNumberFormat("@").setValue(bannerTitle).setFontWeight("bold").setFontSize(12);
+  officialSheet.getRange(2, 1, 1, tableHeaders.length).setValues([tableHeaders]).setFontWeight("bold").setBackground("#e2e8f0");
+  officialSheet.getRange(3, 1, tableRows.length, tableHeaders.length).setValues(tableRows);
+
+  const blockHeight = tableRows.length + 3;
+  if (archiveSheet.getLastRow() >= 1) archiveSheet.insertRowsBefore(1, blockHeight);
+  archiveSheet.getRange(1, 1).setNumberFormat("@").setValue(bannerTitle).setFontWeight("bold").setFontSize(12);
+  archiveSheet.getRange(2, 1, 1, tableHeaders.length).setValues([tableHeaders]).setFontWeight("bold").setBackground("#e2e8f0");
+  archiveSheet.getRange(3, 1, tableRows.length, tableHeaders.length).setValues(tableRows);
+
+  cacheRemove_("pub_" + targetDate);
+  return { status: "success", message: `שבצ"ק מאושר! השבצ"ק לתאריך ${targetDate} (${dayName}) פורסם לכלל חיילי הפלוגה ונשמר בארכיון.` };
+}
+
+// שבצ"ק מפורסם לתאריך (נשמר במטמון - הצפייה של החיילים היא הפעולה הנפוצה ביותר)
+function getPublishedShavzak_(dateEur) {
+  const key = "pub_" + dateEur;
+  const cached = cacheGetJson_(key);
+  if (cached) return cached.rows ? cached : null;
+
+  const { buildSheet } = ensureShavzakSheets(getSS_());
+  const block = findDateBlock_(buildSheet, dateEur);
+  const rows = [];
+  block.idxs.forEach(i => {
+    const r = block.values[i];
+    if (cleanHebrewText(r[10]) !== SHV.PUBLISHED) return;
+    rows.push({
+      taskName: cleanHebrewText(r[2]),
+      shiftNumber: cleanHebrewText(r[3]),
+      hoursLabel: cleanHebrewText(r[4]),
+      platoon: normalizeFramework(r[5]),
+      cmdrs: cleanHebrewText(r[8]),
+      soldiers: cleanHebrewText(r[9]),
+      cmdrPns: splitList_(r[12], ","),
+      soldierPns: splitList_(r[13], ",")
+    });
+  });
+  const result = rows.length
+    ? { date: dateEur, dayName: getHebrewDayName(dateEur), title: `שבצ"ק פלוגתי - מסייעת 8109 | ${getHebrewDayName(dateEur)} ${dateEur}`, rows }
+    : { rows: null };
+  cachePutJson_(key, result, rows.length ? 6 * 3600 : 120);
+  return rows.length ? result : null;
+}
+
+function getSoldierShavzakView(user) {
+  // יום שבצ"ק מתחיל ב-06:00 - לפני 06:00 "היום" הוא עדיין אתמול
+  const now = new Date();
+  const hour = parseInt(Utilities.formatDate(now, "Asia/Jerusalem", "H"), 10);
+  const base = new Date(now.getTime() - (hour < 6 ? 86400000 : 0));
+  const todayEur = formatToEuropeanDate(base);
+  const tomorrowEur = formatToEuropeanDate(new Date(base.getTime() + 86400000));
+
+  const todayBlock = getPublishedShavzak_(todayEur);
+  const tomorrowBlock = getPublishedShavzak_(tomorrowEur);
+  const myPn = user.personalNumber, myName = user.name;
+
+  const findMine = (block) => {
+    if (!block) return [];
+    const mine = [];
+    block.rows.forEach(r => {
+      const cNames = splitList_(r.cmdrs, ",");
+      const sNames = splitList_(r.soldiers, ",");
+      const inC = r.cmdrPns.length === cNames.length ? r.cmdrPns.includes(myPn) : cNames.includes(myName);
+      const inS = r.soldierPns.length === sNames.length ? r.soldierPns.includes(myPn) : sNames.includes(myName);
+      if (inC || inS) mine.push({ taskName: r.taskName, hoursLabel: r.hoursLabel, roleInTask: inC ? "מפקד משימה" : "לוחם", sortKey: (shiftRange(r.hoursLabel) || { s: 0 }).s });
+    });
+    return mine.sort((a, b) => a.sortKey - b.sortKey);
+  };
+
+  // לתמונה - בלי מספרים אישיים
+  const forImage = (block) => block ? {
+    date: block.date, dayName: block.dayName, title: block.title,
+    rows: block.rows.map(r => ({ taskName: r.taskName, shiftNumber: r.shiftNumber, hoursLabel: r.hoursLabel, platoon: r.platoon,
+      cmdrs: splitList_(r.cmdrs, ",").filter(n => n !== SHV_NONE).join(", "),
+      soldiers: splitList_(r.soldiers, ",").filter(n => n !== SHV_NONE).join(", ") }))
+  } : null;
+
+  return {
+    status: "success",
+    soldierName: myName, todayDate: todayEur, tomorrowDate: tomorrowEur,
+    todayMissions: findMine(todayBlock),
+    hasTomorrowShavzak: Boolean(tomorrowBlock),
+    tomorrowMissions: findMine(tomorrowBlock),
+    todayBlockForImage: forImage(todayBlock),
+    tomorrowBlockForImage: forImage(tomorrowBlock),
+    officialBlockForImage: forImage(tomorrowBlock || todayBlock)
+  };
+}
+
+// ==========================================
+// אדמין (שלומי)
+// ==========================================
+function adminSyncMatrices() {
+  syncSoldiersToMatrices();
+  clearAllCaches_();
+  return { status: "success", message: "המטריצות סונכרנו בהצלחה מול רשימת החיילים!" };
+}
+
+function adminUpdateSingleSoldier(data) {
+  const ss = getSS_();
+  const soldiersSheet = ss.getSheetByName("חיילים");
+  const repSheet = ss.getSheetByName("דיווחים");
+  const s = findSoldierByPn_(data.personalNumber);
+  if (!s) return { status: "error", message: "החייל לא נמצא" };
+
+  const timestamp = new Date();
+  const stamp = Utilities.formatDate(timestamp, "Asia/Jerusalem", "dd/MM/yyyy HH:mm");
+  const reportDate = data.reportDate ? formatToEuropeanDate(data.reportDate) : Utilities.formatDate(timestamp, "Asia/Jerusalem", "dd/MM/yyyy");
+  const row = verifiedSoldierRow_(s);
+  const mainStatus = cleanHebrewText(data.mainStatus);
+  const subStatus = cleanHebrewText(data.subStatus);
+  const notes = cleanHebrewText(data.notes || "");
+
+  if (mainStatus === "לא פעיל") {
+    soldiersSheet.getRange(row, 4).setValue("לא");
+    soldiersSheet.getRange(row, 6).setValue("ADM " + stamp);
+    if (repSheet) repSheet.appendRow([timestamp, reportDate, s.fw || "אדמין", "ADMIN", s.name, "לא פעיל", "הועבר ללא פעיל", notes]);
+    cacheRemove_(CK.SOLDIERS);
+    return { status: "success", message: "החייל " + s.name + " הוגדר כלא פעיל!" };
+  }
+
+  const isReleased = (mainStatus === "אינו נוכח" && subStatus === "שוחרר");
+  if (!s.active && !isReleased) {
+    soldiersSheet.getRange(row, 4).setValue("כן");
+    soldiersSheet.getRange(row, 6).setValue("ADM " + stamp + " (הוחזר לפעיל)");
+    cacheRemove_(CK.SOLDIERS);
+  }
+  if (repSheet) repSheet.appendRow([timestamp, reportDate, s.fw || "אדמין", "ADMIN", s.name, mainStatus, subStatus, notes]);
+  updateAllMatrices(reportDate, [{ name: s.name, mainStatus, subStatus, notes }]);
+  return { status: "success", message: "החייל " + s.name + " עודכן בהצלחה!" };
+}
+
+function adminAddNewSoldier(data) {
+  const ss = getSS_();
+  const soldiersSheet = ss.getSheetByName("חיילים");
+  const repSheet = ss.getSheetByName("דיווחים");
+  if (!soldiersSheet) return { status: "error", message: "גיליון חיילים לא נמצא" };
+
+  const sName = normalizeName(data.name);
+  const sFw = normalizeFramework(data.framework);
+  const sPn = cleanPn(data.personalNumber);
+  const sRole = cleanHebrewText(data.role || "חייל");
+  if (!sName || !sPn || !sFw) return { status: "error", message: "נא למלא שם, מ\"א ומסגרת" };
+  if (!/^\d{5,9}$/.test(sPn)) return { status: "error", message: "מספר אישי לא תקין" };
+
+  const idx = getSoldiersIndex_(true);
+  if (idx.list.some(s => s.pn === sPn)) return { status: "error", message: "מספר אישי " + sPn + " כבר קיים!" };
+  if (idx.list.some(s => s.name === sName)) return { status: "error", message: "כבר קיים חייל בשם " + sName + ". הוסף שם משפחה/כינוי כדי להבדיל ביניהם." };
+
+  const isCmdr = /מפקד|קצין|פיקוד|שלומי/.test(sRole) ? "כן" : "";
+  const width = Math.max(idx.roleCol, 5);
+  const rowVals = new Array(width).fill("");
+  rowVals[0] = sFw; rowVals[1] = sName; rowVals[2] = sPn; rowVals[3] = data.isActive ? "כן" : "לא"; rowVals[4] = isCmdr;
+  rowVals[idx.roleCol - 1] = sRole;
+  const newRow = soldiersSheet.getLastRow() + 1;
+  soldiersSheet.getRange(newRow, 3).setNumberFormat("@");
+  soldiersSheet.getRange(newRow, 1, 1, width).setValues([rowVals]);
+  cacheRemove_(CK.SOLDIERS);
+
+  syncSoldiersToMatrices();
+  if (repSheet) repSheet.appendRow([new Date(), Utilities.formatDate(new Date(), "Asia/Jerusalem", "dd/MM/yyyy"), sFw, "ADMIN", sName, "חייל חדש", sRole, "נוסף מהאדמין (מ\"א: " + sPn + ")"]);
+  return { status: "success", message: "החייל " + sName + " נוסף וסונכרן בהצלחה!" };
+}
+
+function adminMoveSoldierFramework(data) {
+  const ss = getSS_();
+  const soldiersSheet = ss.getSheetByName("חיילים");
+  const repSheet = ss.getSheetByName("דיווחים");
+  const s = findSoldierByPn_(data.personalNumber);
+  const newFw = normalizeFramework(data.newFramework);
+  if (!s || !newFw) return { status: "error", message: "נא לבחור חייל ומסגרת יעד" };
+  if (s.fw === newFw) return { status: "error", message: "החייל כבר נמצא במסגרת זו" };
+
+  const timestamp = new Date();
+  const stamp = Utilities.formatDate(timestamp, "Asia/Jerusalem", "dd/MM/yyyy HH:mm");
+  const reportDate = Utilities.formatDate(timestamp, "Asia/Jerusalem", "dd/MM/yyyy");
+  const oldFw = s.fw;
+  const sName = s.name;
+
+  const row = verifiedSoldierRow_(s);
+  soldiersSheet.getRange(row, 1).setValue(newFw);
+  soldiersSheet.getRange(row, 6).setValue("ADM " + stamp + " (הועבר ל" + newFw + ")");
+  cacheRemove_(CK.SOLDIERS);
+
+  // מטריצות נוכחות: הזזת השורה לאזור של המסגרת החדשה
+  [getDetailedSheet_(ss), ss.getSheetByName("נוכחות"), getYamamSheet_(ss)].filter(Boolean).forEach(sheet => {
+    const lastRow = sheet.getLastRow(), lastCol = sheet.getLastColumn();
+    if (lastRow < 2 || lastCol < 2) return;
+    const fws = sheet.getRange(2, 1, lastRow - 1, 1).getValues().map(r => normalizeFramework(r[0]));
+    const names = sheet.getRange(2, 2, lastRow - 1, 1).getValues().map(r => normalizeName(r[0]));
+    const idx = names.indexOf(sName);
+    if (idx === -1) return;
+    const actualRow = idx + 2;
+    let insertAfter = -1;
+    for (let r = fws.length - 1; r >= 0; r--) { if (fws[r] === newFw && r !== idx) { insertAfter = r + 2; break; } }
+    const rowValues = sheet.getRange(actualRow, 1, 1, lastCol).getValues();
+    rowValues[0][0] = newFw;
+    if (insertAfter !== -1) {
+      sheet.insertRowAfter(insertAfter);
+      sheet.getRange(insertAfter + 1, 1, 1, lastCol).setValues(rowValues);
+      sheet.deleteRow(actualRow >= insertAfter + 1 ? actualRow + 1 : actualRow);
+    } else {
+      sheet.getRange(actualRow, 1).setValue(newFw);
     }
+  });
 
-    // 2. אם חסר דיווח נוכחות לאחת מהמחלקות (1, 2, 3 או מסופחים):
-    if (missing.length > 0 && !res.hasSkeleton) {
-      blockBox.classList.remove("hidden");
-      if (missing.length === 1) {
-        blockBox.textContent = `${missing[0]} עדיין לא דיווחה נוכחות לתאריך ${res.targetDate}`;
+  // מצבות נשק / ציוד - לפי מ"א
+  [[getWeaponsMatrixSheet(ss), getWeaponsLedgerSheet(ss), ""], [getLogisticsMatrixSheet(ss), getLogisticsLedgerSheet(ss), "מפל\"ג"]].forEach(([matrix, ledger, approver]) => {
+    if (!matrix || matrix.getLastRow() < 2) return;
+    const pns = matrix.getRange(2, 1, matrix.getLastRow() - 1, 1).getValues().map(r => cleanPn(r[0]));
+    const i = pns.indexOf(s.pn);
+    if (i === -1) return;
+    matrix.getRange(i + 2, 3).setValue(newFw);
+    if (ledger) ledger.appendRow([timestamp, s.pn, sName, newFw, "העברת מסגרת", "עדכון מחלקה", "-", approver, "הועבר מ-" + oldFw + " ל-" + newFw]);
+    sortGearMatrixSheet_(matrix);
+  });
+
+  if (repSheet) repSheet.appendRow([timestamp, reportDate, newFw, "ADMIN", sName, "העברת מסגרת", oldFw + " -> " + newFw, "הועבר מ-" + oldFw + " ל-" + newFw]);
+  return { status: "success", message: "החייל " + sName + " הועבר בהצלחה ל" + newFw + "!" };
+}
+
+function adminResetPassword(data) {
+  const s = findSoldierByPn_(data.personalNumber);
+  if (!s) return { status: "error", message: "החייל לא נמצא" };
+  const idx = getSoldiersIndex_();
+  const row = verifiedSoldierRow_(s);
+  getSS_().getSheetByName("חיילים").getRange(row, idx.passCol).clearContent();
+  CacheService.getScriptCache().remove("fail_" + s.pn);
+  cacheRemove_(CK.SOLDIERS);
+  return { status: "success", message: `הסיסמה של ${s.name} אופסה. בכניסה הבאה הוא יתבקש לבחור סיסמה חדשה.` };
+}
+
+// ==========================================
+// נשקייה ואפסנאות
+// ==========================================
+function readToolsColumn_(sheet, ignored) {
+  const tools = [];
+  if (!sheet || sheet.getLastRow() < 1) return tools;
+  sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues().forEach((r, i) => {
+    const v = cleanHebrewText(r[0]);
+    if (v && !(i === 0 && ignored.includes(v)) && !tools.includes(v)) tools.push(v);
+  });
+  return tools;
+}
+
+function getWeaponsToolsList() {
+  const cached = cacheGetJson_(CK.TOOLS_WP);
+  if (cached) return cached;
+  const defaultList = ["M16", "M4", "מאג", "נגב", "מפרו", "מארס", "טריג'יקון", "ציין לייזר", "אמר\"ל", "מטול", "עכבר"];
+  const tools = readToolsColumn_(getWeaponsToolsSheet_(getSS_()), ["שם פריט", "פריט", "סוג פריט", "סוג נשק", "נשק", "כלי"]).filter(t => !isWeaponKitTool(t));
+  const result = tools.length ? tools : defaultList;
+  cachePutJson_(CK.TOOLS_WP, result, LISTS_CACHE_SEC);
+  return result;
+}
+
+function getLogisticsToolsList() {
+  const cached = cacheGetJson_(CK.TOOLS_LG);
+  if (cached) return cached;
+  const ss = getSS_();
+  const defaultList = ["קסדה", "שכפ\"ץ קרמי", "וסט לוחם", "חגור", "שק\"ש", "קיטבג", "את חפירה", "ברכיות", "מימייה", "חולצות ב'", "מכנסי ב'"];
+  let sheet = getLogisticsToolsSheet_(ss);
+  if (!sheet) {
+    sheet = ss.insertSheet("הגדרות_ציוד_לוגיסטי");
+    sheet.getRange(1, 1, defaultList.length, 1).setValues(defaultList.map(t => [t]));
+    return defaultList;
+  }
+  const tools = readToolsColumn_(sheet, ["שם פריט", "פריט", "סוג פריט", "ציוד", "שם ציוד"]);
+  const result = tools.length ? tools : defaultList;
+  cachePutJson_(CK.TOOLS_LG, result, LISTS_CACHE_SEC);
+  return result;
+}
+
+function appendTools_(sheet, tools, cacheKey) {
+  if (!sheet || !tools.length) return;
+  sheet.getRange(sheet.getLastRow() + 1, 1, tools.length, 1).setValues(tools.map(t => [t]));
+  cacheRemove_(cacheKey);
+}
+
+// קורא שורה אחת ממצבת (לפי מ"א בעמודה A) - בלי לקרוא את כל הגיליון
+function readMatrixRowByPn_(sheet, pn, minCols) {
+  const lastRow = sheet.getLastRow();
+  const lastCol = Math.max(sheet.getLastColumn(), minCols);
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(h => cleanHebrewText(h));
+  let rowIdx = -1, rowValues = null;
+  if (lastRow >= 2) {
+    const col = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    for (let i = 0; i < col.length; i++) {
+      if (cleanPn(col[i][0]) === pn) { rowIdx = i + 2; break; }
+    }
+    if (rowIdx !== -1) rowValues = sheet.getRange(rowIdx, 1, 1, lastCol).getValues()[0];
+  }
+  return { headers, rowIdx, rowValues, lastCol };
+}
+
+function getCombinedSoldierData(pn) {
+  const s = findSoldierByPn_(pn);
+  if (!s) return { status: "not_found", found: false, message: "מספר אישי לא נמצא" };
+  const meta = {
+    personalNumber: s.pn, name: s.name, framework: s.fw,
+    license: "ללא", hasLicenseRecorded: false, weaponsItems: [], logisticsItems: [], isNewToWeapons: true, isNewToLogistics: true
+  };
+  const ss = getSS_();
+
+  const mw = getWeaponsMatrixSheet(ss);
+  if (mw && mw.getLastRow() >= 2) {
+    const r = readMatrixRowByPn_(mw, s.pn, 4);
+    if (r.rowIdx !== -1) {
+      meta.isNewToWeapons = false;
+      const lic = cleanHebrewText(r.rowValues[3]);
+      if (lic) { meta.license = lic; meta.hasLicenseRecorded = true; }
+      for (let c = 4; c < r.headers.length; c++) {
+        const val = cleanHebrewText(r.rowValues[c]);
+        if (!val || !r.headers[c]) continue;
+        if (isWeaponKitTool(r.headers[c])) meta.logisticsItems.push({ toolName: r.headers[c], quantityOrSerial: val });
+        else meta.weaponsItems.push({ toolName: r.headers[c], serialNumber: val });
+      }
+    }
+  }
+
+  const ml = getLogisticsMatrixSheet(ss);
+  if (ml && ml.getLastRow() >= 2) {
+    const r = readMatrixRowByPn_(ml, s.pn, 3);
+    if (r.rowIdx !== -1) {
+      meta.isNewToLogistics = false;
+      for (let c = 3; c < r.headers.length; c++) {
+        const val = cleanHebrewText(r.rowValues[c]);
+        if (val && r.headers[c]) meta.logisticsItems.push({ toolName: r.headers[c], quantityOrSerial: val });
+      }
+    }
+  }
+  return { status: "success", found: true, soldier: meta };
+}
+
+function apiGetSoldierGear_(data, user) {
+  const p = user.permissions;
+  const requested = cleanPn(data.personalNumber);
+  const canViewOthers = p.maflagReturns || p.reportsCenter || p.adminPanel;
+  const targetPn = (requested && canViewOthers) ? requested : user.personalNumber;
+  const res = { status: "success", soldierData: getCombinedSoldierData(targetPn) };
+  if (!data.skipTools) {
+    res.weaponsTools = getWeaponsToolsList();
+    res.logisticsTools = getLogisticsToolsList();
+  }
+  return res;
+}
+
+function apiSubmitWeapons_(data, user) {
+  const targetPn = cleanPn(data.personalNumber) || user.personalNumber;
+  const forOther = targetPn !== user.personalNumber;
+  if (forOther && !user.permissions.maflagReturns) return { status: "error", message: "אין לך הרשאה לעדכן נשק של חייל אחר" };
+  const s = findSoldierByPn_(targetPn);
+  if (!s) return { status: "error", message: "החייל לא נמצא" };
+  return submitWeaponUpdateOrReturn_({
+    pn: s.pn, name: s.name, fw: s.fw, license: data.license,
+    returnedItems: data.returnedItems, newItems: data.newItems,
+    authorizedBy: forOther ? user.name + " (מפל\"ג)" : ""
+  });
+}
+
+function apiSubmitLogistics_(data, user) {
+  const targetPn = cleanPn(data.personalNumber) || user.personalNumber;
+  if (targetPn !== user.personalNumber && !user.permissions.maflagReturns) return { status: "error", message: "אין לך הרשאה לחתום בשם חייל אחר" };
+  const s = findSoldierByPn_(targetPn);
+  if (!s) return { status: "error", message: "החייל לא נמצא" };
+  return submitLogisticsIssue_({ pn: s.pn, name: s.name, fw: s.fw, newItems: data.newItems });
+}
+
+function submitWeaponUpdateOrReturn_(p) {
+  const ss = getSS_();
+  let matrix = getWeaponsMatrixSheet(ss);
+  let ledger = getWeaponsLedgerSheet(ss);
+  if (!matrix) {
+    matrix = ss.insertSheet("מצבת_נשק");
+    matrix.getRange(1, 1, 1, 7).setValues([["מספר אישי", "שם מלא", "מסגרת", "רישיון", "M16", "כוונת", "אמר\"ל"]]).setFontWeight("bold");
+  }
+  if (!ledger) {
+    ledger = ss.insertSheet("תנועות_נשק");
+    ledger.getRange(1, 1, 1, 9).setValues([["חותמת זמן", "מספר אישי", "שם מלא", "מסגרת", "פעולה", "נשק/אמל\"ח", "מספר סידורי/כמות", "רישיון", "הערות"]]).setFontWeight("bold");
+  }
+
+  const license = cleanHebrewText(p.license || "");
+  const r = readMatrixRowByPn_(matrix, p.pn, 4);
+  const headers = r.headers.slice();
+  const isNewRow = r.rowIdx === -1;
+  let row;
+  if (isNewRow) {
+    row = new Array(headers.length).fill("");
+    row[0] = p.pn; row[1] = p.name; row[2] = p.fw; row[3] = license || "ללא";
+  } else {
+    row = r.rowValues.slice();
+    row[1] = p.name; row[2] = p.fw;
+    if (license && license !== "ללא") row[3] = license;
+  }
+  const licLog = cleanHebrewText(row[3]) || "ללא";
+  const ts = new Date();
+  const ledgerRows = [];
+  const newTools = [];
+  const note = p.authorizedBy ? "אושר ע\"י " + p.authorizedBy : "הזדכות";
+
+  (p.returnedItems || []).forEach(item => {
+    const t = cleanHebrewText(item.toolName);
+    const c = headers.indexOf(t);
+    if (c < 4) return;
+    const curr = cleanHebrewText(row[c]);
+    const retQty = parseInt(item.returnQty, 10), currQty = parseInt(curr, 10);
+    if (isWeaponKitTool(t) && !isNaN(retQty) && !isNaN(currQty) && retQty < currQty) {
+      row[c] = currQty - retQty;
+      ledgerRows.push([ts, p.pn, p.name, p.fw, "זיכוי", t, retQty, licLog, note + " (חלקי)"]);
+    } else {
+      row[c] = "";
+      ledgerRows.push([ts, p.pn, p.name, p.fw, "זיכוי", t, curr, licLog, note]);
+    }
+  });
+
+  const known = getWeaponsToolsList();
+  (p.newItems || []).forEach(item => {
+    const t = cleanHebrewText(item.toolName), serial = cleanHebrewText(item.serialNumber);
+    if (!t || !serial) return;
+    let c = headers.indexOf(t);
+    if (c === -1) {
+      c = headers.length;
+      headers.push(t);
+      if (!isWeaponKitTool(t) && known.indexOf(t) === -1) newTools.push(t);
+    }
+    while (row.length < headers.length) row.push("");
+    const curr = cleanHebrewText(row[c]);
+    if (isWeaponKitTool(t)) {
+      const add = parseInt(serial, 10), cq = parseInt(curr, 10);
+      row[c] = (!isNaN(add) && !isNaN(cq)) ? cq + add : serial;
+    } else {
+      // מספר סידורי של נשק - לא מחברים מספרים! אם כבר יש כלי - מוסיפים אחרי פסיק
+      row[c] = (curr && curr !== serial) ? curr + ", " + serial : serial;
+    }
+    ledgerRows.push([ts, p.pn, p.name, p.fw, "חתימה", t, serial, licLog, "חתימה"]);
+  });
+  while (row.length < headers.length) row.push("");
+
+  if (headers.length > r.headers.length) {
+    matrix.getRange(1, r.headers.length + 1, 1, headers.length - r.headers.length)
+      .setValues([headers.slice(r.headers.length)]).setFontWeight("bold");
+  }
+  const targetRow = isNewRow ? Math.max(matrix.getLastRow(), 1) + 1 : r.rowIdx;
+  matrix.getRange(targetRow, 1, 1, row.length).setValues([row]);
+  if (ledgerRows.length) ledger.getRange(ledger.getLastRow() + 1, 1, ledgerRows.length, 9).setValues(ledgerRows);
+  if (newTools.length) appendTools_(getWeaponsToolsSheet_(ss), newTools, CK.TOOLS_WP);
+  if (isNewRow) sortGearMatrixSheet_(matrix);
+  return { status: "success", message: "נשקייה: הפעולה הושלמה בהצלחה!" };
+}
+
+function submitLogisticsIssue_(p) {
+  const ss = getSS_();
+  let matrix = getLogisticsMatrixSheet(ss);
+  let ledger = getLogisticsLedgerSheet(ss);
+  if (!matrix) {
+    matrix = ss.insertSheet("מצבת_ציוד");
+    matrix.getRange(1, 1, 1, 3).setValues([["מספר אישי", "שם מלא", "מסגרת"]]).setFontWeight("bold");
+  }
+  if (!ledger) {
+    ledger = ss.insertSheet("תנועות_ציוד");
+    ledger.getRange(1, 1, 1, 9).setValues([["חותמת זמן", "מספר אישי", "שם מלא", "מסגרת", "פעולה", "סוג פריט", "כמות/מספר", "גורם מאשר", "הערות"]]).setFontWeight("bold");
+  }
+  if (!(p.newItems || []).length) return { status: "error", message: "לא נבחרו פריטים" };
+
+  const r = readMatrixRowByPn_(matrix, p.pn, 3);
+  const headers = r.headers.slice();
+  const isNewRow = r.rowIdx === -1;
+  let row;
+  if (isNewRow) {
+    row = new Array(headers.length).fill("");
+    row[0] = p.pn; row[1] = p.name; row[2] = p.fw;
+  } else {
+    row = r.rowValues.slice();
+    row[1] = p.name; row[2] = p.fw;
+  }
+  const ts = new Date();
+  const ledgerRows = [];
+  const newTools = [];
+  const known = getLogisticsToolsList();
+
+  p.newItems.forEach(item => {
+    const t = cleanHebrewText(item.toolName), qtyStr = cleanHebrewText(item.quantityOrSerial || "1");
+    if (!t) return;
+    let c = headers.indexOf(t);
+    if (c === -1) {
+      c = headers.length;
+      headers.push(t);
+      if (known.indexOf(t) === -1) newTools.push(t);
+    }
+    while (row.length < headers.length) row.push("");
+    const add = parseInt(qtyStr, 10), cq = parseInt(cleanHebrewText(row[c]), 10);
+    row[c] = (!isNaN(add) && !isNaN(cq)) ? cq + add : qtyStr;
+    ledgerRows.push([ts, p.pn, p.name, p.fw, "חתימה", t, qtyStr, "חייל", "חתימה על ציוד אפסנאות"]);
+  });
+  while (row.length < headers.length) row.push("");
+
+  if (headers.length > r.headers.length) {
+    matrix.getRange(1, r.headers.length + 1, 1, headers.length - r.headers.length)
+      .setValues([headers.slice(r.headers.length)]).setFontWeight("bold");
+  }
+  const targetRow = isNewRow ? Math.max(matrix.getLastRow(), 1) + 1 : r.rowIdx;
+  matrix.getRange(targetRow, 1, 1, row.length).setValues([row]);
+  if (ledgerRows.length) ledger.getRange(ledger.getLastRow() + 1, 1, ledgerRows.length, 9).setValues(ledgerRows);
+  if (newTools.length) appendTools_(getLogisticsToolsSheet_(ss), newTools, CK.TOOLS_LG);
+  if (isNewRow) sortGearMatrixSheet_(matrix);
+  return { status: "success", message: "אפסנאות: הציוד נחתם בהצלחה!" };
+}
+
+function maflagReturnLogisticsItems(data, user) {
+  const ss = getSS_();
+  const s = findSoldierByPn_(data.personalNumber);
+  if (!s) return { status: "error", message: "החייל לא נמצא" };
+  const ts = new Date();
+  const approver = user.name + " (מפל\"ג)";
+
+  const groups = [
+    { matrix: getLogisticsMatrixSheet(ss), ledger: getLogisticsLedgerSheet(ss), minCol: 3, items: [] },
+    { matrix: getWeaponsMatrixSheet(ss), ledger: getWeaponsLedgerSheet(ss), minCol: 4, items: [] }
+  ];
+  (data.returnedItems || []).forEach(item => {
+    groups[isWeaponKitTool(item.toolName) ? 1 : 0].items.push(item);
+  });
+
+  let count = 0;
+  groups.forEach(g => {
+    if (!g.items.length || !g.matrix || g.matrix.getLastRow() < 2) return;
+    const r = readMatrixRowByPn_(g.matrix, s.pn, g.minCol);
+    if (r.rowIdx === -1) return;
+    const row = r.rowValues.slice();
+    const ledgerRows = [];
+    g.items.forEach(item => {
+      const t = cleanHebrewText(item.toolName);
+      const c = r.headers.indexOf(t);
+      if (c < g.minCol) return; // לא מאפשר לגעת בעמודות מ"א/שם/מסגרת/רישיון
+      const curr = cleanHebrewText(row[c]);
+      const retQty = parseInt(item.returnQty, 10), cq = parseInt(curr, 10);
+      if (!isNaN(retQty) && !isNaN(cq) && retQty < cq) {
+        row[c] = cq - retQty;
+        ledgerRows.push([ts, s.pn, s.name, s.fw, "זיכוי", t, retQty, approver, "זיכוי חלקי (מפל\"ג)"]);
       } else {
-        const lastFw = missing[missing.length - 1];
-        const firstPart = missing.slice(0, -1).join(", ");
-        blockBox.textContent = `מחלקות ${firstPart} ו-${lastFw} עדיין לא דיווחו נוכחות לתאריך ${res.targetDate}`;
+        row[c] = "";
+        ledgerRows.push([ts, s.pn, s.name, s.fw, "זיכוי", t, curr, approver, "זיכוי מלא (מפל\"ג)"]);
       }
-      return;
-    }
+      count++;
+    });
+    g.matrix.getRange(r.rowIdx, 1, 1, row.length).setValues([row]);
+    if (ledgerRows.length && g.ledger) g.ledger.getRange(g.ledger.getLastRow() + 1, 1, ledgerRows.length, 9).setValues(ledgerRows);
+  });
+  return { status: "success", message: `הזיכוי בוצע בהצלחה (${count} פריטים)!` };
+}
 
-    // 3. שלב 1: חלוקת משימות למחלקות (כשטרם חולקו משימות, או כשהקצין לחץ עריכת חלוקה)
-    if ((shvViewMode === "officers" || shvViewMode === "final_approval") && (!res.hasSkeleton || shvForceSkeletonEdit)) {
-      stage1Wrap.classList.remove("hidden");
-      if (res.hasSkeleton) {
-        toggleBtn.classList.remove("hidden");
-        toggleBtn.textContent = "↩️ חזרה ללוח השיבוץ";
-      }
-      renderStage1SummaryTable(res.frameworkSummary || []);
-      await renderStage1TasksList(res.rows || []);
-      return;
-    }
+// ==========================================
+// מאגר משותף לדוחות / מפל"ג / אדמין
+// ==========================================
+function getSharedDataset() {
+  const ss = getSS_();
+  const idx = getSoldiersIndex_();
+  const orderMap = getFrameworkOrderMap();
 
-    // 4. שלב 2-4: לוח שיבוץ החיילים
-    if (shvViewMode === "officers" || shvViewMode === "final_approval") {
-      toggleBtn.classList.remove("hidden");
-      toggleBtn.textContent = "🔄 ערוך חלוקת משימות למחלקות";
-    }
+  const masterSoldiers = idx.list.filter(s => s.name).map(s => ({
+    name: s.name, framework: s.fw, personalNumber: s.pn, isActive: s.active, isCommander: soldierIsCommander_(s)
+  }));
+  const activeNames = masterSoldiers.filter(s => s.isActive).map(s => s.name);
+  const commanders = masterSoldiers.filter(s => s.isCommander).map(s => s.name);
 
-    shvWorkspaceState = {
-      targetDate: res.targetDate,
-      dayName: res.dayName,
-      viewMode: shvViewMode,
-      userFramework: currentUser.framework,
-      hasSkeleton: res.hasSkeleton,
-      allPlatoonsSubmitted: res.allPlatoonsSubmitted,
-      isPendingMpApproval: res.isPendingMpApproval,
-      isOfficialApproved: res.isOfficialApproved,
-      allSoldiers: res.availableSoldiers || [],
-      rows: (res.rows || []).map(r => {
-        const savedCmdrs = r.assignedCmdrs ? r.assignedCmdrs.split(",").map(x => x.trim()).filter(Boolean) : [];
-        const savedSoldiers = r.assignedSoldiers ? r.assignedSoldiers.split(",").map(x => x.trim()).filter(Boolean) : [];
-        const cmdrSlots = [];
-        for (let c = 0; c < r.reqCmdrs; c++) cmdrSlots.push(savedCmdrs[c] || "");
-        const soldierSlots = [];
-        for (let s = 0; s < r.reqSoldiers; s++) soldierSlots.push(savedSoldiers[s] || "");
-        return { ...r, cmdrSlots, soldierSlots };
-      })
+  // מטריצות נוכחות - רק X הימים האחרונים, מיושר לפי שם (גם אם סדר השורות שונה בין הגיליונות)
+  const det = getDetailedSheet_(ss);
+  let dates = [], names = [], frameworks = [], detailed = [], presence = [], yamam = null;
+  if (det && det.getLastRow() >= 2 && det.getLastColumn() >= 3) {
+    const lastCol = det.getLastColumn();
+    const span = Math.min(SHARED_DATES_LIMIT, lastCol - 2);
+    const startCol = lastCol - span + 1;
+    const n = det.getLastRow() - 1;
+    dates = det.getRange(1, startCol, 1, span).getValues()[0].map(h => h ? formatToEuropeanDate(h) : "");
+    frameworks = det.getRange(2, 1, n, 1).getValues().map(r => normalizeFramework(r[0]));
+    names = det.getRange(2, 2, n, 1).getValues().map(r => normalizeName(r[0]));
+    detailed = det.getRange(2, startCol, n, span).getValues().map(r => r.map(v => cleanHebrewText(v)));
+
+    const alignedGrid = (sheet) => {
+      if (!sheet || sheet.getLastRow() < 2 || sheet.getLastColumn() < 3) return null;
+      const sLastCol = sheet.getLastColumn();
+      const sHeaders = sheet.getRange(1, 3, 1, sLastCol - 2).getValues()[0].map(h => h ? formatToEuropeanDate(h) : "");
+      const colOfDate = dates.map(d => d ? sHeaders.lastIndexOf(d) : -1);
+      const sn = sheet.getLastRow() - 1;
+      const sNames = sheet.getRange(2, 2, sn, 1).getValues().map(r => normalizeName(r[0]));
+      const sGrid = sheet.getRange(2, 3, sn, sLastCol - 2).getValues();
+      const rowOf = {};
+      sNames.forEach((nm, i) => { if (nm && rowOf[nm] === undefined) rowOf[nm] = i; });
+      return names.map(nm => {
+        const ri = rowOf[nm];
+        return colOfDate.map(ci => (ri === undefined || ci === -1) ? "" : cleanHebrewText(sGrid[ri][ci]));
+      });
     };
-
-    // הודעות סטטוס לפי שלב
-    if (shvViewMode === "officers" && res.allPlatoonsSubmitted) {
-      stageBanner.classList.remove("hidden");
-      stageBanner.textContent = "✅ כלל המחלקות סיימו לשבץ! בדוק תקינות, בצע שינויים במידת הצורך והעבר לאישור מ\"פ.";
-    } else if (shvViewMode === "final_approval") {
-      stageBanner.classList.remove("hidden");
-      stageBanner.textContent = res.isPendingMpApproval
-        ? "📋 השבצ\"ק הועבר ע\"י הקצינים וממתין לאישור מ\"פ (פיקוד עליון)."
-        : "📋 תצוגת שבצ\"ק פלוגתי מלאה לעריכה ואישור סופי.";
-    }
-
-    // התראות חוסרים עבור קצינים (בסקירה) ופיקוד עליון
-    if ((shvViewMode === "final_approval" || (shvViewMode === "officers" && res.allPlatoonsSubmitted)) && res.allWarnings && res.allWarnings.length > 0) {
-      hcWarn.classList.remove("hidden");
-      hcWarn.innerHTML = `<strong>🚨 התראות וחוסרים בשבצ"ק (${res.allWarnings.length}):</strong><br>` +
-        res.allWarnings.map(w => `• ${escapeHtml(w)}`).join("<br>");
-    }
-
-    stage2Wrap.classList.remove("hidden");
-    renderShavzakUI();
+    presence = alignedGrid(ss.getSheetByName("נוכחות")) || detailed.map(r => r.map(v => (v && !/חופשה|גימלים|שוחרר|ג'/.test(v)) ? "V" : (v ? "X" : "")));
+    yamam = alignedGrid(getYamamSheet_(ss));
   }
 
-  function renderStage1SummaryTable(summaryList) {
-    const container = document.getElementById("shvSummaryTableContainer");
-    let totSoldiers = 0, totCmdrs = 0, totAll = 0;
-
-    const rowsHtml = summaryList.map(item => {
-      totSoldiers += item.soldiersCount;
-      totCmdrs += item.cmdrsCount;
-      totAll += item.totalCount;
-      return `<tr>
-        <td style="font-weight:bold;color:#e2e8f0;">${escapeHtml(item.framework)}</td>
-        <td>${item.soldiersCount}</td>
-        <td>${item.cmdrsCount}</td>
-        <td style="font-weight:bold;color:#38bdf8;">${item.totalCount}</td>
-      </tr>`;
-    }).join("");
-
-    container.innerHTML = `<table class="summary-table">
-      <thead>
-        <tr>
-          <th>מסגרת</th>
-          <th>חיילים</th>
-          <th>מפקדים</th>
-          <th>סה"כ</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rowsHtml}
-        <tr style="background:#0f172a;font-weight:bold;color:#fde047;">
-          <td>סה"כ</td>
-          <td>${totSoldiers}</td>
-          <td>${totCmdrs}</td>
-          <td>${totAll}</td>
-        </tr>
-      </tbody>
-    </table>`;
-  }
-
-  async function renderStage1TasksList(existingRows) {
-    const listDiv = document.getElementById("skeletonTasksList");
-    listDiv.innerHTML = '<div style="color:#94a3b8;">טוען משימות מגיליון "משימות"...</div>';
-
-    const res = await apiCall({ action: "shavzak_get_tasks" });
-    shvSkeletonShifts = res.shifts || [];
-
-    if (!shvSkeletonShifts.length) {
-      listDiv.innerHTML = '<div class="status-box status-err" style="display:block;">גיליון "משימות" ריק. יש להזין משימות בגיליון "משימות" (עמודות A-F) ולנסות שוב.</div>';
-      return;
-    }
-
-    const existingMap = {};
-    existingRows.forEach(r => {
-      existingMap[`${r.taskName}__${r.shiftNumber}`] = r.platoon;
-    });
-
-    listDiv.innerHTML = shvSkeletonShifts.map((sh, idx) => {
-      const savedPlatoon = existingMap[sh.shiftKey] || "מחלקה 1";
-      return `<div class="item-box" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-        <div>
-          <div style="font-weight:bold;color:#38bdf8;">${escapeHtml(sh.taskName)} (משמרת ${sh.shiftNumber}/${sh.totalShifts})</div>
-          <div style="font-size:0.85rem;color:#cbd5e1;">🕒 ${escapeHtml(sh.hoursLabel)} | דרישה: ${sh.reqCmdrs} מפקדים, ${sh.reqSoldiers} חיילים</div>
-        </div>
-        <select id="skelPlatoon_${idx}" style="width:155px;margin:0;">
-          ${SHAVZAK_PLATOONS.map(p => `<option value="${escapeHtml(p)}" ${p === savedPlatoon ? "selected" : ""}>${escapeHtml(p)}</option>`).join("")}
-        </select>
-      </div>`;
-    }).join("");
-  }
-
-  async function saveOfficerSkeleton() {
-    const targetDate = document.getElementById("shvTargetDate").value.trim();
-    if (!targetDate) { alert("נא להזין תאריך"); return; }
-
-    const assignments = shvSkeletonShifts.map((sh, idx) => ({
-      taskName: sh.taskName, shiftNumber: sh.shiftNumber, hoursLabel: sh.hoursLabel,
-      reqCmdrs: sh.reqCmdrs, reqSoldiers: sh.reqSoldiers,
-      platoon: document.getElementById(`skelPlatoon_${idx}`).value
-    }));
-
-    showBox("skeletonStatus", "שומר חלוקת משימות למחלקות...", true);
-    const res = await apiCall({ action: "shavzak_init_skeleton", targetDate, assignments });
-    showBox("skeletonStatus", res.message, res.status === "success");
-    if (res.status === "success") {
-      shvForceSkeletonEdit = false;
-      setTimeout(() => loadShavzakWorkspace(), 800);
-    }
-  }
-
-  function getAssignedSoldiersSet() {
-    const set = new Set();
-    if (!shvWorkspaceState) return set;
-    shvWorkspaceState.rows.forEach(r => {
-      if (!r.canViewDetails) return;
-      r.cmdrSlots.forEach(name => { if (name && name !== "ללא שיבוץ") set.add(name); });
-      r.soldierSlots.forEach(name => { if (name && name !== "ללא שיבוץ") set.add(name); });
-    });
-    return set;
-  }
-
-  function renderShavzakUI() {
-    if (!shvWorkspaceState) return;
-    const assignedSet = getAssignedSoldiersSet();
-    const canSeeAllSoldiers = (shvWorkspaceState.viewMode === "final_approval") ||
-                              (shvWorkspaceState.viewMode === "officers" && shvWorkspaceState.allPlatoonsSubmitted);
-
-    const filterWrap = document.getElementById("shvPoolFilterWrap");
-    filterWrap.classList.toggle("hidden", !canSeeAllSoldiers);
-
-    let poolSoldiers = shvWorkspaceState.allSoldiers.filter(s => !assignedSet.has(s.name));
-    if (canSeeAllSoldiers) {
-      const fwFilter = document.getElementById("shvPoolFwFilter").value;
-      if (fwFilter !== "ALL") {
-        poolSoldiers = poolSoldiers.filter(s => s.framework === fwFilter);
+  const weaponsSoldiers = [], soldierKitMap = {};
+  const mw = getWeaponsMatrixSheet(ss);
+  if (mw && mw.getLastRow() >= 2 && mw.getLastColumn() >= 4) {
+    const wData = mw.getRange(1, 1, mw.getLastRow(), mw.getLastColumn()).getValues();
+    const wHeaders = wData[0].map(h => cleanHebrewText(h));
+    for (let i = 1; i < wData.length; i++) {
+      const pn = cleanPn(wData[i][0]), sName = normalizeName(wData[i][1]), fw = normalizeFramework(wData[i][2]), lic = cleanHebrewText(wData[i][3]) || "ללא";
+      if (!sName && !pn) continue;
+      const pure = [], kit = [];
+      for (let c = 4; c < wHeaders.length; c++) {
+        const val = cleanHebrewText(wData[i][c]);
+        if (!val || !wHeaders[c]) continue;
+        if (isWeaponKitTool(wHeaders[c])) kit.push({ toolName: wHeaders[c], quantityOrSerial: val });
+        else pure.push({ toolName: wHeaders[c], serialNumber: val });
       }
-    } else {
-      // מפקד מחלקה (או קצין בשלב השיבוץ המחלקתי) רואה רק את חיילי המחלקה שלו
-      poolSoldiers = poolSoldiers.filter(s => s.framework === shvWorkspaceState.userFramework);
+      weaponsSoldiers.push({ personalNumber: pn, name: sName, framework: fw, license: lic, items: pure });
+      if (kit.length) soldierKitMap[pn] = kit;
     }
+    weaponsSoldiers.sort((a, b) => ((orderMap[a.framework] || 99) - (orderMap[b.framework] || 99)) || a.name.localeCompare(b.name, "he"));
+  }
 
-    const poolDiv = document.getElementById("shvAvailablePool");
-    if (poolSoldiers.length === 0) {
-      poolDiv.innerHTML = '<div style="color:#94a3b8;font-size:0.85rem;text-align:center;padding:12px;">אין חיילים פנויים לשיבוץ.</div>';
-    } else {
-      poolDiv.innerHTML = poolSoldiers.map(s => {
-        const isSelected = (shvSelectedSoldier === s.name);
-        let badges = "";
-        if (s.isCommander) badges += `<span class="chip-badge badge-cmdr">מפקד</span> `;
-        if (s.subStatus && s.subStatus.includes("מגיע היום")) badges += `<span class="chip-badge badge-arrive">מגיע היום</span> `;
-        if (s.subStatus && s.subStatus.includes("יוצא היום")) badges += `<span class="chip-badge badge-leave">יוצא היום</span> `;
-        if (canSeeAllSoldiers) badges += `<span class="chip-badge" style="background:#334155;color:#cbd5e1;">${escapeHtml(s.framework)}</span> `;
-
-        return `<div class="shv-soldier-chip ${isSelected ? "selected-chip" : ""}" onclick="selectSoldierFromPool('${s.name.replace(/'/g, "\\'")}')">
-          <div>
-            <div style="font-weight:bold;font-size:0.92rem;">${escapeHtml(s.name)}</div>
-            <div style="margin-top:2px;">${badges}</div>
-          </div>
-          <span style="color:#38bdf8;font-size:0.8rem;">${isSelected ? "נבחר ✓" : "שבץ ◀"}</span>
-        </div>`;
-      }).join("");
-    }
-
-    const board = document.getElementById("shvScheduleBoard");
-    const actionBox = document.getElementById("shvActionButtons");
-    actionBox.classList.remove("hidden");
-
-    let hasMyPlatoonRows = false;
-    let allMyPlatoonSlotsFilled = true;
-    const isOfficerOrTop = (shvWorkspaceState.viewMode === "officers" || shvWorkspaceState.viewMode === "final_approval");
-
-    board.innerHTML = shvWorkspaceState.rows.map((r, rIdx) => {
-      // משימה של מחלקה אחרת שאינה פתוחה לצפייה
-      if (!r.canViewDetails) {
-        const transferSelect = isOfficerOrTop ? `
-          <select style="width:135px;padding:5px;margin:0;font-size:0.82rem;" onchange="transferShiftPlatoon('${escapeHtml(r.taskName)}', ${r.shiftNumber}, this.value)">
-            ${SHAVZAK_PLATOONS.map(p => `<option value="${escapeHtml(p)}" ${p === r.platoon ? "selected" : ""}>${escapeHtml(p)}</option>`).join("")}
-          </select>
-        ` : `<span style="background:#334155;color:#cbd5e1;padding:4px 10px;border-radius:6px;font-weight:bold;">${escapeHtml(r.platoon)}</span>`;
-
-        return `<div class="shv-shift-locked">
-          <div><strong style="color:#e2e8f0;">${escapeHtml(r.taskName)}</strong> (משמרת ${r.shiftNumber}) • <span>🕒 ${escapeHtml(r.hoursLabel)}</span></div>
-          ${transferSelect}
-        </div>`;
+  const logisticsSoldiers = [], soldierLogMap = {};
+  const ml = getLogisticsMatrixSheet(ss);
+  if (ml && ml.getLastRow() >= 2 && ml.getLastColumn() >= 3) {
+    const lData = ml.getRange(1, 1, ml.getLastRow(), ml.getLastColumn()).getValues();
+    const lHeaders = lData[0].map(h => cleanHebrewText(h));
+    for (let j = 1; j < lData.length; j++) {
+      const pn = cleanPn(lData[j][0]), sName = normalizeName(lData[j][1]), fw = normalizeFramework(lData[j][2]);
+      if (!sName && !pn) continue;
+      const items = [];
+      for (let c = 3; c < lHeaders.length; c++) {
+        const val = cleanHebrewText(lData[j][c]);
+        if (val && lHeaders[c]) items.push({ toolName: lHeaders[c], quantityOrSerial: val });
       }
-
-      if (r.isMyPlatoon) hasMyPlatoonRows = true;
-
-      let cmdrHtml = "";
-      r.cmdrSlots.forEach((val, cIdx) => {
-        if (r.isMyPlatoon && !val) allMyPlatoonSlotsFilled = false;
-        if (val) {
-          cmdrHtml += `<div class="shv-slot-row">
-            <span>⭐ <strong>מפקד:</strong> ${escapeHtml(val)}</span>
-            ${r.canEdit ? `<button type="button" class="btn-trash" title="בטל בחירה" onclick="clearShvSlot(${rIdx}, 'cmdr', ${cIdx})">🗑️</button>` : ""}
-          </div>`;
-        } else {
-          cmdrHtml += `<div class="shv-slot-row shv-slot-empty">
-            <span style="color:#94a3b8;cursor:pointer;flex:1;" onclick="assignSelectedToSlot(${rIdx}, 'cmdr', ${cIdx})">
-              ⭐ משבצת מפקד פנויה ${shvSelectedSoldier ? `(לחץ לשיבוץ ${escapeHtml(shvSelectedSoldier)})` : "(בחר מהרשימה)"}
-            </span>
-            <button type="button" class="btn-unassigned" onclick="markSlotUnassigned(${rIdx}, 'cmdr', ${cIdx})">ללא שיבוץ</button>
-          </div>`;
-        }
-      });
-
-      let soldiersHtml = "";
-      r.soldierSlots.forEach((val, sIdx) => {
-        if (r.isMyPlatoon && !val) allMyPlatoonSlotsFilled = false;
-        if (val) {
-          soldiersHtml += `<div class="shv-slot-row">
-            <span>🪖 <strong>לוחם:</strong> ${escapeHtml(val)}</span>
-            ${r.canEdit ? `<button type="button" class="btn-trash" title="בטל בחירה" onclick="clearShvSlot(${rIdx}, 'soldier', ${sIdx})">🗑️</button>` : ""}
-          </div>`;
-        } else {
-          soldiersHtml += `<div class="shv-slot-row shv-slot-empty">
-            <span style="color:#94a3b8;cursor:pointer;flex:1;" onclick="assignSelectedToSlot(${rIdx}, 'soldier', ${sIdx})">
-              🪖 משבצת חייל פנויה ${shvSelectedSoldier ? `(לחץ לשיבוץ ${escapeHtml(shvSelectedSoldier)})` : "(בחר מהרשימה)"}
-            </span>
-            <button type="button" class="btn-unassigned" onclick="markSlotUnassigned(${rIdx}, 'soldier', ${sIdx})">ללא שיבוץ</button>
-          </div>`;
-        }
-      });
-
-      const headerBadge = isOfficerOrTop ? `
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:0.82rem;color:#cbd5e1;">🕒 ${escapeHtml(r.hoursLabel)}</span>
-          <select style="width:125px;padding:4px;margin:0;font-size:0.82rem;" onchange="transferShiftPlatoon('${escapeHtml(r.taskName)}', ${r.shiftNumber}, this.value)">
-            ${SHAVZAK_PLATOONS.map(p => `<option value="${escapeHtml(p)}" ${p === r.platoon ? "selected" : ""}>${escapeHtml(p)}</option>`).join("")}
-          </select>
-        </div>
-      ` : `<span style="background:#0369a1;color:#fff;padding:3px 9px;border-radius:6px;font-size:0.85rem;font-weight:bold;">${escapeHtml(r.platoon)} • 🕒 ${escapeHtml(r.hoursLabel)}</span>`;
-
-      return `<div class="shv-shift-card" style="border-color:#0284c7;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
-          <div>
-            <span style="font-weight:bold;font-size:1.08rem;color:#38bdf8;">${escapeHtml(r.taskName)}</span>
-            <span style="color:#cbd5e1;font-size:0.9rem;"> (משמרת ${r.shiftNumber})</span>
-          </div>
-          ${headerBadge}
-        </div>
-        ${cmdrHtml}
-        ${soldiersHtml}
-      </div>`;
-    }).join("");
-
-    // הצגת כפתורים מתאימים לכל תפקיד
-    document.getElementById("platoonBtnsRow").classList.toggle("hidden", shvWorkspaceState.viewMode !== "platoon");
-    document.getElementById("officerBtnsWrap").classList.toggle("hidden", shvWorkspaceState.viewMode !== "officers");
-    document.getElementById("finalMpBtnsWrap").classList.toggle("hidden", shvWorkspaceState.viewMode !== "final_approval");
-
-    if (shvWorkspaceState.viewMode === "platoon") {
-      const btnSub = document.getElementById("btnSubmitPlatoonApproval");
-      btnSub.disabled = !hasMyPlatoonRows || !allMyPlatoonSlotsFilled;
-    } else if (shvWorkspaceState.viewMode === "officers") {
-      const btnOffSub = document.getElementById("btnOfficerSubmitMyPlatoon");
-      btnOffSub.disabled = !hasMyPlatoonRows || !allMyPlatoonSlotsFilled;
-      btnOffSub.classList.toggle("hidden", shvWorkspaceState.allPlatoonsSubmitted);
-
-      const btnMp = document.getElementById("btnForwardToMp");
-      btnMp.classList.toggle("hidden", !shvWorkspaceState.allPlatoonsSubmitted);
+      const obj = { personalNumber: pn, name: sName, framework: fw, items };
+      logisticsSoldiers.push(obj);
+      soldierLogMap[pn] = obj;
     }
   }
-
-  function selectSoldierFromPool(name) {
-    shvSelectedSoldier = (shvSelectedSoldier === name) ? null : name;
-    renderShavzakUI();
-  }
-
-  function assignSelectedToSlot(rIdx, slotType, sIdx) {
-    if (!shvSelectedSoldier) { alert("בחר תחילה חייל מרשימת החיילים הנוכחים בצד ימין."); return; }
-    const row = shvWorkspaceState.rows[rIdx];
-    if (slotType === "cmdr") row.cmdrSlots[sIdx] = shvSelectedSoldier;
-    else row.soldierSlots[sIdx] = shvSelectedSoldier;
-    shvSelectedSoldier = null;
-    renderShavzakUI();
-  }
-
-  function markSlotUnassigned(rIdx, slotType, sIdx) {
-    const row = shvWorkspaceState.rows[rIdx];
-    if (slotType === "cmdr") row.cmdrSlots[sIdx] = "ללא שיבוץ";
-    else row.soldierSlots[sIdx] = "ללא שיבוץ";
-    renderShavzakUI();
-  }
-
-  function clearShvSlot(rIdx, slotType, sIdx) {
-    const row = shvWorkspaceState.rows[rIdx];
-    if (slotType === "cmdr") row.cmdrSlots[sIdx] = "";
-    else row.soldierSlots[sIdx] = "";
-    renderShavzakUI();
-  }
-
-  async function transferShiftPlatoon(taskName, shiftNumber, newPlatoon) {
-    showBox("shvSaveStatus", `מעביר משימה ל${newPlatoon}...`, true);
-    const res = await apiCall({
-      action: "shavzak_transfer_shift",
-      targetDate: shvWorkspaceState.targetDate,
-      taskName,
-      shiftNumber,
-      newPlatoon
-    });
-    showBox("shvSaveStatus", res.message, res.status === "success");
-    if (res.status === "success") await loadShavzakWorkspace();
-  }
-
-  function attemptSubmitPlatoonApproval() {
-    let hasTaskWithoutCmdr = false;
-    shvWorkspaceState.rows.forEach(r => {
-      if (!r.isMyPlatoon) return;
-      if (r.reqCmdrs > 0) {
-        const hasRealCmdr = r.cmdrSlots.some(name => {
-          if (!name || name === "ללא שיבוץ") return false;
-          const sObj = shvWorkspaceState.allSoldiers.find(x => x.name === name);
-          return sObj ? sObj.isCommander : true;
-        });
-        if (!hasRealCmdr) hasTaskWithoutCmdr = true;
-      }
-    });
-
-    if (hasTaskWithoutCmdr) {
-      openCustomModal("⚠️", "התראת שיבוץ", "אנא אשרו משימה ללא מפקד", "OK", () => savePlatoonShavzak(true));
-    } else {
-      savePlatoonShavzak(true);
+  Object.keys(soldierKitMap).forEach(pn => {
+    if (soldierLogMap[pn]) soldierLogMap[pn].items.push(...soldierKitMap[pn]);
+    else {
+      const ms = masterSoldiers.find(s => s.personalNumber === pn);
+      const obj = { personalNumber: pn, name: ms ? ms.name : "חייל", framework: ms ? ms.framework : "אחר", items: [...soldierKitMap[pn]] };
+      logisticsSoldiers.push(obj);
+      soldierLogMap[pn] = obj;
     }
-  }
-
-  async function savePlatoonShavzak(submitForApproval) {
-    const platoon = shvWorkspaceState.userFramework;
-    const canEditAll = (shvWorkspaceState.viewMode === "final_approval") ||
-                       (shvWorkspaceState.viewMode === "officers" && shvWorkspaceState.allPlatoonsSubmitted);
-    const updates = [];
-
-    shvWorkspaceState.rows.forEach(r => {
-      if (!canEditAll && r.platoon !== platoon) return;
-
-      let missingCmdr = false;
-      if (r.reqCmdrs > 0) {
-        const hasRealCmdr = r.cmdrSlots.some(name => {
-          if (!name || name === "ללא שיבוץ") return false;
-          const sObj = shvWorkspaceState.allSoldiers.find(x => x.name === name);
-          return sObj ? sObj.isCommander : true;
-        });
-        if (!hasRealCmdr) missingCmdr = true;
-      }
-
-      const unassignedCmdrs = r.cmdrSlots.filter(x => x === "ללא שיבוץ").length;
-      const unassignedSoldiers = r.soldierSlots.filter(x => x === "ללא שיבוץ").length;
-
-      updates.push({
-        taskName: r.taskName, shiftNumber: r.shiftNumber, platoon: r.platoon,
-        cmdrsList: r.cmdrSlots.filter(Boolean), soldiersList: r.soldierSlots.filter(Boolean),
-        missingCmdr, unassignedCount: unassignedCmdrs + unassignedSoldiers
-      });
-    });
-
-    showBox("shvSaveStatus", "שומר שיבוץ בגיליון 'שבצק בבניה'...", true);
-    const res = await apiCall({
-      action: "shavzak_save_platoon",
-      targetDate: shvWorkspaceState.targetDate,
-      platoon,
-      canEditAll,
-      submitForApproval,
-      updates
-    });
-    showBox("shvSaveStatus", res.message, res.status === "success");
-    if (res.status === "success" && submitForApproval) {
-      setTimeout(() => loadShavzakWorkspace(), 900);
-    }
-  }
-
-  async function forwardToMpApproval() {
-    await savePlatoonShavzak(false);
-    showBox("shvSaveStatus", "מעביר את השבצ\"ק לאישור מ\"פ...", true);
-    const res = await apiCall({
-      action: "shavzak_forward_to_mp",
-      targetDate: shvWorkspaceState.targetDate
-    });
-    showBox("shvSaveStatus", res.message, res.status === "success");
-    if (res.status === "success") await loadShavzakWorkspace();
-  }
-
-  async function publishOfficialShavzak() {
-    await savePlatoonShavzak(false);
-    showBox("shvSaveStatus", "מאשר ומפרסם שבצ\"ק רשמי...", true);
-    const res = await apiCall({
-      action: "shavzak_approve_official",
-      targetDate: shvWorkspaceState.targetDate
-    });
-    showBox("shvSaveStatus", res.message, res.status === "success");
-  }
-
-  // ==========================================
-  // מסך: טופס חתימות
-  // ==========================================
-  function switchGearSubTab(tab) {
-    document.getElementById("tabWpBtn").className = "btn-tab" + (tab === "weapons" ? " active" : "");
-    document.getElementById("tabLgBtn").className = "btn-tab" + (tab === "logistics" ? " active" : "");
-    document.getElementById("weaponsSection").classList.toggle("hidden", tab !== "weapons");
-    document.getElementById("logisticsSection").classList.toggle("hidden", tab !== "logistics");
-    document.getElementById("soldierActionStatus").style.display = "none";
-  }
-
-  async function loadSoldierGearScreen() {
-    const res = await apiCall({ action: "get_soldier_gear", personalNumber: currentUser.personalNumber });
-    wpToolsList = res.weaponsTools || [];
-    lgToolsList = res.logisticsTools || [];
-    if (res.soldierData && res.soldierData.found) {
-      soldierGearData = res.soldierData.soldier;
-      renderSoldierHub();
-    }
-  }
-
-  function renderSoldierHub() {
-    const s = soldierGearData;
-    document.getElementById("licenseBox").classList.toggle("hidden", s.hasLicenseRecorded);
-
-    const wpList = document.getElementById("weaponsCurrentList"); wpList.innerHTML = "";
-    if (!s.weaponsItems.length) {
-      wpList.innerHTML = '<div style="color:#94a3b8;font-size:0.85rem;">אין נשק או אמל"ח חתום כרגע.</div>';
-    } else {
-      s.weaponsItems.forEach(it => {
-        const d = document.createElement("div"); d.className = "item-box";
-        d.innerHTML = `<div style="font-weight:bold;">${escapeHtml(it.toolName)} (מס': ${escapeHtml(it.serialNumber)})</div>
-          <label class="return-check"><input type="checkbox" class="chk-wp-ret" data-tool="${escapeHtml(it.toolName)}" data-serial="${escapeHtml(it.serialNumber)}"> 🔴 הזדכתי על כלי זה</label>`;
-        wpList.appendChild(d);
-      });
-    }
-
-    const lgList = document.getElementById("logisticsCurrentList"); lgList.innerHTML = "";
-    if (!s.logisticsItems.length) {
-      lgList.innerHTML = '<div style="color:#94a3b8;font-size:0.85rem;">אין ציוד אפסנאות חתום כרגע.</div>';
-    } else {
-      s.logisticsItems.forEach(it => {
-        const isQty = !isNaN(parseInt(it.quantityOrSerial, 10)) && parseInt(it.quantityOrSerial, 10) < 50;
-        const valLabel = (it.quantityOrSerial === "V" || it.quantityOrSerial === "v") ? "חתום" : (isQty ? it.quantityOrSerial + " יח'" : it.quantityOrSerial);
-        const d = document.createElement("div"); d.className = "item-box";
-        d.innerHTML = `<div style="font-weight:bold;color:#38bdf8;">${escapeHtml(it.toolName)}</div><div style="color:#cbd5e1;font-size:0.9rem;">כמות/סטטוס: ${escapeHtml(valLabel)}</div>`;
-        lgList.appendChild(d);
-      });
-    }
-
-    document.getElementById("weaponsNewContainer").innerHTML = "";
-    document.getElementById("logisticsNewContainer").innerHTML = "";
-    if (s.isNewToWeapons) addWeaponRow();
-    if (s.isNewToLogistics) addLogisticsRow();
-  }
-
-  function addWeaponRow() {
-    const container = document.getElementById("weaponsNewContainer");
-    const div = document.createElement("div"); div.className = "item-box";
-    let opts = wpToolsList.map(t => `<option value="${escapeHtml(t)}" ${t === "M16" ? "selected" : ""}>${escapeHtml(t)}</option>`).join("") + `<option value="OTHER_CUSTOM">+ אחר</option>`;
-    div.innerHTML = `<label>סוג נשק/אמל"ח:</label><select class="wp-tool" onchange="onWpnTypeChange(this)">${opts}</select>
-      <input type="text" class="custom-name hidden" placeholder="שם נשק...">
-      <label>מספר נשק / סידורי:</label><input type="text" class="wp-serial" placeholder="הקלד מספר נשק..." oninput="checkWpnKit(this)">
-      <div class="wp-sight-box hidden" style="margin-top:8px;"><label class="wp-sight-lbl" style="color:#38bdf8;"></label><input type="text" class="wp-sight-serial"></div>
-      <div class="wp-kit-container">
-        <div style="font-weight:bold;color:#38bdf8;margin-bottom:6px;">📦 ציוד נשקייה נלווה:</div>
-        <label style="font-size:0.85rem;">מחסניות:</label><select class="wp-mags">${[0,1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">${n === 0 ? "0 מחסניות" : n}</option>`).join("")}</select>
-        <label class="kit-check"><input type="checkbox" class="wp-makpork"><span>מקפורק</span></label>
-        <label class="kit-check"><input type="checkbox" class="wp-strap"><span>רצועה לנשק</span></label>
-        <label class="kit-check"><input type="checkbox" class="wp-glasses"><span>משקפי "שומר אחי"</span></label>
-      </div>`;
-    container.appendChild(div);
-  }
-
-  function onWpnTypeChange(sel) {
-    const box = sel.closest(".item-box");
-    box.querySelector(".custom-name").classList.toggle("hidden", sel.value !== "OTHER_CUSTOM");
-    checkWpnKit(box.querySelector(".wp-serial"));
-  }
-
-  function checkWpnKit(inp) {
-    const box = inp.closest(".item-box");
-    const toolVal = box.querySelector(".wp-tool").value;
-    const hasSerial = inp.value.trim().length > 0;
-    const isNon = ["כוונת", "מפרו", "מארס", "טריג'יקון", "ציין לייזר", "אמר\"ל", "עכבר"].some(nf => toolVal.indexOf(nf) !== -1);
-    box.querySelector(".wp-kit-container").style.display = (hasSerial && !isNon) ? "block" : "none";
-
-    const sightBox = box.querySelector(".wp-sight-box"), sightLbl = box.querySelector(".wp-sight-lbl"), sightInp = box.querySelector(".wp-sight-serial");
-    if (hasSerial && toolVal === "M16") {
-      sightBox.classList.remove("hidden"); sightLbl.innerText = "כוונת מפרו (מספר סידורי):"; sightInp.placeholder = "מספר כוונת מפרו (אופציונלי)..."; sightInp.dataset.sightType = "מפרו";
-    } else if (hasSerial && toolVal === "M4") {
-      sightBox.classList.remove("hidden"); sightLbl.innerText = "כוונת טריג' (מספר סידורי):"; sightInp.placeholder = "מספר כוונת טריג' (אופציונלי)..."; sightInp.dataset.sightType = "טריג'יקון";
-    } else {
-      sightBox.classList.add("hidden"); sightInp.value = ""; delete sightInp.dataset.sightType;
-    }
-  }
-
-  function addLogisticsRow() {
-    const container = document.getElementById("logisticsNewContainer");
-    const div = document.createElement("div"); div.className = "item-box";
-    let opts = lgToolsList.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("") + `<option value="OTHER_CUSTOM">+ אחר</option>`;
-    div.innerHTML = `<label>פריט אפסנאות:</label><select class="lg-tool" onchange="this.parentElement.querySelector('.custom-name').classList.toggle('hidden', this.value!=='OTHER_CUSTOM')">${opts}</select>
-      <input type="text" class="custom-name hidden" placeholder="שם פריט..."><label>כמות:</label><input type="number" class="lg-qty" value="1" min="1">`;
-    container.appendChild(div);
-  }
-
-  async function submitWeaponsAction() {
-    const returned = [];
-    document.querySelectorAll(".chk-wp-ret:checked").forEach(c => returned.push({ toolName: c.dataset.tool, serialNumber: c.dataset.serial }));
-    const newItems = [];
-    const boxes = document.querySelectorAll("#weaponsNewContainer .item-box");
-    for (let i = 0; i < boxes.length; i++) {
-      const sel = boxes[i].querySelector(".wp-tool"), cust = boxes[i].querySelector(".custom-name").value.trim(), serial = boxes[i].querySelector(".wp-serial").value.trim();
-      const name = (sel.value === "OTHER_CUSTOM") ? cust : sel.value;
-      if (name && !serial) { alert("חסר מספר נשק"); boxes[i].querySelector(".wp-serial").focus(); return; }
-      if (name && serial) newItems.push({ toolName: name, serialNumber: serial });
-      const sightInp = boxes[i].querySelector(".wp-sight-serial");
-      if (sightInp && sightInp.value.trim() && sightInp.dataset.sightType) newItems.push({ toolName: sightInp.dataset.sightType, serialNumber: sightInp.value.trim() });
-      const mags = boxes[i].querySelector(".wp-mags");
-      if (mags && parseInt(mags.value, 10) > 0) newItems.push({ toolName: "מחסניות", serialNumber: mags.value });
-      if (boxes[i].querySelector(".wp-makpork").checked) newItems.push({ toolName: "מקפורק", serialNumber: "V" });
-      if (boxes[i].querySelector(".wp-strap").checked) newItems.push({ toolName: "רצועה לנשק", serialNumber: "V" });
-      if (boxes[i].querySelector(".wp-glasses").checked) newItems.push({ toolName: "משקפי שומר אחי", serialNumber: "V" });
-    }
-    if (!returned.length && !newItems.length) { alert("לא סומנו זיכויים ולא נוספו כלים חדשים"); return; }
-
-    let finalLic = soldierGearData.license || "ללא";
-    if (!soldierGearData.hasLicenseRecorded) {
-      const licVal = document.getElementById("soldierLicense").value;
-      finalLic = (licVal === "אחר") ? document.getElementById("licenseOther").value.trim() : licVal;
-      if (!finalLic) finalLic = "ללא";
-    }
-
-    showBox("soldierActionStatus", "מעדכן נשקייה...", true);
-    const r = await apiCall({ action: "submit_weapons", personalNumber: soldierGearData.personalNumber, name: soldierGearData.name, framework: soldierGearData.framework, license: finalLic, returnedItems: returned, newItems });
-    showBox("soldierActionStatus", r.message, r.status === "success");
-    await loadSoldierGearScreen();
-  }
-
-  async function submitLogisticsAction() {
-    const newItems = [];
-    document.querySelectorAll("#logisticsNewContainer .item-box").forEach(box => {
-      const sel = box.querySelector(".lg-tool"), cust = box.querySelector(".custom-name").value.trim(), qty = box.querySelector(".lg-qty").value.trim();
-      const name = (sel.value === "OTHER_CUSTOM") ? cust : sel.value;
-      if (name) newItems.push({ toolName: name, quantityOrSerial: qty });
-    });
-    if (!newItems.length) { alert("נא להזין לפחות פריט אפסנאות אחד"); return; }
-    showBox("soldierActionStatus", "חותם על ציוד אפסנאות...", true);
-    const r = await apiCall({ action: "submit_logistics", personalNumber: soldierGearData.personalNumber, name: soldierGearData.name, framework: soldierGearData.framework, newItems });
-    showBox("soldierActionStatus", r.message, r.status === "success");
-    await loadSoldierGearScreen();
-  }
-
-  // ==========================================
-  // מסך: דיווח נוכחות
-  // ==========================================
-  async function loadAttendanceScreen() {
-    const tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
-    const dStr = `${String(tmr.getDate()).padStart(2,'0')}/${String(tmr.getMonth()+1).padStart(2,'0')}/${tmr.getFullYear()}`;
-    const isoStr = `${tmr.getFullYear()}-${String(tmr.getMonth()+1).padStart(2,'0')}-${String(tmr.getDate()).padStart(2,'0')}`;
-
-    document.getElementById("attReportDate").value = dStr;
-    const picker = document.getElementById("attDatePicker");
-    picker.value = isoStr;
-    picker.onchange = function() {
-      if (this.value) {
-        const p = this.value.split("-");
-        document.getElementById("attReportDate").value = `${p[2]}/${p[1]}/${p[0]}`;
-      }
-    };
-
-    document.getElementById("attReporterName").value = currentUser.name;
-    document.getElementById("attStatusBox").style.display = "none";
-
-    const perms = currentUser.permissions || {};
-    const fwSel = document.getElementById("attFrameworkSelect");
-    fwSel.innerHTML = "";
-
-    const allowedList = perms.attendanceAllCompany
-      ? ALL_FRAMEWORKS
-      : (perms.allowedAttendanceFrameworks || []).map(f => normalizeFramework(f));
-
-    if (allowedList.length === 1) {
-      const onlyFw = allowedList[0];
-      const opt = document.createElement("option");
-      opt.value = onlyFw; opt.textContent = onlyFw;
-      fwSel.appendChild(opt);
-      fwSel.value = onlyFw;
-      fwSel.disabled = true;
-      await loadAndRenderAttendanceSoldiers();
-    } else {
-      fwSel.disabled = false;
-      const defOpt = document.createElement("option");
-      defOpt.value = ""; defOpt.textContent = "-- בחר מסגרת --";
-      fwSel.appendChild(defOpt);
-      allowedList.forEach(f => {
-        const opt = document.createElement("option");
-        opt.value = f; opt.textContent = f;
-        fwSel.appendChild(opt);
-      });
-      document.getElementById("attSoldiersContainer").innerHTML = "";
-      document.getElementById("btnSubmitAtt").classList.add("hidden");
-    }
-  }
-
-  async function loadAndRenderAttendanceSoldiers() {
-    const fw = normalizeFramework(document.getElementById("attFrameworkSelect").value);
-    const container = document.getElementById("attSoldiersContainer");
-    const btn = document.getElementById("btnSubmitAtt");
-    container.innerHTML = "";
-    document.getElementById("attStatusBox").style.display = "none";
-
-    if (!fw) { btn.classList.add("hidden"); return; }
-
-    container.innerHTML = `<div class="card" style="text-align:center;color:#94a3b8;">טוען חיילי ${escapeHtml(fw)}...</div>`;
-    const res = await apiCall({ action: "get_attendance_soldiers", filterFramework: fw });
-    const list = res.soldiers || [];
-    attendanceSoldiers = list;
-
-    container.innerHTML = "";
-    if (!list.length) {
-      container.innerHTML = `<div class="card" style="text-align:center;color:#fca5a5;">לא נמצאו חיילים פעילים בגיליון "חיילים" תחת מסגרת "${escapeHtml(fw)}".</div>`;
-      btn.classList.add("hidden");
-      return;
-    }
-
-    list.forEach((s, idx) => {
-      const isPres = (s.mainStatus || "נוכח") === "נוכח";
-      const rawSub = s.subStatus || (isPres ? "נוכחות מלאה" : "חופשה");
-      const absSub = (rawSub === "גימלים" || rawSub.includes("ג'")) ? "גימלים" : rawSub;
-      const isOther = !isPres && absSub === "אחר";
-
-      const card = document.createElement("div"); card.className = "card";
-      card.dataset.soldierName = s.name;
-      card.innerHTML = `<div style="font-weight:bold;font-size:1.05rem;margin-bottom:10px;">${escapeHtml(s.name)}</div>
-        <div class="radio-group">
-          <label class="radio-card ${isPres ? "active-green" : ""}" id="attLblP_${idx}" onclick="setAttRadio(${idx}, true)"><input type="radio" name="attMain_${idx}" value="נוכח" ${isPres ? "checked" : ""}> נוכח</label>
-          <label class="radio-card ${!isPres ? "active-red" : ""}" id="attLblA_${idx}" onclick="setAttRadio(${idx}, false)"><input type="radio" name="attMain_${idx}" value="אינו נוכח" ${!isPres ? "checked" : ""}> אינו נוכח</label>
-        </div>
-        <div id="attPresMenu_${idx}" class="${isPres ? "" : "hidden"}">
-          <select id="attSubP_${idx}">
-            <option value="נוכחות מלאה" ${rawSub==="נוכחות מלאה"?"selected":""}>נוכחות מלאה</option>
-            <option value="מגיע היום" ${rawSub==="מגיע היום"?"selected":""}>מגיע היום</option>
-            <option value="יוצא היום" ${rawSub==="יוצא היום"?"selected":""}>יוצא היום</option>
-          </select>
-        </div>
-        <div id="attAbsMenu_${idx}" class="${!isPres ? "" : "hidden"}">
-          <select id="attSubA_${idx}" onchange="document.getElementById('attNoteBox_${idx}').classList.toggle('hidden', this.value!=='אחר')">
-            <option value="חופשה" ${absSub==="חופשה"?"selected":""}>חופשה</option>
-            <option value="גימלים" ${absSub==="גימלים"?"selected":""}>ג' - רפואי</option>
-            <option value="שוחרר" ${absSub==="שוחרר"?"selected":""}>שוחרר</option>
-            <option value="אחר" ${absSub==="אחר"?"selected":""}>אחר</option>
-          </select>
-          <div id="attNoteBox_${idx}" class="${isOther ? "" : "hidden"}"><input type="text" id="attNote_${idx}" placeholder="פרט סיבה..." value="${escapeHtml(s.notes || "")}"></div>
-        </div>`;
-      container.appendChild(card);
-    });
-    btn.classList.remove("hidden");
-  }
-
-  function setAttRadio(idx, isPres) {
-    document.getElementById(`attLblP_${idx}`).className = "radio-card" + (isPres ? " active-green" : "");
-    document.getElementById(`attLblA_${idx}`).className = "radio-card" + (!isPres ? " active-red" : "");
-    document.getElementById(`attPresMenu_${idx}`).classList.toggle("hidden", !isPres);
-    document.getElementById(`attAbsMenu_${idx}`).classList.toggle("hidden", isPres);
-  }
-
-  async function submitAttendanceReport() {
-    const fw = normalizeFramework(document.getElementById("attFrameworkSelect").value);
-    const reporter = document.getElementById("attReporterName").value.trim();
-    const rDate = document.getElementById("attReportDate").value.trim();
-    if (!fw || !reporter || !rDate) { alert("נא למלא תאריך, מסגרת ושם מדווח"); return; }
-
-    const records = [];
-    document.querySelectorAll("#attSoldiersContainer .card").forEach((card, idx) => {
-      const name = card.dataset.soldierName;
-      if (!name) return;
-      const isPres = card.querySelector(`input[name="attMain_${idx}"]:checked`).value === "נוכח";
-      const mainStatus = isPres ? "נוכח" : "אינו נוכח";
-      const subStatus = isPres ? document.getElementById(`attSubP_${idx}`).value : document.getElementById(`attSubA_${idx}`).value;
-      const notes = (!isPres && subStatus === "אחר") ? document.getElementById(`attNote_${idx}`).value.trim() : "";
-      records.push({ name, mainStatus, subStatus, notes });
-    });
-
-    if (!records.length) { alert("אין חיילים לשליחה"); return; }
-
-    const btn = document.getElementById("btnSubmitAtt");
-    btn.disabled = true; btn.innerText = "שולח דיווח...";
-    const res = await apiCall({
-      action: "submit_attendance",
-      requesterPn: currentUser.personalNumber,
-      framework: fw,
-      reporterName: reporter,
-      reportDate: rDate,
-      records
-    });
-    btn.disabled = false; btn.innerText = "🚀 שלח דיווח נוכחות";
-
-    showBox("attStatusBox", res.message, res.status === "success");
-  }
-
-  // ==========================================
-  // מסך: טופס זיכויים (מפל"ג)
-  // ==========================================
-  function switchMafSubTab(tab) {
-    document.getElementById("tabMafCardBtn").className = "btn-tab" + (tab === "card" ? " active" : "");
-    document.getElementById("tabMafRepBtn").className = "btn-tab" + (tab === "rep" ? " active" : "");
-    document.getElementById("mafCardSection").classList.toggle("hidden", tab !== "card");
-    document.getElementById("mafRepSection").classList.toggle("hidden", tab !== "rep");
-  }
-
-  async function loadMaflagWorkspace() {
-    sharedDB = await apiCall({ action: "get_shared_dataset" });
-    const sel = document.getElementById("mafSoldierSelect");
-    sel.innerHTML = '<option value="">-- בחר לוחם --</option>';
-    const ordMap = { "מחלקה 1":1, "מחלקה 2":2, "מחלקה 3":3, "חפ\"ק":4, "מפל\"ג":5, "חמ\"ל":6, "מסופחים":7 };
-    (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[normalizeFramework(a.framework)]||99)-(ordMap[normalizeFramework(b.framework)]||99) || a.name.localeCompare(b.name,'he')).forEach(s => {
-      const o = document.createElement("option"); o.value = s.personalNumber; o.textContent = `${normalizeFramework(s.framework)} | ${s.name} (${s.personalNumber})`; sel.appendChild(o);
-    });
-    const fwSel = document.getElementById("mafFwSelect"); fwSel.innerHTML = "";
-    (sharedDB.canonicalFrameworks || []).forEach(fw => { const o = document.createElement("option"); o.value = fw; o.textContent = fw; fwSel.appendChild(o); });
-    const tSel = document.getElementById("mafToolSelect"); tSel.innerHTML = "";
-    (sharedDB.logisticsTools || []).forEach(t => { const o = document.createElement("option"); o.value = t; o.textContent = t; tSel.appendChild(o); });
-  }
-
-  async function onMafSoldierSelected() {
-    const pn = document.getElementById("mafSoldierSelect").value;
-    if (!pn) { document.getElementById("mafSoldierDetails").classList.add("hidden"); return; }
-    const res = await apiCall({ action: "get_soldier_gear", personalNumber: pn });
-    if (res.soldierData && res.soldierData.found) {
-      mafLoadedSoldier = res.soldierData.soldier;
-      const s = mafLoadedSoldier;
-      document.getElementById("mafSName").innerText = `${s.name} (מ"א: ${s.personalNumber})`;
-      document.getElementById("mafSMeta").innerText = `מסגרת: ${s.framework}`;
-
-      const lgDiv = document.getElementById("mafLogisticsList"); lgDiv.innerHTML = "";
-      s.logisticsItems.forEach(it => {
-        const isQty = !isNaN(parseInt(it.quantityOrSerial,10)) && parseInt(it.quantityOrSerial,10) < 50;
-        const qtyInp = isQty ? ` (כמות: ${escapeHtml(it.quantityOrSerial)}) | לזכות: <input type="number" class="maf-qty" data-tool="${escapeHtml(it.toolName)}" value="${escapeHtml(it.quantityOrSerial)}" min="1" max="${escapeHtml(it.quantityOrSerial)}" style="width:65px;display:inline-block;padding:4px;margin:0 4px;">` : "";
-        const d = document.createElement("div"); d.className = "item-box";
-        d.innerHTML = `<label class="return-check"><input type="checkbox" class="chk-maf-lg" data-tool="${escapeHtml(it.toolName)}" data-val="${escapeHtml(it.quantityOrSerial)}"> ${escapeHtml(it.toolName)}${qtyInp}</label>`;
-        lgDiv.appendChild(d);
-      });
-
-      const wpDiv = document.getElementById("mafWeaponsList"); wpDiv.innerHTML = "";
-      s.weaponsItems.forEach(it => {
-        const d = document.createElement("div"); d.className = "item-box";
-        d.innerHTML = `<label class="return-check"><input type="checkbox" class="chk-maf-wp" data-tool="${escapeHtml(it.toolName)}" data-serial="${escapeHtml(it.serialNumber)}"> ${escapeHtml(it.toolName)} (מס': ${escapeHtml(it.serialNumber)})</label>`;
-        wpDiv.appendChild(d);
-      });
-      document.getElementById("mafSoldierDetails").classList.remove("hidden");
-    }
-  }
-
-  async function submitMaflagReturns() {
-    const wpRets = []; document.querySelectorAll(".chk-maf-wp:checked").forEach(c => wpRets.push({ toolName: c.dataset.tool, serialNumber: c.dataset.serial }));
-    const lgRets = [];
-    document.querySelectorAll(".chk-maf-lg:checked").forEach(c => {
-      const toolName = c.dataset.tool;
-      let returnQty = c.dataset.val;
-      document.querySelectorAll(".maf-qty").forEach(inp => { if (inp.dataset.tool === toolName) returnQty = inp.value; });
-      lgRets.push({ toolName, quantityOrSerial: c.dataset.val, returnQty });
-    });
-    if (!wpRets.length && !lgRets.length) { alert("נא לסמן פריטים לזיכוי"); return; }
-    showBox("mafActionStatus", "מבצע זיכויים...", true);
-    if (wpRets.length) await apiCall({ action: "submit_weapons", personalNumber: mafLoadedSoldier.personalNumber, name: mafLoadedSoldier.name, framework: mafLoadedSoldier.framework, returnedItems: wpRets, newItems: [], authorizedBy: "מפל\"ג" });
-    if (lgRets.length) await apiCall({ action: "maflag_return", personalNumber: mafLoadedSoldier.personalNumber, name: mafLoadedSoldier.name, framework: mafLoadedSoldier.framework, returnedItems: lgRets });
-    showBox("mafActionStatus", "הזיכוי בוצע בהצלחה!", true);
-    await onMafSoldierSelected();
-  }
-
-  function sendMaflagSoldierWa() {
-    const s = mafLoadedSoldier; if (!s) return;
-    let msg = `*כרטיס לוחם - מסייעת 8109*\n• שם: *${s.name}* (${s.personalNumber})\n• מסגרת: ${s.framework}\n\n📦 *ציוד אפסנאות ונלווה:*\n` + (s.logisticsItems.length ? s.logisticsItems.map((it,i)=>`${i+1}. ${it.toolName}: ${it.quantityOrSerial}`).join("\n") : "(אין)") + `\n\n🔫 *נשק ואמל"ח:*\n` + (s.weaponsItems.length ? s.weaponsItems.map((it,i)=>`${i+1}. ${it.toolName}: ${it.serialNumber}`).join("\n") : "(אין)");
-    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(msg), "_blank");
-  }
-
-  function onMafRepTypeChange() {
-    const t = document.getElementById("mafRepType").value;
-    document.getElementById("boxMafFw").classList.toggle("hidden", t !== "by_framework");
-    document.getElementById("boxMafTool").classList.toggle("hidden", t !== "by_tool");
-  }
-
-  function generateMafReport() {
-    const type = document.getElementById("mafRepType").value, soldiers = sharedDB.logisticsSoldiers || [];
-    let msg = "";
-    if (type === "all_company") {
-      msg = "*דוח ציוד ואפסנאות - מסייעת 8109*\n\n";
-      (sharedDB.canonicalFrameworks || []).forEach(fw => {
-        const grp = soldiers.filter(s => normalizeFramework(s.framework) === normalizeFramework(fw) && s.items.length);
-        if (grp.length) msg += `📌 *${fw}*\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName} (${it.quantityOrSerial})`).join(", ")}`).join("\n") + "\n\n";
-      });
-    } else if (type === "by_framework") {
-      const fw = document.getElementById("mafFwSelect").value, grp = soldiers.filter(s => normalizeFramework(s.framework) === normalizeFramework(fw) && s.items.length);
-      msg = `*דוח ציוד - ${fw}*\n\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName} (${it.quantityOrSerial})`).join(", ")}`).join("\n");
-    } else if (type === "by_tool") {
-      const tool = document.getElementById("mafToolSelect").value; let total = 0; const lines = [];
-      soldiers.forEach(s => s.items.forEach(it => { if (it.toolName === tool) { const q = parseInt(it.quantityOrSerial,10); const num = (!isNaN(q)&&q>0)?q:1; total += num; lines.push(`${s.name} ${it.quantityOrSerial}`); } }));
-      msg = `${tool}: סך הכל ${total}\n` + lines.join("\n");
-    } else {
-      const counts = {};
-      soldiers.forEach(s => s.items.forEach(it => { const q = parseInt(it.quantityOrSerial,10); const num = (!isNaN(q)&&q>0)?q:1; counts[it.toolName] = (counts[it.toolName]||0) + num; }));
-      msg = "דוח מרכז לפי פריטים\n\n" + Object.keys(counts).map(k => `${k} ${counts[k]}`).join("\n");
-    }
-    document.getElementById("mafRepText").value = msg;
-    document.getElementById("mafRepOut").classList.remove("hidden");
-  }
-
-  // ==========================================
-  // מסך: ממשק דוחות (פיקוד עליון)
-  // ==========================================
-  function switchRepDomain(dom) {
-    repDomain = dom;
-    document.getElementById("tabSubPres").className = "btn-tab" + (dom === "presence" ? " active" : "");
-    document.getElementById("tabSubWpn").className = "btn-tab" + (dom === "weapons" ? " active" : "");
-    document.getElementById("repPresenceControls").classList.toggle("hidden", dom !== "presence");
-    document.getElementById("repWeaponsControls").classList.toggle("hidden", dom !== "weapons");
-    document.getElementById("hcRepOut").classList.add("hidden");
-  }
-
-  function onRepWpnTypeChange() {
-    const t = document.getElementById("repWpnType").value;
-    document.getElementById("boxRepWpnFw").classList.toggle("hidden", t !== "by_framework");
-    document.getElementById("boxRepWpnTool").classList.toggle("hidden", t !== "by_tool");
-    document.getElementById("boxRepWpnSoldier").classList.toggle("hidden", t !== "by_soldier");
-  }
-
-  async function loadHighCommandWorkspace() {
-    sharedDB = await apiCall({ action: "get_shared_dataset" });
-    const validDates = (sharedDB.dates || []).filter(Boolean);
-    if (validDates.length) {
-      const p = validDates[validDates.length-1].split("/");
-      if (p.length===3) document.getElementById("repPresDate").value = `${p[2]}-${p[1]}-${p[0]}`;
-    }
-    const fws = sharedDB.canonicalFrameworks || ALL_FRAMEWORKS;
-    const presFw = document.getElementById("repPresFw"); presFw.innerHTML = '<option value="ALL">כלל הפלוגה</option>';
-    const wpnFw = document.getElementById("repWpnFwSel"); wpnFw.innerHTML = "";
-    fws.forEach(fw => {
-      const o1 = document.createElement("option"); o1.value = fw; o1.textContent = fw; presFw.appendChild(o1);
-      const o2 = document.createElement("option"); o2.value = fw; o2.textContent = fw; wpnFw.appendChild(o2);
-    });
-    const wToolSel = document.getElementById("repWpnToolSel"); wToolSel.innerHTML = "";
-    (sharedDB.weaponsTools || []).forEach(t => { const o = document.createElement("option"); o.value = t; o.textContent = t; wToolSel.appendChild(o); });
-
-    const ordMap = { "מחלקה 1":1, "מחלקה 2":2, "מחלקה 3":3, "חפ\"ק":4, "מפל\"ג":5, "חמ\"ל":6, "מסופחים":7 };
-    const sorted = (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[normalizeFramework(a.framework)]||99)-(ordMap[normalizeFramework(b.framework)]||99) || a.name.localeCompare(b.name,'he'));
-    const sSel = document.getElementById("repWpnSoldierSel"); sSel.innerHTML = "";
-    sorted.forEach(s => { const o = document.createElement("option"); o.value = s.personalNumber; o.textContent = `${normalizeFramework(s.framework)} | ${s.name} (${s.personalNumber})`; sSel.appendChild(o); });
-  }
-
-  function generateHighCommandReport() {
-    document.getElementById("hcRepErr").style.display = "none";
-    if (repDomain === "weapons") {
-      const type = document.getElementById("repWpnType").value, soldiers = sharedDB.weaponsSoldiers || [];
-      let msg = "";
-      if (type === "all_company") {
-        msg = "*דוח נשק פלוגתי - מסייעת 8109*\n\n";
-        (sharedDB.canonicalFrameworks || []).forEach(fw => {
-          const grp = soldiers.filter(s => normalizeFramework(s.framework) === normalizeFramework(fw) && s.items.length);
-          if (grp.length) msg += `📌 *${fw}*\n` + grp.map(s => `• ${s.name} (${s.personalNumber}): ${s.items.map(it=>`${it.toolName}: ${it.serialNumber}`).join(", ")}`).join("\n") + "\n\n";
-        });
-      } else if (type === "by_framework") {
-        const fw = document.getElementById("repWpnFwSel").value, grp = soldiers.filter(s => normalizeFramework(s.framework) === normalizeFramework(fw) && s.items.length);
-        msg = `*דוח נשק - ${fw}*\n\n` + grp.map(s => `• ${s.name}: ${s.items.map(it=>`${it.toolName}: ${it.serialNumber}`).join(", ")}`).join("\n");
-      } else if (type === "by_tool") {
-        const tool = document.getElementById("repWpnToolSel").value, holders = [];
-        soldiers.forEach(s => s.items.forEach(it => { if (it.toolName === tool) holders.push(`${s.name} (${normalizeFramework(s.framework)}) - ${it.serialNumber}`); }));
-        msg = `*מצבת מחזיקים - ${tool}* (${holders.length})\n\n` + holders.join("\n");
-      } else {
-        const pn = document.getElementById("repWpnSoldierSel").value;
-        const s = (sharedDB.masterSoldiers || []).find(x => x.personalNumber === pn);
-        const wp = (sharedDB.weaponsSoldiers || []).find(x => x.personalNumber === pn);
-        const lg = (sharedDB.logisticsSoldiers || []).find(x => x.personalNumber === pn);
-        msg = `*דוח אישי לחייל - ${s.name} (${pn})*\n\n🔫 *נשקייה:*\n` + ((wp && wp.items.length) ? wp.items.map(it=>`• ${it.toolName}: ${it.serialNumber}`).join("\n") : "(אין)") + `\n\n📦 *אפסנאות ונלווה:*\n` + ((lg && lg.items.length) ? lg.items.map(it=>`• ${it.toolName}: ${it.quantityOrSerial}`).join("\n") : "(אין)");
-      }
-      document.getElementById("hcRepText").value = msg;
-      document.getElementById("hcRepOut").classList.remove("hidden");
-      return;
-    }
-
-    const iso = document.getElementById("repPresDate").value, p = iso.split("-");
-    const eurDate = p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : iso;
-    const colIdx = (sharedDB.dates || []).indexOf(eurDate);
-    if (colIdx === -1) { showBox("hcRepErr", `לא נמצאו נתונים לתאריך ${eurDate}`, false); return; }
-
-    const rType = document.getElementById("repPresType").value, targetFw = document.getElementById("repPresFw").value;
-    let msg = "";
-    if (rType === "detailed") {
-      msg = `*דוח שמי מפורט [${eurDate}]*\n\n`;
-      (sharedDB.canonicalFrameworks || []).forEach(fw => {
-        if (targetFw !== "ALL" && normalizeFramework(fw) !== normalizeFramework(targetFw)) return;
-        const lines = [];
-        for (let i = 0; i < sharedDB.names.length; i++) {
-          const nm = sharedDB.names[i];
-          if (sharedDB.activeNames.indexOf(nm) === -1 || normalizeFramework(sharedDB.frameworks[i]) !== normalizeFramework(fw)) continue;
-          const st = String(sharedDB.detailed[i][colIdx] || "לא דווח"), isP = String(sharedDB.presence[i][colIdx]) === "V";
-          lines.push(`• ${nm} - ${isP ? "נוכח" : "אינו נוכח"} (${st})`);
-        }
-        if (lines.length) msg += `📌 *${fw}*\n${lines.join("\n")}\n\n`;
-      });
-    } else {
-      let tot = 0, pres = 0, yam = 0, rel = 0; const gims = [], vacs = [];
-      for (let i = 0; i < sharedDB.names.length; i++) {
-        const nm = sharedDB.names[i];
-        if (sharedDB.activeNames.indexOf(nm) === -1) continue;
-        if (targetFw !== "ALL" && normalizeFramework(sharedDB.frameworks[i]) !== normalizeFramework(targetFw)) continue;
-        tot++;
-        const st = String(sharedDB.detailed[i][colIdx] || "");
-        if (String(sharedDB.presence[i][colIdx]) === "V") pres++;
-        if (st !== "שוחרר") yam++;
-        if (st.includes("שוחרר")) rel++;
-        else if (st.includes("גימלים") || st.includes("ג'")) gims.push(nm);
-        else if (st.includes("חופשה")) vacs.push(nm);
-      }
-      msg = `*דוח נוכחות - מסייעת 8109 [${eurDate}]*\n\n• סה"כ רשומים: ${tot}\n• נוכחים בפועל: ${pres}\n• זכאי ימ"מ: ${yam}\n• משוחררים: ${rel}\n\n• גימלים (${gims.length}): ${gims.join(", ")||"אין"}\n• חופשות (${vacs.length}): ${vacs.join(", ")||"אין"}`;
-    }
-    document.getElementById("hcRepText").value = msg;
-    document.getElementById("hcRepOut").classList.remove("hidden");
-  }
-
-  // ==========================================
-  // מסך: ממשק אדמין (שלומי)
-  // ==========================================
-  async function loadShlomiWorkspace() {
-    const [dbRes, attRes] = await Promise.all([apiCall({ action: "get_shared_dataset" }), apiCall({ action: "get_attendance_soldiers" })]);
-    sharedDB = dbRes; attendanceSoldiers = attRes.soldiers || [];
-    document.getElementById("uDate").value = new Date().toISOString().split("T")[0];
-
-    const fws = sharedDB.canonicalFrameworks || ALL_FRAMEWORKS;
-    ["aFw", "mNewFw"].forEach(id => {
-      const el = document.getElementById(id); el.innerHTML = "";
-      fws.forEach(fw => { const o = document.createElement("option"); o.value = fw; o.textContent = fw; el.appendChild(o); });
-    });
-
-    const ordMap = { "מחלקה 1":1, "מחלקה 2":2, "מחלקה 3":3, "חפ\"ק":4, "מפל\"ג":5, "חמ\"ל":6, "מסופחים":7 };
-    const sorted = (sharedDB.masterSoldiers || []).slice().sort((a,b) => (ordMap[normalizeFramework(a.framework)]||99)-(ordMap[normalizeFramework(b.framework)]||99) || a.name.localeCompare(b.name,'he'));
-    ["uSoldier", "mSoldier"].forEach(id => {
-      const el = document.getElementById(id); el.innerHTML = "";
-      sorted.forEach(s => { const o = document.createElement("option"); o.value = s.name; o.dataset.fw = normalizeFramework(s.framework); o.textContent = `${normalizeFramework(s.framework)} | ${s.name}`; el.appendChild(o); });
-    });
-    onAdmSoldierSelect();
-  }
-
-  function syncAdmSubOptions() {
-    const map = { "נוכח": ["נוכחות מלאה", "מגיע היום", "יוצא היום", "אחר"], "אינו נוכח": ["חופשה", "גימלים", "שוחרר", "אחר"], "לא פעיל": ["הסרה מהטופס"] };
-    const subSel = document.getElementById("uSubStatus"); subSel.innerHTML = "";
-    (map[document.getElementById("uMainStatus").value] || []).forEach(v => { const o = document.createElement("option"); o.value = v; o.textContent = v; subSel.appendChild(o); });
-  }
-
-  function onAdmSoldierSelect() {
-    const nm = document.getElementById("uSoldier").value;
-    const found = attendanceSoldiers.find(s => s.name === nm);
-    if (found) {
-      document.getElementById("uMainStatus").value = found.mainStatus || "נוכח";
-      syncAdmSubOptions();
-      document.getElementById("uSubStatus").value = found.subStatus || "נוכחות מלאה";
-      document.getElementById("uNotes").value = found.notes || "";
-    } else syncAdmSubOptions();
-  }
-
-  async function submitAdmSingleUpdate() {
-    const sel = document.getElementById("uSoldier"), name = sel.value, fw = sel.options[sel.selectedIndex]?.dataset.fw || "";
-    const res = await apiCall({ action: "admin_update_soldier", name, framework: fw, reportDate: document.getElementById("uDate").value, mainStatus: document.getElementById("uMainStatus").value, subStatus: document.getElementById("uSubStatus").value, notes: document.getElementById("uNotes").value.trim() });
-    showBox("uStatus", res.message, res.status === "success");
-  }
-
-  async function submitAdmAddSoldier() {
-    const res = await apiCall({ action: "admin_add_soldier", name: document.getElementById("aName").value.trim(), personalNumber: document.getElementById("aPn").value.trim(), framework: document.getElementById("aFw").value, role: document.getElementById("aRole").value.trim(), isActive: document.getElementById("aActive").checked });
-    showBox("aStatus", res.message, res.status === "success");
-    if (res.status === "success") await loadShlomiWorkspace();
-  }
-
-  async function submitAdmMoveSoldier() {
-    const res = await apiCall({ action: "admin_move_soldier", name: document.getElementById("mSoldier").value, newFramework: document.getElementById("mNewFw").value });
-    showBox("mStatus", res.message, res.status === "success");
-    if (res.status === "success") await loadShlomiWorkspace();
-  }
-
-  async function submitAdmSync() {
-    const res = await apiCall({ action: "admin_sync" });
-    showBox("syncStatus", res.message, res.status === "success");
-  }
-
-  function runPnCrossCheck() {
-    const raw = document.getElementById("pastedPnInput").value.trim();
-    if (!raw) { alert("נא להדביק רשימת מ\"א"); return; }
-    const pastedSet = new Set(raw.match(/\b\d{5,8}\b/g) || []);
-    const missing = attendanceSoldiers.filter(s => !pastedSet.has(String(s.personalNumber).trim()));
-    let rep = `*דוח פערי התייצבות - מסייעת 8109*\n• סה"כ פעילים: ${attendanceSoldiers.length}\n• חסרים ברשימה: ${missing.length}\n\n`;
-    (sharedDB.canonicalFrameworks || ALL_FRAMEWORKS).forEach(fw => {
-      const grp = missing.filter(s => normalizeFramework(s.framework) === normalizeFramework(fw));
-      if (grp.length) rep += `📌 *${fw}* (${grp.length}):\n` + grp.map(s => `• ${s.name} (${s.personalNumber})`).join("\n") + "\n\n";
-    });
-    document.getElementById("crossCheckText").value = rep;
-    document.getElementById("crossCheckOut").classList.remove("hidden");
-  }
-
-  function filterSelectOptions(selectId, term, callback) {
-    const t = term.trim().toLowerCase(), sel = document.getElementById(selectId); let first = -1;
-    for (let i = 0; i < sel.options.length; i++) {
-      const m = sel.options[i].text.toLowerCase().indexOf(t) !== -1;
-      sel.options[i].style.display = m ? "" : "none";
-      if (m && first === -1) first = i;
-    }
-    if (first !== -1) { sel.selectedIndex = first; if (callback) callback(); }
-  }
-
-  function openWaText(areaId) { window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(document.getElementById(areaId).value), "_blank"); }
-  function copyTextArea(areaId) { const el = document.getElementById(areaId); el.select(); document.execCommand("copy"); alert("הועתק ללוח!"); }
-</script>
-</body>
-</html>
+  });
+  logisticsSoldiers.sort((a, b) => ((orderMap[a.framework] || 99) - (orderMap[b.framework] || 99)) || a.name.localeCompare(b.name, "he"));
+
+  return {
+    status: "success",
+    dates,
+    frameworks: names.length ? frameworks : masterSoldiers.map(s => s.framework),
+    names: names.length ? names : masterSoldiers.map(s => s.name),
+    activeNames, commanders, masterSoldiers,
+    detailed, presence, yamam,
+    canonicalFrameworks: ALL_COMPANY_FRAMEWORKS,
+    weaponsSoldiers, logisticsSoldiers,
+    weaponsTools: getWeaponsToolsList(),
+    logisticsTools: Array.from(new Set([...getLogisticsToolsList(), "מחסניות", "מקפורק", "רצועה לנשק", "משקפי שומר אחי"]))
+  };
+}
