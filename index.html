@@ -14,7 +14,6 @@
     .brand-title { font-size: 1.45rem; font-weight: 900; letter-spacing: 1px; }
     .brand-line { height: 3px; width: 60px; background: #38bdf8; margin: 6px auto 0; border-radius: 2px; }
 
-    /* סרגל פרופיל משתמש קבוע בראש המסך */
     .user-profile-bar { background: #1e293b; padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #38bdf8; max-width: 640px; margin-left: auto; margin-right: auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
     .profile-info-main { font-size: 1.05rem; font-weight: bold; color: #fff; }
     .profile-info-sub { font-size: 0.85rem; color: #7dd3fc; margin-top: 3px; }
@@ -42,7 +41,6 @@
     .btn-tab { flex: 1; padding: 11px 6px; border: 1px solid #475569; border-radius: 8px; background: #1e293b; color: #94a3b8; font-weight: bold; cursor: pointer; text-align: center; font-size: 0.9rem; }
     .btn-tab.active { background: #0284c7; color: #fff; border-color: #0284c7; }
 
-    /* רשת המשבצות בדשבורד הראשי */
     .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .hub-tile { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.15s; }
     .hub-tile:hover, .hub-tile:active { border-color: #38bdf8; background: #172554; transform: translateY(-2px); }
@@ -70,7 +68,6 @@
     .checkbox-row input { width: 20px; height: 20px; margin: 0; }
     .btn-row { display: flex; gap: 8px; margin-top: 8px; }
 
-    /* שבצ"ק */
     .shv-mission-hero { background: linear-gradient(135deg, #1e3a8a, #0f172a); border: 2px solid #38bdf8; border-radius: 12px; padding: 18px; margin-bottom: 14px; text-align: center; }
     .shv-hero-day { font-size: 0.9rem; color: #7dd3fc; font-weight: bold; margin-bottom: 4px; }
     .shv-hero-task { font-size: 1.5rem; font-weight: 900; color: #fff; margin: 4px 0; }
@@ -103,7 +100,7 @@
     <div class="brand-line"></div>
   </div>
 
-  <!-- סרגל פרופיל משתמש מחובר: שם + מספר אישי + הרשאה -->
+  <!-- סרגל פרופיל משתמש קבוע בראש המסך -->
   <div id="userProfileBar" class="user-profile-bar hidden">
     <div>
       <div class="profile-info-main" id="barUserNamePn"></div>
@@ -138,9 +135,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- מסך 1: הזדהות -->
-  <!-- ========================================== -->
   <div id="screenLogin" class="card narrow-wrap">
     <h2 style="text-align:center;">🔐 כניסה לפורטל הפלוגתי</h2>
     <label>הקש מספר אישי:</label>
@@ -166,17 +161,13 @@
     <div id="loginStatus" class="status-box"></div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- מסך 2: דשבורד ראשי (משבצות לפי הרשאות המשתמש) -->
-  <!-- ========================================== -->
+  <!-- מסך 2: דשבורד ראשי -->
   <div id="screenHub" class="card narrow-wrap hidden">
     <h2 style="text-align:center;margin-bottom:14px;">בחר מסך פעולה:</h2>
     <div id="hubTilesGrid" class="hub-grid"></div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- מסך 3: שבצק - צפיה (כלל הפלוגה) -->
-  <!-- ========================================== -->
+  <!-- מסך 3: שבצק - צפיה -->
   <div id="screenShavzakView" class="narrow-wrap hidden">
     <div class="card">
       <h2>📅 שבצק - צפיה</h2>
@@ -189,9 +180,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
-  <!-- מסך 4: טופס חתימות (כלל הפלוגה) -->
-  <!-- ========================================== -->
+  <!-- מסך 4: טופס חתימות -->
   <div id="screenSignatures" class="narrow-wrap hidden">
     <div class="card">
       <h2>✍️ טופס חתימות</h2>
@@ -234,9 +223,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- מסך 5: דיווח נוכחות -->
-  <!-- ========================================== -->
   <div id="screenAttendance" class="narrow-wrap hidden">
     <div class="card">
       <h2>📋 דיווח נוכחות</h2>
@@ -255,9 +242,7 @@
     <button type="button" id="btnSubmitAtt" class="btn-action btn-success hidden" onclick="submitAttendanceReport()">🚀 שלח דיווח נוכחות</button>
   </div>
 
-  <!-- ========================================== -->
   <!-- מסך 6: טופס זיכויים (מפל"ג) -->
-  <!-- ========================================== -->
   <div id="screenMaflag" class="narrow-wrap hidden">
     <div class="btn-tab-container">
       <div id="tabMafCardBtn" class="btn-tab active" onclick="switchMafSubTab('card')">🎖️ כרטיס לוחם וזיכויים</div>
@@ -306,9 +291,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- מסך 7: ממשק דוחות (פיקוד עליון) -->
-  <!-- ========================================== -->
   <div id="screenReports" class="narrow-wrap hidden">
     <div class="card">
       <h2>📊 ממשק דוחות</h2>
@@ -354,9 +337,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- מסך 8: שבצק - קצינים / שבצק - אישור סופי -->
-  <!-- ========================================== -->
   <div id="screenShavzakBuilder" class="hidden">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
@@ -406,9 +387,7 @@
     </div>
   </div>
 
-  <!-- ========================================== -->
   <!-- מסך 9: ממשק אדמין (שלומי) -->
-  <!-- ========================================== -->
   <div id="screenAdmin" class="narrow-wrap hidden">
     <div class="card">
       <h2>✏️ תיקון דיווח לחייל</h2>
@@ -474,6 +453,15 @@
   const ALL_FRAMEWORKS = ["מחלקה 1", "מחלקה 2", "מחלקה 3", "חפ\"ק", "מפל\"ג", "חמ\"ל", "מסופחים"];
   const SHAVZAK_PLATOONS = ["מחלקה 1", "מחלקה 2", "מחלקה 3", "מסופחים"];
 
+  function escapeHtml(str) {
+    return String(str || "")
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
   function cleanHebrewText(val) {
     return String(val || "")
       .replace(/[\u200B-\u200F\u202A-\u202E\uFEFF]/g, "")
@@ -507,7 +495,7 @@
   let shvWorkspaceState = null;
   let shvSelectedSoldier = null;
   let shvSkeletonShifts = [];
-  let shvMode = "officers"; // "officers" | "final_approval"
+  let shvMode = "officers";
   let mobileWarningShown = false;
 
   async function apiCall(payload) {
@@ -642,69 +630,21 @@
     const perms = currentUser.permissions || {};
 
     const tiles = [
-      {
-        show: true,
-        icon: "📅",
-        title: "שבצק - צפיה",
-        desc: "משימות היום ומחר ותמונת שבצ\"ק",
-        action: () => openScreen("shavzak_view")
-      },
-      {
-        show: true,
-        icon: "✍️",
-        title: "טופס חתימות",
-        desc: "נשקייה ואפסנאות אישית",
-        action: () => openScreen("signatures")
-      },
-      {
-        show: Boolean(perms.attendanceReport),
-        icon: "📋",
-        title: "דיווח נוכחות",
-        desc: perms.attendanceAllCompany ? "כלל הפלוגה" : (perms.allowedAttendanceFrameworks || []).join(", "),
-        action: () => openScreen("attendance")
-      },
-      {
-        show: Boolean(perms.maflagReturns),
-        icon: "📦",
-        title: "טופס זיכויים",
-        desc: "זיכוי ציוד ודוחות מפל\"ג",
-        action: () => openScreen("maflag")
-      },
-      {
-        show: Boolean(perms.reportsCenter),
-        icon: "📊",
-        title: "ממשק דוחות",
-        desc: "דוחות נוכחות ונשקייה לפיקוד",
-        action: () => openScreen("reports")
-      },
-      {
-        show: Boolean(perms.shavzakOfficers),
-        icon: "⭐",
-        title: "שבצק - קצינים",
-        desc: "שיוך משימות למסגרות ושיבוץ",
-        action: () => openScreen("shavzak_officers")
-      },
-      {
-        show: Boolean(perms.shavzakFinalApproval),
-        icon: "🎖️",
-        title: "שבצק - אישור סופי",
-        desc: "בקרת חוסרים ופרסום שבצ\"ק רשמי",
-        action: () => openScreen("shavzak_final")
-      },
-      {
-        show: Boolean(perms.adminPanel),
-        icon: "🛠️",
-        title: "ממשק אדמין",
-        desc: "ניהול חיילים, העברות והצלבות",
-        action: () => openScreen("admin")
-      }
+      { show: true, icon: "📅", title: "שבצק - צפיה", desc: "משימות היום ומחר ותמונת שבצ\"ק", action: () => openScreen("shavzak_view") },
+      { show: true, icon: "✍️", title: "טופס חתימות", desc: "נשקייה ואפסנאות אישית", action: () => openScreen("signatures") },
+      { show: Boolean(perms.attendanceReport), icon: "📋", title: "דיווח נוכחות", desc: perms.attendanceAllCompany ? "כלל הפלוגה" : (perms.allowedAttendanceFrameworks || []).join(", "), action: () => openScreen("attendance") },
+      { show: Boolean(perms.maflagReturns), icon: "📦", title: "טופס זיכויים", desc: "זיכוי ציוד ודוחות מפל\"ג", action: () => openScreen("maflag") },
+      { show: Boolean(perms.reportsCenter), icon: "📊", title: "ממשק דוחות", desc: "דוחות נוכחות ונשקייה לפיקוד", action: () => openScreen("reports") },
+      { show: Boolean(perms.shavzakOfficers), icon: "⭐", title: "שבצק - קצינים", desc: "שיוך משימות למסגרות ושיבוץ", action: () => openScreen("shavzak_officers") },
+      { show: Boolean(perms.shavzakFinalApproval), icon: "🎖️", title: "שבצק - אישור סופי", desc: "בקרת חוסרים ופרסום שבצ\"ק רשמי", action: () => openScreen("shavzak_final") },
+      { show: Boolean(perms.adminPanel), icon: "🛠️", title: "ממשק אדמין", desc: "ניהול חיילים, העברות והצלבות", action: () => openScreen("admin") }
     ];
 
     tiles.filter(t => t.show).forEach(t => {
       const card = document.createElement("div");
       card.className = "hub-tile";
       card.onclick = t.action;
-      card.innerHTML = `<div class="hub-icon">${t.icon}</div><div class="hub-title">${t.title}</div><div class="hub-desc">${t.desc}</div>`;
+      card.innerHTML = `<div class="hub-icon">${t.icon}</div><div class="hub-title">${escapeHtml(t.title)}</div><div class="hub-desc">${escapeHtml(t.desc)}</div>`;
       grid.appendChild(card);
     });
 
@@ -768,13 +708,13 @@
     if (res.todayMissions && res.todayMissions.length > 0) {
       todayDiv.innerHTML = res.todayMissions.map(m => `
         <div class="shv-mission-hero">
-          <div class="shv-hero-day">📌 המשימה שלך היום (${res.todayDate})</div>
-          <div class="shv-hero-task">${m.taskName}</div>
-          <div class="shv-hero-hours">🕒 ${m.hoursLabel} (${m.roleInTask})</div>
+          <div class="shv-hero-day">📌 המשימה שלך היום (${escapeHtml(res.todayDate)})</div>
+          <div class="shv-hero-task">${escapeHtml(m.taskName)}</div>
+          <div class="shv-hero-hours">🕒 ${escapeHtml(m.hoursLabel)} (${escapeHtml(m.roleInTask)})</div>
         </div>
       `).join("");
     } else {
-      todayDiv.innerHTML = `<div class="item-box" style="text-align:center;color:#94a3b8;">אין משימה רשומה עבורך להיום (${res.todayDate}).</div>`;
+      todayDiv.innerHTML = `<div class="item-box" style="text-align:center;color:#94a3b8;">אין משימה רשומה עבורך להיום (${escapeHtml(res.todayDate)}).</div>`;
     }
 
     const tmrDiv = document.getElementById("tomorrowMissionCard");
@@ -782,13 +722,13 @@
       if (res.tomorrowMissions && res.tomorrowMissions.length > 0) {
         tmrDiv.innerHTML = res.tomorrowMissions.map(m => `
           <div class="shv-mission-hero" style="border-color:#22c55e;background:linear-gradient(135deg,#064e3b,#0f172a);">
-            <div class="shv-hero-day" style="color:#6ee7b7;">⏭️ המשימה שלך למחר (${res.tomorrowDate})</div>
-            <div class="shv-hero-task">${m.taskName}</div>
-            <div class="shv-hero-hours">🕒 ${m.hoursLabel} (${m.roleInTask})</div>
+            <div class="shv-hero-day" style="color:#6ee7b7;">⏭️ המשימה שלך למחר (${escapeHtml(res.tomorrowDate)})</div>
+            <div class="shv-hero-task">${escapeHtml(m.taskName)}</div>
+            <div class="shv-hero-hours">🕒 ${escapeHtml(m.hoursLabel)} (${escapeHtml(m.roleInTask)})</div>
           </div>
         `).join("");
       } else {
-        tmrDiv.innerHTML = `<div class="item-box" style="text-align:center;color:#94a3b8;">פורסם שבצ"ק למחר (${res.tomorrowDate}) - אינך משובץ למשימה.</div>`;
+        tmrDiv.innerHTML = `<div class="item-box" style="text-align:center;color:#94a3b8;">פורסם שבצ"ק למחר (${escapeHtml(res.tomorrowDate)}) - אינך משובץ למשימה.</div>`;
       }
     } else {
       tmrDiv.innerHTML = "";
@@ -890,8 +830,8 @@
     } else {
       s.weaponsItems.forEach(it => {
         const d = document.createElement("div"); d.className = "item-box";
-        d.innerHTML = `<div style="font-weight:bold;">${it.toolName} (מס': ${it.serialNumber})</div>
-          <label class="return-check"><input type="checkbox" class="chk-wp-ret" data-tool="${it.toolName}" data-serial="${it.serialNumber}"> 🔴 הזדכתי על כלי זה</label>`;
+        d.innerHTML = `<div style="font-weight:bold;">${escapeHtml(it.toolName)} (מס': ${escapeHtml(it.serialNumber)})</div>
+          <label class="return-check"><input type="checkbox" class="chk-wp-ret" data-tool="${escapeHtml(it.toolName)}" data-serial="${escapeHtml(it.serialNumber)}"> 🔴 הזדכתי על כלי זה</label>`;
         wpList.appendChild(d);
       });
     }
@@ -904,7 +844,7 @@
         const isQty = !isNaN(parseInt(it.quantityOrSerial, 10)) && parseInt(it.quantityOrSerial, 10) < 50;
         const valLabel = (it.quantityOrSerial === "V" || it.quantityOrSerial === "v") ? "חתום" : (isQty ? it.quantityOrSerial + " יח'" : it.quantityOrSerial);
         const d = document.createElement("div"); d.className = "item-box";
-        d.innerHTML = `<div style="font-weight:bold;color:#38bdf8;">${it.toolName}</div><div style="color:#cbd5e1;font-size:0.9rem;">כמות/סטטוס: ${valLabel}</div>`;
+        d.innerHTML = `<div style="font-weight:bold;color:#38bdf8;">${escapeHtml(it.toolName)}</div><div style="color:#cbd5e1;font-size:0.9rem;">כמות/סטטוס: ${escapeHtml(valLabel)}</div>`;
         lgList.appendChild(d);
       });
     }
@@ -918,7 +858,7 @@
   function addWeaponRow() {
     const container = document.getElementById("weaponsNewContainer");
     const div = document.createElement("div"); div.className = "item-box";
-    let opts = wpToolsList.map(t => `<option value="${t}" ${t === "M16" ? "selected" : ""}>${t}</option>`).join("") + `<option value="OTHER_CUSTOM">+ אחר</option>`;
+    let opts = wpToolsList.map(t => `<option value="${escapeHtml(t)}" ${t === "M16" ? "selected" : ""}>${escapeHtml(t)}</option>`).join("") + `<option value="OTHER_CUSTOM">+ אחר</option>`;
     div.innerHTML = `<label>סוג נשק/אמל"ח:</label><select class="wp-tool" onchange="onWpnTypeChange(this)">${opts}</select>
       <input type="text" class="custom-name hidden" placeholder="שם נשק...">
       <label>מספר נשק / סידורי:</label><input type="text" class="wp-serial" placeholder="הקלד מספר נשק..." oninput="checkWpnKit(this)">
@@ -959,7 +899,7 @@
   function addLogisticsRow() {
     const container = document.getElementById("logisticsNewContainer");
     const div = document.createElement("div"); div.className = "item-box";
-    let opts = lgToolsList.map(t => `<option value="${t}">${t}</option>`).join("") + `<option value="OTHER_CUSTOM">+ אחר</option>`;
+    let opts = lgToolsList.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("") + `<option value="OTHER_CUSTOM">+ אחר</option>`;
     div.innerHTML = `<label>פריט אפסנאות:</label><select class="lg-tool" onchange="this.parentElement.querySelector('.custom-name').classList.toggle('hidden', this.value!=='OTHER_CUSTOM')">${opts}</select>
       <input type="text" class="custom-name hidden" placeholder="שם פריט..."><label>כמות:</label><input type="number" class="lg-qty" value="1" min="1">`;
     container.appendChild(div);
@@ -1013,7 +953,7 @@
   }
 
   // ==========================================
-  // מסך: דיווח נוכחות (לפי הרשאה מרחיבה)
+  // מסך: דיווח נוכחות (יצירת DOM בטוחה לכל המסגרות כולל חפ"ק/מפל"ג/חמ"ל/מסופחים)
   // ==========================================
   async function loadAttendanceScreen() {
     const tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
@@ -1052,8 +992,18 @@
       await loadAndRenderAttendanceSoldiers();
     } else {
       fwSel.disabled = false;
-      fwSel.innerHTML = '<option value="">-- בחר מסגרת --</option>' +
-        allowedList.map(f => `<option value="${f}">${f}</option>`).join("");
+      const defOpt = document.createElement("option");
+      defOpt.value = "";
+      defOpt.textContent = "-- בחר מסגרת --";
+      fwSel.appendChild(defOpt);
+
+      allowedList.forEach(f => {
+        const opt = document.createElement("option");
+        opt.value = f;
+        opt.textContent = f;
+        fwSel.appendChild(opt);
+      });
+
       document.getElementById("attSoldiersContainer").innerHTML = "";
       document.getElementById("btnSubmitAtt").classList.add("hidden");
     }
@@ -1068,14 +1018,14 @@
 
     if (!fw) { btn.classList.add("hidden"); return; }
 
-    container.innerHTML = `<div class="card" style="text-align:center;color:#94a3b8;">טוען חיילי ${fw}...</div>`;
+    container.innerHTML = `<div class="card" style="text-align:center;color:#94a3b8;">טוען חיילי ${escapeHtml(fw)}...</div>`;
     const res = await apiCall({ action: "get_attendance_soldiers", filterFramework: fw });
     const list = res.soldiers || [];
     attendanceSoldiers = list;
 
     container.innerHTML = "";
     if (!list.length) {
-      container.innerHTML = `<div class="card" style="text-align:center;color:#fca5a5;">לא נמצאו חיילים פעילים בגיליון "חיילים" תחת מסגרת "${fw}".</div>`;
+      container.innerHTML = `<div class="card" style="text-align:center;color:#fca5a5;">לא נמצאו חיילים פעילים בגיליון "חיילים" תחת מסגרת "${escapeHtml(fw)}".</div>`;
       btn.classList.add("hidden");
       return;
     }
@@ -1088,7 +1038,7 @@
 
       const card = document.createElement("div"); card.className = "card";
       card.dataset.soldierName = s.name;
-      card.innerHTML = `<div style="font-weight:bold;font-size:1.05rem;margin-bottom:10px;">${s.name}</div>
+      card.innerHTML = `<div style="font-weight:bold;font-size:1.05rem;margin-bottom:10px;">${escapeHtml(s.name)}</div>
         <div class="radio-group">
           <label class="radio-card ${isPres ? "active-green" : ""}" id="attLblP_${idx}" onclick="setAttRadio(${idx}, true)"><input type="radio" name="attMain_${idx}" value="נוכח" ${isPres ? "checked" : ""}> נוכח</label>
           <label class="radio-card ${!isPres ? "active-red" : ""}" id="attLblA_${idx}" onclick="setAttRadio(${idx}, false)"><input type="radio" name="attMain_${idx}" value="אינו נוכח" ${!isPres ? "checked" : ""}> אינו נוכח</label>
@@ -1107,7 +1057,7 @@
             <option value="שוחרר" ${absSub==="שוחרר"?"selected":""}>שוחרר</option>
             <option value="אחר" ${absSub==="אחר"?"selected":""}>אחר</option>
           </select>
-          <div id="attNoteBox_${idx}" class="${isOther ? "" : "hidden"}"><input type="text" id="attNote_${idx}" placeholder="פרט סיבה..." value="${s.notes || ""}"></div>
+          <div id="attNoteBox_${idx}" class="${isOther ? "" : "hidden"}"><input type="text" id="attNote_${idx}" placeholder="פרט סיבה..." value="${escapeHtml(s.notes || "")}"></div>
         </div>`;
       container.appendChild(card);
     });
@@ -1208,11 +1158,11 @@
     listDiv.innerHTML = shvSkeletonShifts.map((sh, idx) => `
       <div class="item-box" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
         <div>
-          <div style="font-weight:bold;color:#38bdf8;">${sh.taskName} (משמרת ${sh.shiftNumber}/${sh.totalShifts})</div>
-          <div style="font-size:0.85rem;color:#cbd5e1;">🕒 ${sh.hoursLabel} | דרישה: ${sh.reqCmdrs} מפקדים, ${sh.reqSoldiers} חיילים</div>
+          <div style="font-weight:bold;color:#38bdf8;">${escapeHtml(sh.taskName)} (משמרת ${sh.shiftNumber}/${sh.totalShifts})</div>
+          <div style="font-size:0.85rem;color:#cbd5e1;">🕒 ${escapeHtml(sh.hoursLabel)} | דרישה: ${sh.reqCmdrs} מפקדים, ${sh.reqSoldiers} חיילים</div>
         </div>
         <select id="skelPlatoon_${idx}" style="width:155px;margin:0;">
-          ${SHAVZAK_PLATOONS.map(p => `<option value="${p}">${p}</option>`).join("")}
+          ${SHAVZAK_PLATOONS.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("")}
         </select>
       </div>
     `).join("");
@@ -1254,7 +1204,7 @@
     });
 
     if (res.status !== "success") {
-      board.innerHTML = `<div class="status-box status-err" style="display:block;">${res.message}</div>`;
+      board.innerHTML = `<div class="status-box status-err" style="display:block;">${escapeHtml(res.message)}</div>`;
       return;
     }
 
@@ -1279,7 +1229,7 @@
     const attWarn = document.getElementById("shvAttendanceWarning");
     if (!isTopCommand && !res.attendanceReported) {
       attWarn.classList.remove("hidden");
-      attWarn.innerHTML = `⚠️ <strong>טרם מולא דוח נוכחות למחלקה שלך (${currentUser.framework}) לתאריך ${res.targetDate}!</strong><br>חזור לתפריט הראשי -> "דיווח נוכחות" ומלא נוכחות לתאריך זה כדי לשבץ חיילים.`;
+      attWarn.innerHTML = `⚠️ <strong>טרם מולא דוח נוכחות למחלקה שלך (${escapeHtml(currentUser.framework)}) לתאריך ${escapeHtml(res.targetDate)}!</strong><br>חזור לתפריט הראשי -> "דיווח נוכחות" ומלא נוכחות לתאריך זה כדי לשבץ חיילים.`;
     } else {
       attWarn.classList.add("hidden");
     }
@@ -1288,7 +1238,7 @@
     if (isTopCommand && res.allWarnings && res.allWarnings.length > 0) {
       hcWarn.classList.remove("hidden");
       hcWarn.innerHTML = `<strong>🚨 התראות וחוסרים בשבצ"ק (${res.allWarnings.length}):</strong><br>` +
-        res.allWarnings.map(w => `• ${w}`).join("<br>");
+        res.allWarnings.map(w => `• ${escapeHtml(w)}`).join("<br>");
     } else {
       hcWarn.classList.add("hidden");
     }
@@ -1324,11 +1274,11 @@
         if (s.isCommander) badges += `<span class="chip-badge badge-cmdr">מפקד</span> `;
         if (s.subStatus && s.subStatus.includes("מגיע היום")) badges += `<span class="chip-badge badge-arrive">מגיע היום</span> `;
         if (s.subStatus && s.subStatus.includes("יוצא היום")) badges += `<span class="chip-badge badge-leave">יוצא היום</span> `;
-        if (shvWorkspaceState.isTopCommand) badges += `<span class="chip-badge" style="background:#334155;color:#cbd5e1;">${s.framework}</span> `;
+        if (shvWorkspaceState.isTopCommand) badges += `<span class="chip-badge" style="background:#334155;color:#cbd5e1;">${escapeHtml(s.framework)}</span> `;
 
         return `<div class="shv-soldier-chip ${isSelected ? "selected-chip" : ""}" onclick="selectSoldierFromPool('${s.name.replace(/'/g, "\\'")}')">
           <div>
-            <div style="font-weight:bold;font-size:0.92rem;">${s.name}</div>
+            <div style="font-weight:bold;font-size:0.92rem;">${escapeHtml(s.name)}</div>
             <div style="margin-top:2px;">${badges}</div>
           </div>
           <span style="color:#38bdf8;font-size:0.8rem;">${isSelected ? "נבחר ✓" : "שבץ ◀"}</span>
@@ -1340,7 +1290,7 @@
     const actionBox = document.getElementById("shvActionButtons");
 
     if (!shvWorkspaceState.rows.length) {
-      board.innerHTML = `<div class="card" style="text-align:center;color:#94a3b8;">טרם נבנה שלד שבצ"ק לתאריך ${shvWorkspaceState.targetDate}.</div>`;
+      board.innerHTML = `<div class="card" style="text-align:center;color:#94a3b8;">טרם נבנה שלד שבצ"ק לתאריך ${escapeHtml(shvWorkspaceState.targetDate)}.</div>`;
       actionBox.classList.add("hidden");
       return;
     }
@@ -1352,8 +1302,8 @@
     board.innerHTML = shvWorkspaceState.rows.map((r, rIdx) => {
       if (!r.canViewDetails) {
         return `<div class="shv-shift-locked">
-          <div><strong style="color:#e2e8f0;">${r.taskName}</strong> (משמרת ${r.shiftNumber}) • <span>🕒 ${r.hoursLabel}</span></div>
-          <span style="background:#334155;color:#cbd5e1;padding:4px 10px;border-radius:6px;font-weight:bold;">${r.platoon}</span>
+          <div><strong style="color:#e2e8f0;">${escapeHtml(r.taskName)}</strong> (משמרת ${r.shiftNumber}) • <span>🕒 ${escapeHtml(r.hoursLabel)}</span></div>
+          <span style="background:#334155;color:#cbd5e1;padding:4px 10px;border-radius:6px;font-weight:bold;">${escapeHtml(r.platoon)}</span>
         </div>`;
       }
 
@@ -1364,13 +1314,13 @@
         if (!val) allEditableSlotsFilled = false;
         if (val) {
           cmdrHtml += `<div class="shv-slot-row">
-            <span>⭐ <strong>מפקד:</strong> ${val}</span>
+            <span>⭐ <strong>מפקד:</strong> ${escapeHtml(val)}</span>
             <button type="button" class="btn-trash" title="בטל בחירה" onclick="clearShvSlot(${rIdx}, 'cmdr', ${cIdx})">🗑️</button>
           </div>`;
         } else {
           cmdrHtml += `<div class="shv-slot-row shv-slot-empty">
             <span style="color:#94a3b8;cursor:pointer;flex:1;" onclick="assignSelectedToSlot(${rIdx}, 'cmdr', ${cIdx})">
-              ⭐ משבצת מפקד פנויה ${shvSelectedSoldier ? `(לחץ לשיבוץ ${shvSelectedSoldier})` : "(בחר מהרשימה)"}
+              ⭐ משבצת מפקד פנויה ${shvSelectedSoldier ? `(לחץ לשיבוץ ${escapeHtml(shvSelectedSoldier)})` : "(בחר מהרשימה)"}
             </span>
             <button type="button" class="btn-unassigned" onclick="markSlotUnassigned(${rIdx}, 'cmdr', ${cIdx})">ללא שיבוץ</button>
           </div>`;
@@ -1382,13 +1332,13 @@
         if (!val) allEditableSlotsFilled = false;
         if (val) {
           soldiersHtml += `<div class="shv-slot-row">
-            <span>🪖 <strong>לוחם:</strong> ${val}</span>
+            <span>🪖 <strong>לוחם:</strong> ${escapeHtml(val)}</span>
             <button type="button" class="btn-trash" title="בטל בחירה" onclick="clearShvSlot(${rIdx}, 'soldier', ${sIdx})">🗑️</button>
           </div>`;
         } else {
           soldiersHtml += `<div class="shv-slot-row shv-slot-empty">
             <span style="color:#94a3b8;cursor:pointer;flex:1;" onclick="assignSelectedToSlot(${rIdx}, 'soldier', ${sIdx})">
-              🪖 משבצת חייל פנויה ${shvSelectedSoldier ? `(לחץ לשיבוץ ${shvSelectedSoldier})` : "(בחר מהרשימה)"}
+              🪖 משבצת חייל פנויה ${shvSelectedSoldier ? `(לחץ לשיבוץ ${escapeHtml(shvSelectedSoldier)})` : "(בחר מהרשימה)"}
             </span>
             <button type="button" class="btn-unassigned" onclick="markSlotUnassigned(${rIdx}, 'soldier', ${sIdx})">ללא שיבוץ</button>
           </div>`;
@@ -1398,10 +1348,10 @@
       return `<div class="shv-shift-card" style="border-color:#0284c7;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
           <div>
-            <span style="font-weight:bold;font-size:1.08rem;color:#38bdf8;">${r.taskName}</span>
+            <span style="font-weight:bold;font-size:1.08rem;color:#38bdf8;">${escapeHtml(r.taskName)}</span>
             <span style="color:#cbd5e1;font-size:0.9rem;"> (משמרת ${r.shiftNumber})</span>
           </div>
-          <span style="background:#0369a1;color:#fff;padding:3px 9px;border-radius:6px;font-size:0.85rem;font-weight:bold;">${r.platoon} • 🕒 ${r.hoursLabel} • ${r.platoonStatus}</span>
+          <span style="background:#0369a1;color:#fff;padding:3px 9px;border-radius:6px;font-size:0.85rem;font-weight:bold;">${escapeHtml(r.platoon)} • 🕒 ${escapeHtml(r.hoursLabel)} • ${escapeHtml(r.platoonStatus)}</span>
         </div>
         ${cmdrHtml}
         ${soldiersHtml}
@@ -1541,16 +1491,16 @@
       const lgDiv = document.getElementById("mafLogisticsList"); lgDiv.innerHTML = "";
       s.logisticsItems.forEach(it => {
         const isQty = !isNaN(parseInt(it.quantityOrSerial,10)) && parseInt(it.quantityOrSerial,10) < 50;
-        const qtyInp = isQty ? ` (כמות: ${it.quantityOrSerial}) | לזכות: <input type="number" class="maf-qty" data-tool="${it.toolName}" value="${it.quantityOrSerial}" min="1" max="${it.quantityOrSerial}" style="width:65px;display:inline-block;padding:4px;margin:0 4px;">` : "";
+        const qtyInp = isQty ? ` (כמות: ${escapeHtml(it.quantityOrSerial)}) | לזכות: <input type="number" class="maf-qty" data-tool="${escapeHtml(it.toolName)}" value="${escapeHtml(it.quantityOrSerial)}" min="1" max="${escapeHtml(it.quantityOrSerial)}" style="width:65px;display:inline-block;padding:4px;margin:0 4px;">` : "";
         const d = document.createElement("div"); d.className = "item-box";
-        d.innerHTML = `<label class="return-check"><input type="checkbox" class="chk-maf-lg" data-tool="${it.toolName}" data-val="${it.quantityOrSerial}"> ${it.toolName}${qtyInp}</label>`;
+        d.innerHTML = `<label class="return-check"><input type="checkbox" class="chk-maf-lg" data-tool="${escapeHtml(it.toolName)}" data-val="${escapeHtml(it.quantityOrSerial)}"> ${escapeHtml(it.toolName)}${qtyInp}</label>`;
         lgDiv.appendChild(d);
       });
 
       const wpDiv = document.getElementById("mafWeaponsList"); wpDiv.innerHTML = "";
       s.weaponsItems.forEach(it => {
         const d = document.createElement("div"); d.className = "item-box";
-        d.innerHTML = `<label class="return-check"><input type="checkbox" class="chk-maf-wp" data-tool="${it.toolName}" data-serial="${it.serialNumber}"> ${it.toolName} (מס': ${it.serialNumber})</label>`;
+        d.innerHTML = `<label class="return-check"><input type="checkbox" class="chk-maf-wp" data-tool="${escapeHtml(it.toolName)}" data-serial="${escapeHtml(it.serialNumber)}"> ${escapeHtml(it.toolName)} (מס': ${escapeHtml(it.serialNumber)})</label>`;
         wpDiv.appendChild(d);
       });
       document.getElementById("mafSoldierDetails").classList.remove("hidden");
@@ -1559,9 +1509,14 @@
 
   async function submitMaflagReturns() {
     const wpRets = []; document.querySelectorAll(".chk-maf-wp:checked").forEach(c => wpRets.push({ toolName: c.dataset.tool, serialNumber: c.dataset.serial }));
-    const lgRets = []; document.querySelectorAll(".chk-maf-lg:checked").forEach(c => {
-      const qInp = document.querySelector(`.maf-qty[data-tool="${c.dataset.tool}"]`);
-      lgRets.push({ toolName: c.dataset.tool, quantityOrSerial: c.dataset.val, returnQty: qInp ? qInp.value : c.dataset.val });
+    const lgRets = [];
+    document.querySelectorAll(".chk-maf-lg:checked").forEach(c => {
+      const toolName = c.dataset.tool;
+      let returnQty = c.dataset.val;
+      document.querySelectorAll(".maf-qty").forEach(inp => {
+        if (inp.dataset.tool === toolName) returnQty = inp.value;
+      });
+      lgRets.push({ toolName, quantityOrSerial: c.dataset.val, returnQty });
     });
     if (!wpRets.length && !lgRets.length) { alert("נא לסמן פריטים לזיכוי"); return; }
     showBox("mafActionStatus", "מבצע זיכויים...", true);
