@@ -898,7 +898,11 @@
     document.getElementById("newPassInput").value = "";
     document.getElementById("confirmPassInput").value = "";
     document.getElementById("loginPassInput").value = "";
-    openMainHub();
+    // חייל / מפקד / קצין / נאמן כ"א נכנסים ישר לצפייה בשבצ"ק. פיקוד עליון, מפל"ג ושלומי - לתפריט הראשי
+    const SHV_FIRST_ROLES = ["חייל", "מפקד", "קצין", "נאמן כ\"א"];
+    const roles = user.roles || [];
+    if (roles.length && roles.every(r => SHV_FIRST_ROLES.includes(r))) openScreen("shavzak_view");
+    else openMainHub();
   }
 
   function hideAllScreens() {
