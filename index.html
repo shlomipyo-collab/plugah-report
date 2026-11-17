@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>מסייעת 8109 - פורטל פלוגתי</title>
   <style>
-    :root { --primary: #0284c7; --bg: #0f172a; --card: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --success: #16a34a; --danger: #dc2626; --warning: #d97706; }
+    :root { color-scheme: dark; --primary: #0284c7; --bg: #0f172a; --card: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --success: #16a34a; --danger: #dc2626; --warning: #d97706; }
     * { box-sizing: border-box; }
     body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0 auto; padding: 14px; max-width: 980px; }
     .narrow-wrap { max-width: 560px; margin: 0 auto; }
@@ -72,6 +72,14 @@
     .date-pick-btn { position: relative; width: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; border: 1px solid #475569; border-radius: 8px; background: #0f172a; cursor: pointer; margin: 0; overflow: hidden; }
     .date-pick-btn:hover { border-color: #38bdf8; }
     .date-pick-btn input[type="date"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; margin: 0; padding: 0; border: none; cursor: pointer; }
+    .task-edit { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .task-edit .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .task-edit input[type="time"] { min-width: 0; }
+    .task-edit .grid3 label { margin: 0 0 3px; font-size: 0.78rem; }
+    .task-edit input { margin-bottom: 8px; padding: 8px; }
+    .day-chips { display: flex; gap: 5px; flex-wrap: wrap; margin: 4px 0 8px; }
+    .day-chip { min-width: 34px; text-align: center; padding: 6px 4px; border-radius: 7px; border: 1px solid #475569; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 0.85rem; user-select: none; }
+    .day-chip.on { background: #6d28d9; border-color: #a78bfa; color: #fff; }
     .unreported-box { background: #451a03; border: 1px solid #d97706; color: #fde68a; border-radius: 8px; padding: 8px 10px; font-size: 0.8rem; margin-bottom: 10px; line-height: 1.5; }
     .radio-group { display: flex; gap: 8px; margin-bottom: 10px; }
     .radio-card { flex: 1; text-align: center; padding: 10px 4px; border: 1px solid #334155; border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: #0f172a; user-select: none; }
@@ -163,7 +171,7 @@
   <!-- מודאל תמונת שבצ"ק -->
   <div id="shvImageModal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width:min(1100px,96vw);max-height:92vh;overflow:auto;">
-      <h3 style="margin:0 0 10px;color:#38bdf8;">📋 שבצ"ק פלוגתי רשמי</h3>
+      <h3 style="margin:0 0 10px;color:#38bdf8;" id="shvImageTitle">📋 שבצ"ק פלוגתי רשמי</h3>
       <img id="shvGeneratedImg" style="width:100%;border-radius:8px;border:1px solid #475569;margin-bottom:12px;" alt="שבצק">
       <div class="btn-row">
         <button type="button" class="btn-action btn-wa" onclick="shareShavzakImage()">📱 שתף תמונה</button>
@@ -213,7 +221,10 @@
       <div id="soldierShvContent" class="hidden">
         <div id="todayMissionCard"></div>
         <div id="tomorrowMissionCard"></div>
-        <button type="button" id="btnOpenShvImage" class="btn-action btn-primary hidden" onclick="openShavzakImageModal()">🖼️ פתח שבצ"ק כתמונה / שתף</button>
+        <div class="btn-row">
+          <button type="button" id="btnShvImgToday" class="btn-action btn-primary hidden" onclick="openShavzakImageModal('today')">🖼️ שבצ"ק מלא - היום</button>
+          <button type="button" id="btnShvImgTomorrow" class="btn-action btn-success hidden" onclick="openShavzakImageModal('tomorrow')">🖼️ שבצ"ק מלא - מחר</button>
+        </div>
       </div>
     </div>
   </div>
@@ -515,6 +526,26 @@
       <div id="mStatus" class="status-box"></div>
     </div>
 
+    <div class="card" style="border-color:#8b5cf6;">
+      <h2>🗂️ ניהול משימות לשבצ"ק</h2>
+      <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:10px;line-height:1.5;">
+        לכל משימה מסמנים באילו ימים היא פעילה. כך בונים שבצ"ק מותאם לשישי ולשבת: למשל "שמירה" עם 3 משמרות בימי חול, ו"שמירה" עם 4 משמרות רק בשישי-שבת (אפשר לשכפל משימה ולשנות).
+      </div>
+      <label>הצג משימות ליום:</label>
+      <select id="tasksDayFilter" onchange="renderAdminTasks()">
+        <option value="ALL">כל המשימות</option>
+        <option value="0">ראשון</option><option value="1">שני</option><option value="2">שלישי</option>
+        <option value="3">רביעי</option><option value="4">חמישי</option><option value="5">שישי</option><option value="6">שבת</option>
+      </select>
+      <div id="adminTasksList"><div class="loading-msg">טוען משימות...</div></div>
+      <div class="btn-row">
+        <button type="button" class="btn-add-line" style="margin:0;" onclick="addAdminTask(false)">+ משימה חדשה</button>
+        <button type="button" class="btn-add-line" style="margin:0;" onclick="addAdminTask(true)">+ יזומה</button>
+      </div>
+      <button type="button" class="btn-action btn-success" style="margin-top:10px;" onclick="saveAdminTasks(this)">💾 שמור משימות</button>
+      <div id="tasksStatus" class="status-box"></div>
+    </div>
+
     <div class="card">
       <h2>🔑 איפוס סיסמה</h2>
       <label>חיפוש חייל:</label><input type="text" placeholder="סנן..." oninput="filterSelectOptions('pSoldier', this.value)">
@@ -572,7 +603,7 @@
   let repDomain = "presence";
   let currentScreen = "login";
 
-  let soldierShvOfficialBlock = null;
+  let soldierShvBlocks = { today: null, tomorrow: null };
   let shvGeneratedDataUrl = null;
   let shvState = null;
   let shvSelectedPn = null;
@@ -1003,8 +1034,9 @@
       tmrDiv.innerHTML = `<div class="item-box" style="text-align:center;color:#64748b;font-size:0.85rem;">שבצ"ק למחר טרם פורסם.</div>`;
     }
 
-    soldierShvOfficialBlock = res.officialBlockForImage;
-    document.getElementById("btnOpenShvImage").classList.toggle("hidden", !soldierShvOfficialBlock);
+    soldierShvBlocks = { today: res.todayBlockForImage, tomorrow: res.tomorrowBlockForImage };
+    document.getElementById("btnShvImgToday").classList.toggle("hidden", !soldierShvBlocks.today);
+    document.getElementById("btnShvImgTomorrow").classList.toggle("hidden", !soldierShvBlocks.tomorrow);
   }
 
   // ==========================================
@@ -1194,9 +1226,11 @@
     return canvas;
   }
 
-  function openShavzakImageModal() {
-    if (!soldierShvOfficialBlock) return;
-    const canvas = buildShavzakCanvas(soldierShvOfficialBlock);
+  function openShavzakImageModal(which) {
+    const block = soldierShvBlocks[which];
+    if (!block) return;
+    document.getElementById("shvImageTitle").textContent = `📋 שבצ"ק ${which === "tomorrow" ? "מחר" : "היום"} - ${block.dayName} ${block.date}`;
+    const canvas = buildShavzakCanvas(block);
     shvGeneratedDataUrl = canvas.toDataURL("image/png");
     document.getElementById("shvGeneratedImg").src = shvGeneratedDataUrl;
     document.getElementById("shvImageModal").classList.remove("hidden");
@@ -1421,13 +1455,14 @@
   async function renderStage1TasksList(existingRows) {
     const listDiv = document.getElementById("skeletonTasksList");
     listDiv.innerHTML = '<div class="loading-msg">טוען משימות מגיליון "משימות"...</div>';
-    const res = await apiCall({ action: "shavzak_get_tasks" });
+    const res = await apiCall({ action: "shavzak_get_tasks", targetDate: document.getElementById("shvTargetDate").value.trim() });
     if (!isOk(res)) { listDiv.innerHTML = `<div class="status-box status-err" style="display:block;">${escapeHtml(res.message)}</div>`; return; }
     shvSkeletonShifts = res.shifts || [];
     if (!shvSkeletonShifts.length) {
-      listDiv.innerHTML = '<div class="status-box status-err" style="display:block;">גיליון "משימות" ריק. יש להזין משימות (עמודות A-F) ולנסות שוב.</div>';
+      listDiv.innerHTML = `<div class="status-box status-err" style="display:block;">אין משימות מוגדרות ל${escapeHtml(res.dayName || "יום זה")}. ניתן להגדיר משימות לפי ימים בממשק האדמין ← ניהול משימות.</div>`;
       return;
     }
+    const dayNote = `<div style="font-size:0.85rem;color:#7dd3fc;margin-bottom:10px;">📆 תבנית משימות ל${escapeHtml(res.dayName || "")} (${shvSkeletonShifts.length} משמרות)</div>`;
     const existingMap = {};
     existingRows.forEach(r => { existingMap[`${r.taskName}__${r.shiftNumber}`] = r.platoon; });
 
@@ -1435,7 +1470,7 @@
     const tasksOrder = [];
     shvSkeletonShifts.forEach(sh => { if (!tasksOrder.includes(sh.taskName)) tasksOrder.push(sh.taskName); });
 
-    listDiv.innerHTML = tasksOrder.map(task => {
+    listDiv.innerHTML = dayNote + tasksOrder.map(task => {
       const shifts = shvSkeletonShifts.map((sh, idx) => ({ sh, idx })).filter(x => x.sh.taskName === task);
       const bulk = shifts.length > 1 ? `<select style="width:auto;padding:5px;margin:0;font-size:0.8rem;" onchange="bulkAssignTask(this)" data-task-idxs="${shifts.map(x => x.idx).join(",")}">
           <option value="">כל המשמרות ל...</option>${SHAVZAK_PLATOONS.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("")}</select>` : "";
@@ -2330,6 +2365,7 @@
     const items = soldierSelectItems(db.masterSoldiers || []);
     ["uSoldier", "mSoldier", "pSoldier"].forEach(id => fillSelect(id, items));
     onAdmSoldierSelect();
+    loadAdminTasks();
   }
 
   function syncAdmSubOptions() {
@@ -2346,6 +2382,91 @@
       document.getElementById("uSubStatus").value = found.subStatus || "נוכחות מלאה";
       document.getElementById("uNotes").value = found.notes || "";
     } else document.getElementById("uNotes").value = "";
+  }
+
+  // --- ניהול משימות ---
+  const DAY_SHORT = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
+  let adminTasks = [];
+
+  async function loadAdminTasks() {
+    const res = await apiCall({ action: "admin_get_tasks" });
+    if (!isOk(res)) { document.getElementById("adminTasksList").innerHTML = `<div style="color:#fca5a5;">${escapeHtml(res.message)}</div>`; return; }
+    adminTasks = (res.tasks || []).map(t => Object.assign({}, t, { days: (t.days || [0,1,2,3,4,5,6]).slice() }));
+    renderAdminTasks();
+  }
+
+  function daysLabel(days) {
+    const d = (days || []).slice().sort();
+    if (d.length === 7) return "כל הימים";
+    if (d.join() === "0,1,2,3,4") return "ימי חול";
+    if (d.join() === "5,6") return "שישי-שבת";
+    return d.map(x => DAY_SHORT[x]).join(",");
+  }
+
+  function renderAdminTasks() {
+    const f = document.getElementById("tasksDayFilter").value;
+    const list = document.getElementById("adminTasksList");
+    const visible = adminTasks.map((t, i) => ({ t, i })).filter(x => f === "ALL" || x.t.days.indexOf(parseInt(f, 10)) !== -1);
+    if (!visible.length) { list.innerHTML = '<div style="color:#94a3b8;text-align:center;padding:10px;">אין משימות ליום זה.</div>'; return; }
+    list.innerHTML = visible.map(({ t, i }) => `<div class="task-edit">
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input type="text" value="${escapeHtml(t.taskName)}" placeholder="שם המשימה" style="font-weight:bold;" oninput="adminTasks[${i}].taskName=this.value">
+        <button type="button" class="btn-mini" title="שכפל" style="margin-bottom:8px;" onclick="duplicateAdminTask(${i})">⧉</button>
+        <button type="button" class="btn-trash" title="מחק" style="margin-bottom:8px;" onclick="deleteAdminTask(${i})">🗑️</button>
+      </div>
+      <div class="grid3">
+        <div><label>התחלה</label><input type="time" value="${escapeHtml(t.startStr)}" onchange="adminTasks[${i}].startStr=this.value"></div>
+        <div><label>סיום</label><input type="time" value="${escapeHtml(t.endStr)}" onchange="adminTasks[${i}].endStr=this.value"></div>
+        <div><label>משמרות</label><input type="number" min="1" max="24" value="${t.numShifts}" oninput="adminTasks[${i}].numShifts=this.value"></div>
+        <div><label>מפקדים</label><input type="number" min="0" value="${t.reqCmdrs}" oninput="adminTasks[${i}].reqCmdrs=this.value"></div>
+        <div><label>חיילים</label><input type="number" min="0" value="${t.reqSoldiers}" oninput="adminTasks[${i}].reqSoldiers=this.value"></div>
+        <div><label>ימים: <span style="color:#c4b5fd;">${escapeHtml(daysLabel(t.days))}</span></label></div>
+      </div>
+      <div class="day-chips">${DAY_SHORT.map((d, di) => `<span class="day-chip ${t.days.indexOf(di) !== -1 ? "on" : ""}" onclick="toggleTaskDay(${i},${di})">${d}</span>`).join("")}</div>
+    </div>`).join("");
+  }
+
+  function toggleTaskDay(i, d) {
+    const days = adminTasks[i].days;
+    const k = days.indexOf(d);
+    if (k === -1) days.push(d); else if (days.length > 1) days.splice(k, 1); else { toast("משימה חייבת לחול לפחות ביום אחד", "err"); return; }
+    renderAdminTasks();
+  }
+
+  function addAdminTask(isYezuma) {
+    const f = document.getElementById("tasksDayFilter").value;
+    const days = f === "ALL" ? [0, 1, 2, 3, 4, 5, 6] : [parseInt(f, 10)];
+    let name = "משימה חדשה";
+    if (isYezuma) {
+      const n = adminTasks.filter(t => /^יזומה/.test(t.taskName)).length;
+      name = n ? `יזומה ${n + 1}` : "יזומה";
+    }
+    adminTasks.push({ taskName: name, startStr: isYezuma ? "17:00" : "06:00", endStr: isYezuma ? "23:00" : "06:00", numShifts: 1, reqCmdrs: isYezuma ? 2 : 0, reqSoldiers: isYezuma ? 6 : 1, days });
+    renderAdminTasks();
+    const items = document.querySelectorAll("#adminTasksList .task-edit");
+    if (items.length) items[items.length - 1].scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function duplicateAdminTask(i) {
+    const src = adminTasks[i];
+    adminTasks.splice(i + 1, 0, Object.assign({}, src, { taskName: src.taskName + " (עותק)", days: src.days.slice() }));
+    renderAdminTasks();
+    toast("שוכפל - שנה שם או ימים לפני שמירה");
+  }
+
+  function deleteAdminTask(i) {
+    confirmModal("מחיקת משימה", `למחוק את "${adminTasks[i].taskName}"? (יחול אחרי שמירה)`, "מחק", () => { adminTasks.splice(i, 1); renderAdminTasks(); });
+  }
+
+  async function saveAdminTasks(btn) {
+    for (const t of adminTasks) {
+      if (!cleanHebrewText(t.taskName)) { toast("יש משימה בלי שם", "err"); return; }
+      if (!/^\d{1,2}:\d{2}$/.test(t.startStr) || !/^\d{1,2}:\d{2}$/.test(t.endStr)) { toast(`${t.taskName}: חסרות שעות`, "err"); return; }
+    }
+    await adminAction(btn, "tasksStatus", { action: "admin_save_tasks", tasks: adminTasks.map(t => ({
+      taskName: cleanHebrewText(t.taskName), startStr: t.startStr, endStr: t.endStr,
+      numShifts: parseInt(t.numShifts, 10), reqCmdrs: parseInt(t.reqCmdrs, 10) || 0, reqSoldiers: parseInt(t.reqSoldiers, 10) || 0, days: t.days
+    })) }, false);
   }
 
   async function adminAction(btn, boxId, payload, reload) {
