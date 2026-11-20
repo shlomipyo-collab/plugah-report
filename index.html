@@ -2772,7 +2772,7 @@
     radioReport = res;
     body.className = "";
     const atHamal = res.devices.filter(d => d.atHamal);
-    const out = res.devices.filter(d => !d.atHamal).sort((a, b) => (a.since || 0) - (b.since || 0));
+    const out = res.devices.filter(d => !d.atHamal).sort((a, b) => Number(a.device) - Number(b.device));
     const photoBtn = (id, title) => id ? `<button type="button" class="btn-mini" data-id="${escapeHtml(id)}" data-t="${escapeHtml(title)}" onclick="showRadioPhoto(this.dataset.id, this.dataset.t)">📷</button>` : "";
     let html = `<div class="rr-hamal"><strong>🏠 בחמ"ל: ${atHamal.length} מתוך ${res.count}</strong><br>${atHamal.length ? atHamal.map(d => d.device).join(", ") : "אין"}</div>`;
     html += `<div style="font-weight:bold;color:#fbbf24;margin:12px 0 6px;">📍 מחוץ לחמ"ל: ${out.length}</div>`;
@@ -2835,7 +2835,7 @@
   function shareRadioReport() {
     const r = radioReport;
     const atHamal = r.devices.filter(d => d.atHamal).map(d => d.device);
-    const out = r.devices.filter(d => !d.atHamal);
+    const out = r.devices.filter(d => !d.atHamal).sort((a, b) => Number(a.device) - Number(b.device));
     const msg = `*📻 דוח קשרים - מסייעת 8109* (${fmtTime(Date.now())})\n\n🏠 *בחמ"ל (${atHamal.length}/${r.count}):* ${atHamal.join(", ") || "אין"}\n\n📍 *מחוץ לחמ"ל (${out.length}):*\n` +
       (out.length ? out.map(d => `• קשר ${d.device} - ${d.holder.name} (${d.holder.framework}) - ${missionText(d.mission, d.missionNote)} - מאז ${fmtTime(d.since)}`).join("\n") : "אין");
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(msg), "_blank");
