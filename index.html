@@ -750,14 +750,18 @@
 (function () {
   if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
   const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-  let dismissed = false; try { dismissed = localStorage.getItem("installDismissed") === "1"; } catch (e) {}
-  if (standalone || dismissed) return;
+  // מוצג רק בכניסה הראשונה ואז לכל היותר פעם בשבוע
+  const WEEK = 7 * 24 * 3600 * 1000;
+  let last = 0; try { last = Number(localStorage.getItem("installPromptShownAt") || 0); } catch (e) {}
+  if (standalone || (last && Date.now() - last < WEEK)) return;
+  let marked = false;
+  const markShown = () => { if (marked) return; marked = true; try { localStorage.setItem("installPromptShownAt", String(Date.now())); } catch (e) {} };
   const bar = () => document.getElementById("installBar");
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
   let deferred = null;
   window.addEventListener("beforeinstallprompt", e => {
     e.preventDefault(); deferred = e;
-    const b = bar(); if (b) b.classList.remove("hidden");
+    const b = bar(); if (b) { b.classList.remove("hidden"); markShown(); }
   });
   window.addEventListener("appinstalled", () => { const b = bar(); if (b) b.classList.add("hidden"); });
   document.addEventListener("DOMContentLoaded", () => {
@@ -765,7 +769,7 @@
     if (isIOS) {
       document.getElementById("installHint").textContent = "ב-Safari: לחץ על כפתור השיתוף ⬆️ ואז \"הוסף למסך הבית\"";
       btn.classList.add("hidden");
-      bar().classList.remove("hidden");
+      bar().classList.remove("hidden"); markShown();
     }
     btn.addEventListener("click", async () => {
       if (!deferred) return;
@@ -775,7 +779,6 @@
     });
   });
   window.dismissInstall = function () {
-    try { localStorage.setItem("installDismissed", "1"); } catch (e) {}
     bar().classList.add("hidden");
   };
 })();
@@ -1167,6 +1170,7 @@
 
   async function openScreen(screenKey) {
     hideAllScreens();
+    { const ib = document.getElementById("installBar"); if (ib) ib.classList.add("hidden"); } // הצעת ההתקנה רק בדף הראשי
     currentScreen = screenKey;
     document.getElementById("btnBackToHub").classList.remove("hidden");
     window.scrollTo(0, 0);
