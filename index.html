@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>מסייעת 8109 - פורטל פלוגתי</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="מסייעת 8109">
   <style>
     :root { color-scheme: dark; --primary: #0284c7; --bg: #0f172a; --card: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --success: #16a34a; --danger: #dc2626; --warning: #d97706; }
     * { box-sizing: border-box; }
@@ -13,6 +21,12 @@
     .brand-header img { max-width: 100px; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 6px; border: 1px solid #475569; }
     .brand-title { font-size: 1.45rem; font-weight: 900; letter-spacing: 1px; }
     .brand-line { height: 3px; width: 60px; background: #38bdf8; margin: 6px auto 0; border-radius: 2px; }
+    #installBar { max-width: 560px; margin: 0 auto 14px; background: #082f49; border: 1px solid #38bdf8; border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+    #installBar img { width: 42px; height: 42px; border-radius: 9px; flex: none; }
+    #installBar .ib-txt { flex: 1; font-size: 0.9rem; line-height: 1.35; }
+    #installBar button { margin: 0; width: auto; padding: 8px 14px; flex: none; }
+    #installBar .ib-x { background: transparent; border: none; color: #94a3b8; font-size: 1.1rem; padding: 4px 6px; }
+    @media all and (display-mode: standalone) { body { padding-top: max(14px, env(safe-area-inset-top)); } }
 
     /* פס טעינה עליון */
     #netBar { position: fixed; top: 0; right: 0; left: 0; height: 3px; z-index: 10000; overflow: hidden; opacity: 0; transition: opacity .2s; pointer-events: none; }
@@ -204,6 +218,13 @@
     <img src="https://drive.google.com/thumbnail?id=1Suw_VFwFdSaiBw1-zRJ8sBzTTINynRvm&sz=w600" alt="מסייעת 8109">
     <div class="brand-title">מסייעת 8109</div>
     <div class="brand-line"></div>
+  </div>
+
+  <div id="installBar" class="hidden">
+    <img src="icons/icon-192.png" alt="">
+    <div class="ib-txt"><b>התקן את מסייעת 8109 כאפליקציה</b><br><span id="installHint" style="color:#94a3b8;">אייקון במסך הבית, נפתח במסך מלא</span></div>
+    <button id="installBtn" type="button" style="background:#0284c7;color:#fff;border:none;border-radius:8px;font-weight:bold;">📲 התקן</button>
+    <button class="ib-x" type="button" onclick="dismissInstall()" aria-label="סגור">✕</button>
   </div>
 
   <div id="userProfileBar" class="user-profile-bar hidden">
@@ -724,6 +745,41 @@
     </div>
   </div>
 
+<script>
+// ===== התקנה כאפליקציה (PWA) =====
+(function () {
+  if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  let dismissed = false; try { dismissed = localStorage.getItem("installDismissed") === "1"; } catch (e) {}
+  if (standalone || dismissed) return;
+  const bar = () => document.getElementById("installBar");
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  let deferred = null;
+  window.addEventListener("beforeinstallprompt", e => {
+    e.preventDefault(); deferred = e;
+    const b = bar(); if (b) b.classList.remove("hidden");
+  });
+  window.addEventListener("appinstalled", () => { const b = bar(); if (b) b.classList.add("hidden"); });
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("installBtn");
+    if (isIOS) {
+      document.getElementById("installHint").textContent = "ב-Safari: לחץ על כפתור השיתוף ⬆️ ואז \"הוסף למסך הבית\"";
+      btn.classList.add("hidden");
+      bar().classList.remove("hidden");
+    }
+    btn.addEventListener("click", async () => {
+      if (!deferred) return;
+      deferred.prompt();
+      try { await deferred.userChoice; } catch (e) {}
+      deferred = null; bar().classList.add("hidden");
+    });
+  });
+  window.dismissInstall = function () {
+    try { localStorage.setItem("installDismissed", "1"); } catch (e) {}
+    bar().classList.add("hidden");
+  };
+})();
+</script>
 <script>
   // ==========================================
   // הגדרות
