@@ -1076,6 +1076,7 @@
       { show: true, icon: "📻", title: "קשרים", desc: "חתימה והחזרה של מכשיר קשר", key: "radio" },
       { show: Boolean(perms.attendanceReport), icon: "📋", title: "דיווח נוכחות", desc: perms.attendanceAllCompany ? "כלל הפלוגה" : (perms.allowedAttendanceFrameworks || []).join(", "), key: "attendance" },
       { show: Boolean(perms.maflagReturns), icon: "📦", title: "טופס זיכויים", desc: "זיכוי ציוד ודוחות מפל\"ג", key: "maflag" },
+      { show: Boolean(perms.maflagReturns || perms.adminPanel), icon: "📻", title: "דוח קשרים", desc: "איפה כל מכשירי הקשר ותנועות אחרונות", key: "radio_report" },
       { show: Boolean(perms.reportsCenter), icon: "📊", title: "ממשק דוחות", desc: "דוחות נוכחות ונשקייה לפיקוד", key: "reports" },
       { show: Boolean(perms.shavzakPlatoon && !perms.shavzakOfficers), icon: "🪖", title: "בניית שבצק", desc: `שיבוץ חיילי ${currentUser.framework}`, key: "shavzak_platoon" },
       { show: Boolean(perms.shavzakOfficers), icon: "⭐", title: "שבצק - קצינים", desc: "חלוקת משימות למחלקות ושיבוץ", key: "shavzak_officers" },
@@ -1117,6 +1118,10 @@
     if (screenKey === "shavzak_view") {
       document.getElementById("screenShavzakView").classList.remove("hidden");
       await loadSoldierShavzakTab();
+    } else if (screenKey === "radio_report") {
+      document.getElementById("screenMaflag").classList.remove("hidden");
+      switchMafSubTab("radio");
+      loadMaflagWorkspace();
     } else if (screenKey === "radio") {
       document.getElementById("screenRadio").classList.remove("hidden");
       await loadRadioScreen();
@@ -1128,6 +1133,7 @@
       await loadAttendanceScreen();
     } else if (screenKey === "maflag") {
       document.getElementById("screenMaflag").classList.remove("hidden");
+      switchMafSubTab("card");
       await loadMaflagWorkspace();
     } else if (screenKey === "reports") {
       document.getElementById("screenReports").classList.remove("hidden");
