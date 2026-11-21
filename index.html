@@ -196,6 +196,43 @@
     .shv-slot-empty { border: 1px dashed #64748b; background: #0f172a; cursor: pointer; }
     .shv-slot-empty.armed { border-color: #22c55e; background: #052e16; }
     .shv-slot-warn { color: #fbbf24; font-size: 0.78rem; }
+    /* שבצקון משימה */
+    .sk-missions { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-bottom: 12px; }
+    .sk-mission { padding: 12px 6px; border: 1px solid #334155; border-radius: 10px; background: #0f172a; text-align: center; font-weight: bold; cursor: pointer; user-select: none; }
+    .sk-mission.on { background: #0369a1; border-color: #38bdf8; color: #fff; }
+    .sk-mission small { display: block; font-weight: normal; color: #94a3b8; font-size: 0.72rem; margin-top: 3px; }
+    .sk-mission.on small { color: #e0f2fe; }
+    .sk-step { font-weight: bold; color: #38bdf8; margin: 14px 0 6px; font-size: 0.95rem; }
+    .sk-hint { font-size: 0.8rem; color: #94a3b8; margin: -4px 0 8px; line-height: 1.45; }
+    .sk-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; min-height: 8px; }
+    .sk-chip { background: #1e293b; border: 1px solid #475569; border-radius: 999px; padding: 5px 10px; font-size: 0.88rem; display: inline-flex; gap: 6px; align-items: center; }
+    .sk-chip.lead { border-color: #38bdf8; background: #082f49; }
+    .sk-chip button { background: none; border: none; color: #f87171; cursor: pointer; padding: 0; font-size: 0.95rem; line-height: 1; }
+    .sk-add { display: flex; gap: 6px; }
+    .sk-add input { margin-bottom: 0; }
+    .sk-add button { width: auto; flex: none; margin: 0; padding: 0 14px; }
+    .sk-times { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .sk-times input { min-width: 0; width: 100%; padding: 11px; margin-bottom: 8px; border: 1px solid #475569; border-radius: 8px; background: #0f172a; color: #fff; font-size: 1rem; font-family: inherit; color-scheme: dark; }
+    .sk-eq { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 9px 10px; margin-bottom: 7px; }
+    .sk-eq.missing { border-color: #ef4444; background: #2a0f12; }
+    .sk-eq.ok { border-color: #166534; }
+    .sk-eq-row { display: flex; align-items: center; gap: 8px; }
+    .sk-eq-name { flex: 1; font-weight: bold; }
+    .sk-eq-btn { padding: 7px 10px; border-radius: 8px; border: 1px solid #475569; background: #1e293b; color: #cbd5e1; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+    .sk-eq-btn.ok.on { background: #166534; border-color: #22c55e; color: #fff; }
+    .sk-eq-btn.miss.on { background: #991b1b; border-color: #ef4444; color: #fff; }
+    .sk-eq input { margin: 8px 0 0; padding: 8px; }
+    .sk-shift-pick { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .sk-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 11px 12px; margin-bottom: 9px; }
+    .sk-card.has-missing { border-color: #ef4444; }
+    .sk-card-head { display: flex; justify-content: space-between; gap: 8px; cursor: pointer; }
+    .sk-card-title { font-weight: bold; font-size: 1rem; }
+    .sk-card-sub { color: #94a3b8; font-size: 0.82rem; margin-top: 2px; }
+    .sk-card-body { margin-top: 10px; font-size: 0.9rem; line-height: 1.55; border-top: 1px solid #334155; padding-top: 8px; }
+    .sk-card-body b { color: #7dd3fc; }
+    .sk-eq-badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; font-weight: bold; white-space: nowrap; align-self: flex-start; }
+    .sk-eq-badge.ok { background: #14532d; color: #bbf7d0; }
+    .sk-eq-badge.bad { background: #7f1d1d; color: #fecaca; }
     .btn-trash { background: #7f1d1d; color: #fecaca; border: 1px solid #dc2626; border-radius: 6px; padding: 5px 9px; cursor: pointer; font-size: 0.9rem; }
     .btn-unassigned { background: #334155; color: #cbd5e1; border: 1px solid #64748b; border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 0.78rem; white-space: nowrap; }
     .warning-banner { background: #7f1d1d; border: 1px solid #ef4444; color: #fecaca; padding: 14px; border-radius: 10px; margin-bottom: 14px; font-size: 0.95rem; text-align: center; }
@@ -441,6 +478,66 @@
   </div>
 
   <!-- מסך: קשרים -->
+  <div id="screenShavzakon" class="narrow-wrap hidden">
+    <div class="card">
+      <h2>📋 שבצקון משימה</h2>
+      <div class="btn-tab-container">
+        <div id="tabSkFill" class="btn-tab active" onclick="switchSkTab('fill')">📝 מילוי שבצקון</div>
+        <div id="tabSkList" class="btn-tab" onclick="switchSkTab('list')">📚 שבצקונים</div>
+      </div>
+
+      <div id="skFillSection">
+        <div id="skLoading" class="loading-msg">טוען...</div>
+        <div id="skForm" class="hidden">
+          <div id="skDayInfo" class="sk-hint"></div>
+          <div class="sk-step">1. איזו משימה?</div>
+          <div id="skMissions" class="sk-missions"></div>
+          <div id="skDetails" class="hidden">
+            <div id="skShiftBox" class="hidden">
+              <div class="sk-hint">לפי השבצ"ק של היום. אפשר לבחור משמרת אחרת:</div>
+              <div id="skShifts" class="sk-shift-pick"></div>
+            </div>
+            <div class="sk-step">2. מפקדים</div>
+            <div class="sk-hint">הראשון ברשימה = מפקד המשימה.</div>
+            <div id="skCmdrs" class="sk-chips"></div>
+            <div class="sk-add"><input type="text" id="skAddCmdr" list="skSoldierNames" placeholder="➕ הוספת מפקד..." onkeydown="if(event.key==='Enter'){event.preventDefault();skAddPerson('cmdrs')}"><button type="button" class="btn-mini" onclick="skAddPerson('cmdrs')">הוסף</button></div>
+            <div class="sk-step">3. לוחמים <span id="skSoldiersCount" style="color:#94a3b8;font-weight:normal;"></span></div>
+            <div id="skSoldiers" class="sk-chips"></div>
+            <div class="sk-add"><input type="text" id="skAddSoldier" list="skSoldierNames" placeholder="➕ הוספת לוחם..." onkeydown="if(event.key==='Enter'){event.preventDefault();skAddPerson('soldiers')}"><button type="button" class="btn-mini" onclick="skAddPerson('soldiers')">הוסף</button></div>
+            <datalist id="skSoldierNames"></datalist>
+            <div class="sk-step">4. שעות צפויות</div>
+            <div class="sk-times">
+              <div><label>התחלה</label><input type="time" id="skStart"></div>
+              <div><label>סיום</label><input type="time" id="skEnd"></div>
+            </div>
+            <div class="sk-step">5. מטרות המשימה</div>
+            <textarea id="skGoals" rows="4" maxlength="1500" placeholder="מה המטרות, דגשים, ציר תנועה, נקודות חשובות..."></textarea>
+            <div class="sk-step">6. בדיקת ציוד בכלי / במתקן <span id="skEqCount" style="color:#94a3b8;font-weight:normal;"></span></div>
+            <div id="skEqEmpty" class="sk-hint hidden">לא הוגדר ציוד למשימה הזו.</div>
+            <button type="button" id="skAllOk" class="btn-mini" style="margin-bottom:8px;" onclick="skMarkAllOk()">✅ סמן הכול כקיים</button>
+            <div id="skEquipment"></div>
+            <button type="button" id="btnSkSubmit" class="btn-action btn-success" style="margin-top:12px;" onclick="submitShavzakon(this)">💾 שמירה ושליחה</button>
+          </div>
+        </div>
+        <div id="skDone" class="hidden">
+          <div class="status-box status-ok" style="display:block;">✅ השבצקון נשמר. עכשיו אפשר לשלוח לווטסאפ:</div>
+          <textarea id="skWaText" rows="12"></textarea>
+          <div class="btn-row">
+            <button type="button" class="btn-action btn-wa" onclick="openWaText('skWaText')">📱 וואטסאפ</button>
+            <button type="button" class="btn-action btn-primary" onclick="copyTextArea('skWaText')">📋 העתק</button>
+          </div>
+          <button type="button" class="btn-action" style="background:#334155;margin-top:8px;" onclick="newShavzakon()">📝 שבצקון חדש</button>
+        </div>
+      </div>
+
+      <div id="skListSection" class="hidden">
+        <label>תאריך:</label>
+        <input type="date" id="skListDate" onchange="loadShavzakonList()">
+        <div id="skList"><div class="loading-msg">טוען...</div></div>
+      </div>
+    </div>
+  </div>
+
   <div id="screenRadio" class="narrow-wrap hidden">
     <div class="card">
       <h2>📻 קשרים 624</h2>
@@ -714,6 +811,18 @@
       </div>
       <button type="button" class="btn-action btn-success" style="margin-top:10px;" onclick="saveAdminTasks(this)">💾 שמור משימות</button>
       <div id="tasksStatus" class="status-box"></div>
+    </div>
+
+    <div class="card" style="border-color:#0ea5e9;">
+      <h2>🧰 שבצקון - משימות וציוד</h2>
+      <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:10px;line-height:1.5;">
+        המשימות שמופיעות בשבצקון, ולכל משימה רשימת הציוד שהמפקד בודק בכלי או במתקן (פריט בכל שורה).
+        כשלמשימה יש את אותו שם כמו בשבצ"ק, המערכת מציעה אוטומטית את הצוות והשעות מהשבצ"ק המפורסם.
+      </div>
+      <div id="adminSkList"><div class="loading-msg">טוען...</div></div>
+      <button type="button" class="btn-add-line" onclick="addAdminSkMission()">+ משימה חדשה</button>
+      <button type="button" class="btn-action btn-success" style="margin-top:10px;" onclick="saveAdminSkConfig(this)">💾 שמור משימות וציוד</button>
+      <div id="skCfgStatus" class="status-box"></div>
     </div>
 
     <div class="card">
@@ -1115,7 +1224,7 @@
 
   function hideAllScreens() {
     ["screenLogin", "screenHub", "screenShavzakView", "screenSignatures", "screenAttendance",
-     "screenMaflag", "screenReports", "screenShavzakBuilder", "screenAdmin", "screenRadio"]
+     "screenMaflag", "screenReports", "screenShavzakBuilder", "screenAdmin", "screenRadio", "screenShavzakon"]
       .forEach(id => document.getElementById(id).classList.add("hidden"));
   }
 
@@ -1133,6 +1242,7 @@
       { show: true, icon: "📅", title: "שבצק - צפיה", desc: "משימות היום ומחר ותמונת שבצ\"ק", key: "shavzak_view" },
       { show: true, icon: "✍️", title: "טופס חתימות", desc: "נשקייה ואפסנאות אישית", key: "signatures" },
       { show: true, icon: "📻", title: "קשרים", desc: "חתימה והחזרה של מכשיר קשר", key: "radio" },
+      { show: Boolean(perms.shavzakon || perms.adminPanel), icon: "📋", title: "שבצקון משימה", desc: "תדריך ובדיקת ציוד לפני עלייה למשימה", key: "shavzakon" },
       { show: Boolean(perms.attendanceReport), icon: "📋", title: "דיווח נוכחות", desc: perms.attendanceAllCompany ? "כלל הפלוגה" : (perms.allowedAttendanceFrameworks || []).join(", "), key: "attendance" },
       { show: Boolean(perms.maflagReturns), icon: "📦", title: "טופס זיכויים", desc: "זיכוי ציוד ודוחות מפל\"ג", key: "maflag" },
       { show: Boolean(perms.maflagReturns || perms.adminPanel), icon: "📻", title: "דוח קשרים", desc: "איפה כל מכשירי הקשר ותנועות אחרונות", key: "radio_report" },
@@ -1182,6 +1292,10 @@
       document.getElementById("screenMaflag").classList.remove("hidden");
       switchMafSubTab("radio");
       loadMaflagWorkspace();
+    } else if (screenKey === "shavzakon") {
+      document.getElementById("screenShavzakon").classList.remove("hidden");
+      switchSkTab("fill");
+      await loadShavzakonScreen();
     } else if (screenKey === "radio") {
       document.getElementById("screenRadio").classList.remove("hidden");
       await loadRadioScreen();
@@ -3144,6 +3258,7 @@
     ["uSoldier", "mSoldier", "pSoldier"].forEach(id => fillSelect(id, items));
     onAdmSoldierSelect();
     loadAdminTasks();
+    loadAdminSkConfig();
   }
 
   function syncAdmSubOptions() {
@@ -3297,6 +3412,273 @@
     });
     document.getElementById("crossCheckText").value = rep;
     document.getElementById("crossCheckOut").classList.remove("hidden");
+  }
+
+  // ==========================================
+  // שבצקון משימה
+  // ==========================================
+  let skData = null;     // מה שהשרת החזיר: משימות, הצעות מהשבצ"ק, חיילים
+  let skState = null;    // הטופס הנוכחי
+
+  function switchSkTab(t) {
+    document.getElementById("tabSkFill").classList.toggle("active", t === "fill");
+    document.getElementById("tabSkList").classList.toggle("active", t === "list");
+    document.getElementById("skFillSection").classList.toggle("hidden", t !== "fill");
+    document.getElementById("skListSection").classList.toggle("hidden", t !== "list");
+    if (t === "list") {
+      const d = document.getElementById("skListDate");
+      if (!d.value) { const n = new Date(); if (n.getHours() < 6) n.setDate(n.getDate() - 1); d.value = dateToIso(n); } // יום שבצ"ק מתחיל ב-06:00
+      loadShavzakonList();
+    }
+  }
+
+  async function loadShavzakonScreen() {
+    document.getElementById("skLoading").classList.remove("hidden");
+    document.getElementById("skLoading").textContent = "טוען...";
+    document.getElementById("skForm").classList.add("hidden");
+    document.getElementById("skDone").classList.add("hidden");
+    const res = await apiCall({ action: "shavzakon_init" });
+    if (!isOk(res)) { document.getElementById("skLoading").textContent = "⚠️ " + (res.message || "שגיאה בטעינה"); return; }
+    skData = res;
+    document.getElementById("skLoading").classList.add("hidden");
+    document.getElementById("skForm").classList.remove("hidden");
+    document.getElementById("skDayInfo").textContent = `יום ${res.dayName} ${res.date}` + (res.published ? "" : " · אין עדיין שבצ\"ק מפורסם להיום, ממלאים ידנית");
+    document.getElementById("skSoldierNames").innerHTML = (res.soldiers || []).map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.framework || "")}</option>`).join("");
+    skState = null;
+    document.getElementById("skDetails").classList.add("hidden");
+    renderSkMissions();
+  }
+
+  function newShavzakon() {
+    document.getElementById("skDone").classList.add("hidden");
+    loadShavzakonScreen();
+  }
+
+  function renderSkMissions() {
+    const sug = (skData && skData.suggestions) || {};
+    document.getElementById("skMissions").innerHTML = (skData.missions || []).map((m, i) => {
+      const shifts = sug[m.mission] || [];
+      const sub = shifts.some(x => x.mine) ? "📌 אתה משובץ" : (shifts.length ? `${shifts.length} משמרות בשבצ"ק` : "מילוי ידני");
+      return `<div class="sk-mission ${skState && skState.mission === m.mission ? "on" : ""}" onclick="pickSkMission(${i})">${escapeHtml(m.mission)}<small>${sub}</small></div>`;
+    }).join("");
+  }
+
+  // משמרת ברירת מחדל: שלי ועכשיו/בקרוב, אחרת שלי, אחרת זו שעכשיו, אחרת הבאה
+  function skDefaultShift(shifts) {
+    if (!shifts.length) return -1;
+    const pick = f => shifts.findIndex(f);
+    let i = pick(x => x.mine && (x.current || x.upcoming));
+    if (i < 0) i = pick(x => x.mine);
+    if (i < 0) i = pick(x => x.current);
+    if (i < 0) i = pick(x => x.upcoming);
+    return i < 0 ? 0 : i;
+  }
+
+  function pickSkMission(i) {
+    const m = skData.missions[i];
+    const shifts = (skData.suggestions || {})[m.mission] || [];
+    skState = { mission: m.mission, equipment: m.equipment.map(item => ({ item, status: "", note: "" })), shifts, shiftIdx: -1, cmdrs: [], soldiers: [] };
+    applySkShift(skDefaultShift(shifts));
+    document.getElementById("skGoals").value = "";
+    renderSkMissions();
+    document.getElementById("skDetails").classList.remove("hidden");
+    renderSkEquipment();
+  }
+
+  function applySkShift(idx) {
+    skState.shiftIdx = idx;
+    const sh = skState.shifts[idx];
+    if (sh) {
+      // מפקד המשימה: אני, אם אני ברשימת המפקדים; אחרת הסדר של השבצ"ק
+      const me = currentUser && currentUser.name;
+      const c = sh.cmdrs.slice();
+      if (me && c.includes(me)) { c.splice(c.indexOf(me), 1); c.unshift(me); }
+      skState.cmdrs = c;
+      skState.soldiers = sh.soldiers.slice();
+      document.getElementById("skStart").value = sh.start || "";
+      document.getElementById("skEnd").value = sh.end || "";
+    } else {
+      skState.cmdrs = currentUser && currentUser.name ? [currentUser.name] : [];
+      skState.soldiers = [];
+      document.getElementById("skStart").value = "";
+      document.getElementById("skEnd").value = "";
+    }
+    const box = document.getElementById("skShiftBox");
+    box.classList.toggle("hidden", skState.shifts.length < 2);
+    document.getElementById("skShifts").innerHTML = skState.shifts.map((x, k) =>
+      `<span class="day-chip ${k === idx ? "on" : ""}" onclick="applySkShift(${k})">${escapeHtml(x.hoursLabel)}${x.mine ? " 📌" : ""}</span>`).join("");
+    renderSkPeople();
+  }
+
+  function renderSkPeople() {
+    const chip = (list, key, i, lead) => `<span class="sk-chip ${lead ? "lead" : ""}">${lead ? "⭐ " : ""}${escapeHtml(list[i])}<button type="button" title="הסר" onclick="skRemovePerson('${key}',${i})">✕</button></span>`;
+    document.getElementById("skCmdrs").innerHTML = skState.cmdrs.map((n, i) => chip(skState.cmdrs, "cmdrs", i, i === 0)).join("") ||
+      '<span class="sk-hint" style="margin:0;">אין מפקד - הוסף למטה</span>';
+    document.getElementById("skSoldiers").innerHTML = skState.soldiers.map((n, i) => chip(skState.soldiers, "soldiers", i, false)).join("") ||
+      '<span class="sk-hint" style="margin:0;">אין לוחמים - הוסף למטה</span>';
+    document.getElementById("skSoldiersCount").textContent = skState.soldiers.length ? `(${skState.soldiers.length})` : "";
+  }
+
+  function skAddPerson(key) {
+    const input = document.getElementById(key === "cmdrs" ? "skAddCmdr" : "skAddSoldier");
+    const name = input.value.trim().replace(/\s+/g, " ");
+    if (!name) return;
+    if (skState.cmdrs.includes(name) || skState.soldiers.includes(name)) { toast(`${name} כבר ברשימה`, "err"); return; }
+    skState[key].push(name);
+    input.value = "";
+    renderSkPeople();
+  }
+
+  function skRemovePerson(key, i) { skState[key].splice(i, 1); renderSkPeople(); }
+
+  function renderSkEquipment() {
+    const eq = skState.equipment;
+    document.getElementById("skEqEmpty").classList.toggle("hidden", eq.length > 0);
+    document.getElementById("skAllOk").classList.toggle("hidden", eq.length === 0);
+    const done = eq.filter(e => e.status).length, miss = eq.filter(e => e.status === "missing").length;
+    document.getElementById("skEqCount").textContent = eq.length ? `(${done}/${eq.length} נבדקו${miss ? ` · ${miss} חסר` : ""})` : "";
+    document.getElementById("skEquipment").innerHTML = eq.map((e, i) => `<div class="sk-eq ${e.status === "ok" ? "ok" : e.status === "missing" ? "missing" : ""}">
+      <div class="sk-eq-row">
+        <span class="sk-eq-name">${escapeHtml(e.item)}</span>
+        <button type="button" class="sk-eq-btn ok ${e.status === "ok" ? "on" : ""}" onclick="skSetEq(${i},'ok')">✅ קיים</button>
+        <button type="button" class="sk-eq-btn miss ${e.status === "missing" ? "on" : ""}" onclick="skSetEq(${i},'missing')">❌ חסר</button>
+      </div>
+      ${e.status === "missing" ? `<input type="text" maxlength="200" placeholder="הערה (לא חובה): מה חסר / תקול..." value="${escapeHtml(e.note)}" oninput="skState.equipment[${i}].note=this.value">` : ""}
+    </div>`).join("");
+  }
+
+  function skSetEq(i, st) {
+    const e = skState.equipment[i];
+    e.status = e.status === st ? "" : st;
+    if (e.status !== "missing") e.note = "";
+    renderSkEquipment();
+  }
+
+  function skMarkAllOk() {
+    skState.equipment.forEach(e => { if (!e.status) e.status = "ok"; });
+    renderSkEquipment();
+  }
+
+  function skFmtTs(ts) {
+    if (!ts) return "";
+    const d = new Date(ts);
+    return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  }
+
+  function skWaMessage(e) {
+    const lines = [];
+    lines.push(`*📋 שבצקון משימה - ${e.mission}*`);
+    lines.push(`📅 ${e.date} | 🕐 ${e.hours}`);
+    lines.push("");
+    lines.push(`⭐ *מפקד המשימה:* ${e.cmdrs[0] || "-"}`);
+    if (e.cmdrs.length > 1) lines.push(`🎖️ *מפקדים נוספים:* ${e.cmdrs.slice(1).join(", ")}`);
+    lines.push(`🪖 *לוחמים (${e.soldiers.length}):* ${e.soldiers.join(", ") || "-"}`);
+    lines.push("");
+    lines.push(`🎯 *מטרות המשימה:*`);
+    lines.push(e.goals);
+    lines.push("");
+    if (e.checks.length) {
+      const miss = e.checks.filter(c => !c.ok);
+      lines.push(miss.length ? `🧰 *ציוד:* ${e.checks.length - miss.length}/${e.checks.length} קיים ⚠️` : `🧰 *ציוד:* כל ${e.checks.length} הפריטים קיימים ✅`);
+      miss.forEach(c => lines.push(`❌ ${c.item}${c.note ? ` - ${c.note}` : ""}`));
+    } else lines.push("🧰 *ציוד:* לא הוגדר ציוד למשימה");
+    lines.push("");
+    lines.push(`✍️ מילא: ${e.by}${e.ts ? ` | ${skFmtTs(e.ts)}` : ""}`);
+    return lines.join("\n");
+  }
+
+  async function submitShavzakon(btn) {
+    if (!skState) { toast("בחר משימה", "err"); return; }
+    const start = document.getElementById("skStart").value, end = document.getElementById("skEnd").value;
+    const goals = document.getElementById("skGoals").value.trim();
+    const unmarked = skState.equipment.filter(e => !e.status);
+    if (!skState.cmdrs.length) { toast("יש להוסיף לפחות מפקד אחד", "err"); return; }
+    if (!start || !end) { toast("יש למלא שעת התחלה וסיום", "err"); return; }
+    if (!goals) { toast("יש למלא את מטרות המשימה", "err"); document.getElementById("skGoals").focus(); return; }
+    if (unmarked.length) { toast(`נשארו ${unmarked.length} פריטי ציוד לא מסומנים`, "err"); return; }
+    setBtnBusy(btn, true, "שומר...");
+    const res = await apiCall({ action: "shavzakon_submit", mission: skState.mission, cmdrs: skState.cmdrs, soldiers: skState.soldiers, start, end, goals,
+      equipment: skState.equipment.map(e => ({ item: e.item, status: e.status, note: e.note })) });
+    setBtnBusy(btn, false);
+    if (!isOk(res)) { toast(res.message || "שגיאה בשמירה", "err"); return; }
+    document.getElementById("skWaText").value = skWaMessage(res.entry);
+    document.getElementById("skForm").classList.add("hidden");
+    document.getElementById("skDone").classList.remove("hidden");
+    window.scrollTo(0, 0);
+    toast("השבצקון נשמר ✓", "ok");
+  }
+
+  let skListEntries = [];
+  async function loadShavzakonList() {
+    const box = document.getElementById("skList");
+    box.innerHTML = '<div class="loading-msg">טוען...</div>';
+    const iso = document.getElementById("skListDate").value;
+    const res = await apiCall({ action: "shavzakon_list", date: iso || "" });
+    if (!isOk(res)) { box.innerHTML = `<div style="color:#fca5a5;">${escapeHtml(res.message || "שגיאה")}</div>`; return; }
+    skListEntries = res.entries || [];
+    if (!skListEntries.length) { box.innerHTML = '<div class="item-box" style="text-align:center;color:#94a3b8;">אין שבצקונים בתאריך הזה.</div>'; return; }
+    box.innerHTML = skListEntries.map((e, i) => `<div class="sk-card ${e.missingCount ? "has-missing" : ""}">
+      <div class="sk-card-head" onclick="this.nextElementSibling.classList.toggle('hidden')">
+        <div>
+          <div class="sk-card-title">${escapeHtml(e.mission)} · ${escapeHtml(e.hours)}</div>
+          <div class="sk-card-sub">⭐ ${escapeHtml(e.cmdrs[0] || "-")} · 🪖 ${e.soldiers.length} לוחמים · ✍️ ${escapeHtml(e.by)} ${escapeHtml(skFmtTs(e.ts))}</div>
+        </div>
+        <span class="sk-eq-badge ${e.missingCount ? "bad" : "ok"}">${e.checks.length ? (e.missingCount ? `❌ חסר ${e.missingCount}` : "✅ ציוד תקין") : "ללא ציוד"}</span>
+      </div>
+      <div class="sk-card-body hidden">
+        ${e.cmdrs.length > 1 ? `<div><b>מפקדים נוספים:</b> ${escapeHtml(e.cmdrs.slice(1).join(", "))}</div>` : ""}
+        <div><b>לוחמים:</b> ${escapeHtml(e.soldiers.join(", ") || "-")}</div>
+        <div style="margin-top:6px;"><b>מטרות:</b><div style="white-space:pre-wrap;">${escapeHtml(e.goals)}</div></div>
+        ${e.checks.length ? `<div style="margin-top:6px;"><b>ציוד:</b> ${e.checks.map(c => `${c.ok ? "✅" : "❌"} ${escapeHtml(c.item)}${c.note ? ` (${escapeHtml(c.note)})` : ""}`).join(" · ")}</div>` : ""}
+        <button type="button" class="btn-action btn-wa" style="margin-top:10px;" onclick="shareSkEntry(${i})">📱 שליחה לווטסאפ</button>
+      </div>
+    </div>`).join("");
+  }
+
+  function shareSkEntry(i) {
+    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(skWaMessage(skListEntries[i])), "_blank");
+  }
+
+  // --- אדמין: משימות וציוד לשבצקון ---
+  let adminSk = [];
+  async function loadAdminSkConfig() {
+    const res = await apiCall({ action: "shavzakon_get_config" });
+    if (!isOk(res)) { document.getElementById("adminSkList").innerHTML = `<div style="color:#fca5a5;">${escapeHtml(res.message)}</div>`; return; }
+    adminSk = (res.missions || []).map(m => ({ mission: m.mission, text: m.equipment.join("\n") }));
+    renderAdminSk();
+  }
+
+  function renderAdminSk() {
+    document.getElementById("adminSkList").innerHTML = adminSk.map((m, i) => `<div class="task-edit">
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input type="text" value="${escapeHtml(m.mission)}" placeholder="שם המשימה" style="font-weight:bold;" oninput="adminSk[${i}].mission=this.value">
+        <button type="button" class="btn-trash" title="מחק" style="margin-bottom:8px;" onclick="deleteAdminSkMission(${i})">🗑️</button>
+      </div>
+      <label style="font-size:0.78rem;margin:0 0 3px;">ציוד נדרש (פריט בכל שורה):</label>
+      <textarea rows="4" style="margin-bottom:0;" oninput="adminSk[${i}].text=this.value">${escapeHtml(m.text)}</textarea>
+    </div>`).join("") || '<div style="color:#94a3b8;text-align:center;padding:10px;">אין משימות.</div>';
+  }
+
+  function addAdminSkMission() {
+    adminSk.push({ mission: "משימה חדשה", text: "" });
+    renderAdminSk();
+    const items = document.querySelectorAll("#adminSkList .task-edit");
+    if (items.length) items[items.length - 1].scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function deleteAdminSkMission(i) {
+    confirmModal("מחיקת משימה", `למחוק את "${adminSk[i].mission}" מהשבצקון? (יחול אחרי שמירה)`, "מחק", () => { adminSk.splice(i, 1); renderAdminSk(); });
+  }
+
+  async function saveAdminSkConfig(btn) {
+    const missions = adminSk.map(m => ({ mission: m.mission.trim(), equipment: m.text.split("\n").map(x => x.trim()).filter(Boolean) })).filter(m => m.mission);
+    const names = missions.map(m => m.mission);
+    if (new Set(names).size !== names.length) { showBox("skCfgStatus", "יש שתי משימות עם אותו שם", false); return; }
+    setBtnBusy(btn, true, "שומר...");
+    const res = await apiCall({ action: "shavzakon_save_config", missions });
+    setBtnBusy(btn, false);
+    showBox("skCfgStatus", res.message || (isOk(res) ? "נשמר" : "שגיאה"), isOk(res));
+    if (isOk(res)) { adminSk = res.missions.map(m => ({ mission: m.mission, text: m.equipment.join("\n") })); renderAdminSk(); }
   }
 
   function openWaText(areaId) { window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(document.getElementById(areaId).value), "_blank"); }
