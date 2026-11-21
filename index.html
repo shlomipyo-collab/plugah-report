@@ -134,6 +134,13 @@
     .skel-table th { background: #0f172a; color: #38bdf8; position: sticky; top: 0; }
     .skel-table td.lbl { text-align: right; color: #cbd5e1; font-size: 0.8rem; }
     .skel-table tr.task-head td { background: #172554; color: #fff; font-weight: bold; }
+    .skel-time { width: 104px; padding: 4px 3px; margin: 2px 0; border: 1px solid #475569; border-radius: 6px; background: #0f172a; color: #fff; font-size: 0.8rem; color-scheme: dark; }
+    .skel-flex-add { font-size: 0.72rem; padding: 3px 7px; border-radius: 6px; border: 1px dashed #38bdf8; background: transparent; color: #7dd3fc; cursor: pointer; margin-right: 6px; font-weight: bold; }
+    .skel-flex-del { background: none; border: none; color: #f87171; cursor: pointer; font-size: 0.85rem; padding: 0 2px; }
+    .flex-tools { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: -4px 0 10px; }
+    .flex-tools input[type="time"] { width: 110px; padding: 6px; margin: 0; border: 1px solid #475569; border-radius: 6px; background: #0f172a; color: #fff; color-scheme: dark; }
+    .sk-qty { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #cbd5e1; }
+    .sk-qty input { width: 74px; margin: 0; padding: 7px; text-align: center; font-weight: bold; }
     .skel-cell { cursor: pointer; min-width: 44px; color: #475569; font-size: 1rem; }
     .skel-cell:hover { background: #1e3a8a; }
     .skel-cell.on { background: #0369a1; color: #fff; font-weight: bold; }
@@ -817,6 +824,7 @@
       <h2>🧰 שבצקון - משימות וציוד</h2>
       <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:10px;line-height:1.5;">
         המשימות שמופיעות בשבצקון, ולכל משימה רשימת הציוד שהמפקד בודק בכלי או במתקן (פריט בכל שורה).
+        לפריט שצריך לספור, כותבים אחרי השם קו ישר וכמות - למשל <b>מחסניות | 12</b> - והמפקד ירשום כמה יש בפועל.
         כשלמשימה יש את אותו שם כמו בשבצ"ק, המערכת מציעה אוטומטית את הצוות והשעות מהשבצ"ק המפורסם.
       </div>
       <div id="adminSkList"><div class="loading-msg">טוען...</div></div>
@@ -1814,6 +1822,20 @@
     const res = await apiCall({ action: "shavzak_get_tasks", targetDate: document.getElementById("shvTargetDate").value.trim() });
     if (!isOk(res)) { listDiv.innerHTML = `<div class="status-box status-err" style="display:block;">${escapeHtml(res.message)}</div>`; return; }
     shvSkeletonShifts = res.shifts || [];
+    // משימות עם שעות גמישות (כמו כיתת כוננות): אם כבר יש חלוקה שמורה, או חלוקה מהשבוע שעבר - לוקחים ממנה את המשמרות והשעות
+    const flexTasks = Array.from(new Set(shvSkeletonShifts.filter(x => x.flexible).map(x => x.taskName)));
+    flexTasks.forEach(task => {
+      const tmpl = shvSkeletonShifts.find(x => x.taskName === task);
+      let src = existingRows.filter(r => r.taskName === task).map(r => ({ hoursLabel: r.hoursLabel, platoon: r.platoon, shiftNumber: r.shiftNumber }));
+      if (!src.length && !existingRows.length && res.prefill && res.prefill.flexRows) src = res.prefill.flexRows.filter(r => r.taskName === task).map((r, k) => Object.assign({ shiftNumber: k + 1 }, r));
+      if (!src.length) return;
+      src.sort((a, b) => ((shiftRange(a.hoursLabel) || { s: 0 }).s) - ((shiftRange(b.hoursLabel) || { s: 0 }).s));
+      const pos = shvSkeletonShifts.findIndex(x => x.taskName === task);
+      const repl = src.map(r => ({ shiftKey: `${task}__${r.shiftNumber}`, taskName: task, shiftNumber: r.shiftNumber, totalShifts: src.length,
+        hoursLabel: r.hoursLabel, reqCmdrs: tmpl.reqCmdrs, reqSoldiers: tmpl.reqSoldiers, flexible: true, presetPlatoon: r.platoon }));
+      shvSkeletonShifts = shvSkeletonShifts.filter(x => x.taskName !== task);
+      shvSkeletonShifts.splice(pos, 0, ...repl);
+    });
     if (!shvSkeletonShifts.length) {
       listDiv.innerHTML = `<div class="status-box status-err" style="display:block;">אין משימות מוגדרות ל${escapeHtml(res.dayName || "יום זה")}. ניתן להגדיר משימות בממשק האדמין ← ניהול משימות.</div>`;
       return;
@@ -1822,7 +1844,7 @@
     existingRows.forEach(r => { existingMap[`${r.taskName}__${r.shiftNumber}`] = r.platoon; });
     const prefillMap = (res.prefill && res.prefill.map) || {};
     const usedPrefill = !existingRows.length && res.prefill;
-    shvSkelPlatoons = shvSkeletonShifts.map(sh => existingMap[sh.shiftKey] || (!existingRows.length && prefillMap[sh.shiftKey]) || "מחלקה 1");
+    shvSkelPlatoons = shvSkeletonShifts.map(sh => sh.presetPlatoon || existingMap[sh.shiftKey] || (!existingRows.length && prefillMap[sh.shiftKey]) || "מחלקה 1");
 
     let note = `📆 תבנית משימות ל${escapeHtml(res.dayName || "")} (${shvSkeletonShifts.length} משמרות).`;
     if (usedPrefill) note += ` <span style="color:#fde68a;">מולא מראש לפי החלוקה של ${escapeHtml(res.prefill.sourceDay)} ${escapeHtml(res.prefill.sourceDate)} - שנה רק מה שצריך.</span>`;
@@ -1837,13 +1859,21 @@
     shvSkeletonShifts.forEach(sh => { if (!tasksOrder.includes(sh.taskName)) tasksOrder.push(sh.taskName); });
     let html = `<div style="font-size:0.85rem;color:#7dd3fc;margin-bottom:10px;">${listDiv.dataset.note || ""}</div>
       <div style="font-size:0.78rem;color:#94a3b8;margin-bottom:8px;">לחץ על התא של המחלקה כדי לשייך אליה את המשמרת. "כולן" משייך את כל המשמרות של המשימה.</div>
+      ${shvSkeletonShifts.some(x => x.flexible) ? `<div style="font-size:0.78rem;color:#fde68a;margin-bottom:8px;">⏱️ במשימות עם שעות גמישות (${escapeHtml(Array.from(new Set(shvSkeletonShifts.filter(x => x.flexible).map(x => x.taskName))).join(", "))}) קובעים את השעות של כל משמרת ומוסיפים משמרות לפי הצורך - למשל משמרת לכל מחלקה. המפקדים יוכלו לפצל אותן לפי שעות בשיבוץ.</div>` : ""}
       <div style="overflow-x:auto;"><table class="skel-table"><thead><tr><th style="text-align:right;">משימה / משמרת</th>${SHAVZAK_PLATOONS.map(p => `<th>${escapeHtml(PLATOON_SHORT[p] || p)}</th>`).join("")}</tr></thead><tbody>`;
     tasksOrder.forEach(task => {
       const shifts = shvSkeletonShifts.map((sh, idx) => ({ sh, idx })).filter(x => x.sh.taskName === task);
-      html += `<tr class="task-head"><td style="text-align:right;">${escapeHtml(task)}</td>` +
+      const isFlex = shifts.some(x => x.sh.flexible);
+      html += `<tr class="task-head"><td style="text-align:right;">${escapeHtml(task)}${isFlex ? ` <button type="button" class="skel-flex-add" data-task="${escapeHtml(task)}" onclick="addSkelShift(this.dataset.task)">+ משמרת</button>` : ""}</td>` +
         SHAVZAK_PLATOONS.map(p => `<td>${shifts.length > 1 ? `<span class="skel-all" data-task="${escapeHtml(task)}" data-p="${escapeHtml(p)}" onclick="setSkelTask(this.dataset.task, this.dataset.p)">כולן</span>` : ""}</td>`).join("") + `</tr>`;
       shifts.forEach(({ sh, idx }) => {
-        html += `<tr><td class="lbl">${hrs(sh.hoursLabel)}<br><span style="color:#64748b;">${sh.reqCmdrs ? sh.reqCmdrs + " מפק' + " : ""}${sh.reqSoldiers} חי'</span></td>` +
+        const lbl = sh.flexible
+          ? (() => { const m = String(sh.hoursLabel).match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/) || ["", "06:00", "06:00"];
+              return `<div style="display:flex;align-items:center;gap:2px;flex-wrap:wrap;direction:ltr;justify-content:flex-end;">
+                <input type="time" class="skel-time" value="${m[1].padStart(5, "0")}" onchange="setSkelHours(${idx}, 0, this.value)">–<input type="time" class="skel-time" value="${m[2].padStart(5, "0")}" onchange="setSkelHours(${idx}, 1, this.value)">
+                ${shifts.length > 1 ? `<button type="button" class="skel-flex-del" title="מחק משמרת" onclick="delSkelShift(${idx})">🗑️</button>` : ""}</div>`; })()
+          : hrs(sh.hoursLabel);
+        html += `<tr><td class="lbl">${lbl}<br><span style="color:#64748b;">${sh.reqCmdrs ? sh.reqCmdrs + " מפק' + " : ""}${sh.reqSoldiers} חי'</span></td>` +
           SHAVZAK_PLATOONS.map(p => `<td class="skel-cell ${shvSkelPlatoons[idx] === p ? "on" : ""}" data-i="${idx}" data-p="${escapeHtml(p)}" onclick="setSkel(${idx}, this.dataset.p)">${shvSkelPlatoons[idx] === p ? "✓" : "·"}</td>`).join("") + `</tr>`;
       });
     });
@@ -1853,6 +1883,41 @@
   }
 
   function setSkel(idx, p) { shvSkelPlatoons[idx] = p; renderSkeletonTable(); }
+
+  // שעות גמישות: שינוי שעות, הוספה ומחיקה של משמרות
+  function setSkelHours(idx, which, val) {
+    if (!/^\d{1,2}:\d{2}$/.test(val)) return;
+    const sh = shvSkeletonShifts[idx];
+    const m = String(sh.hoursLabel).match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/) || ["", "06:00", "06:00"];
+    const parts = [m[1].padStart(5, "0"), m[2].padStart(5, "0")];
+    parts[which] = val;
+    sh.hoursLabel = `${parts[0]} - ${parts[1]}`;
+  }
+
+  function addSkelShift(task) {
+    const idxs = shvSkeletonShifts.map((x, i) => x.taskName === task ? i : -1).filter(i => i >= 0);
+    const last = shvSkeletonShifts[idxs[idxs.length - 1]];
+    const m = String(last.hoursLabel).match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/) || ["", "06:00", "06:00"];
+    const first = String(shvSkeletonShifts[idxs[0]].hoursLabel).match(/(\d{1,2}:\d{2})/);
+    // ברירת מחדל: ממשיכה מסוף המשמרת האחרונה. אם היממה כבר מכוסה - אותן שעות כמו האחרונה (משמרת מקבילה למחלקה אחרת)
+    const wraps = first && first[1].padStart(5, "0") === m[2].padStart(5, "0");
+    const start = wraps ? m[1].padStart(5, "0") : m[2].padStart(5, "0");
+    const endMin = (timeToMinutes(start) + 360) % 1440;
+    const end = wraps ? m[2].padStart(5, "0") : `${String(Math.floor(endMin / 60)).padStart(2, "0")}:${String(endMin % 60).padStart(2, "0")}`;
+    const num = Math.max(...idxs.map(i => shvSkeletonShifts[i].shiftNumber)) + 1;
+    const lastP = shvSkelPlatoons[idxs[idxs.length - 1]];
+    const nextP = SHAVZAK_PLATOONS[(SHAVZAK_PLATOONS.indexOf(lastP) + 1) % SHAVZAK_PLATOONS.length] || lastP;
+    const at = idxs[idxs.length - 1] + 1;
+    shvSkeletonShifts.splice(at, 0, Object.assign({}, last, { shiftKey: `${task}__${num}`, shiftNumber: num, hoursLabel: `${start} - ${end}`, presetPlatoon: null }));
+    shvSkelPlatoons.splice(at, 0, nextP);
+    renderSkeletonTable();
+  }
+
+  function delSkelShift(idx) {
+    shvSkeletonShifts.splice(idx, 1);
+    shvSkelPlatoons.splice(idx, 1);
+    renderSkeletonTable();
+  }
   function setSkelTask(task, p) {
     shvSkeletonShifts.forEach((sh, idx) => { if (sh.taskName === task) shvSkelPlatoons[idx] = p; });
     renderSkeletonTable();
@@ -1861,6 +1926,8 @@
   async function saveOfficerSkeleton() {
     const targetDate = document.getElementById("shvTargetDate").value.trim();
     if (!targetDate) { toast("נא להזין תאריך", "err"); return; }
+    const badFlex = shvSkeletonShifts.find(sh => { const r = shiftRange(sh.hoursLabel); return !r || r.e - r.s < 15; });
+    if (badFlex) { toast(`שעות לא תקינות ב${badFlex.taskName} (${badFlex.hoursLabel})`, "err"); return; }
     const assignments = shvSkeletonShifts.map((sh, idx) => ({
       taskName: sh.taskName, shiftNumber: sh.shiftNumber, hoursLabel: sh.hoursLabel,
       reqCmdrs: sh.reqCmdrs, reqSoldiers: sh.reqSoldiers, platoon: shvSkelPlatoons[idx]
@@ -2146,15 +2213,58 @@
       const slots = r.cmdrSlots.map((sl, i) => slotRowHtml(r, rIdx, "cmdr", i, sl, conflict)).join("") +
                     r.soldierSlots.map((sl, i) => slotRowHtml(r, rIdx, "soldier", i, sl, conflict)).join("");
       const issHtml = iss && iss.problems.some(p => p.type !== "empty") ? `<div class="row-issues">${iss.problems.filter(p => p.type !== "empty").map(p => "• " + escapeHtml(p.text)).join("<br>")}</div>` : "";
+      const flexTools = flexToolsHtml(r, rIdx);
       return `<div class="shv-shift-card ${r.dirty ? "dirty" : ""}" data-r="${rIdx}">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
           <div><span style="font-weight:bold;font-size:1.08rem;color:#38bdf8;">${escapeHtml(r.taskName)}</span>
           <span style="color:#cbd5e1;font-size:0.9rem;"> (משמרת ${r.shiftNumber})</span>${r.canEdit ? "" : ' <span style="font-size:0.75rem;color:#94a3b8;">🔒</span>'}</div>
           ${header}
-        </div>${issHtml}
+        </div>${flexTools}${issHtml}
         ${slots || '<div style="color:#64748b;font-size:0.85rem;">אין דרישת כוח אדם למשמרת זו.</div>'}
       </div>`;
     }).join("");
+  }
+
+  // פיצול / איחוד משמרות במשימה עם שעות גמישות (למשל כיתת כוננות)
+  let shvSplitOpen = -1;
+  function shvPrevAdjacent(r) {
+    return shvState.rows.findIndex(o => o !== r && o.taskName === r.taskName && o.platoon === r.platoon && o.range && r.range && o.range.e === r.range.s);
+  }
+  function flexToolsHtml(r, rIdx) {
+    if (!r.flexible || !r.canEdit || (shvState.viewMode === "platoon" && !r.isMyPlatoon)) return "";
+    if (shvSplitOpen === rIdx) {
+      const mid = r.range ? Math.round((r.range.s + r.range.e) / 2 / 30) * 30 : 720;
+      const v = `${String(Math.floor(mid / 60) % 24).padStart(2, "0")}:${String(mid % 60).padStart(2, "0")}`;
+      return `<div class="flex-tools"><span style="font-size:0.85rem;">✂️ לפצל בשעה:</span><input type="time" id="shvSplitAt" value="${v}">
+        <button type="button" class="btn-mini home" onclick="doSplitShvShift(${rIdx})">פצל</button><button type="button" class="btn-mini" onclick="shvSplitOpen=-1;renderShavzakBoard()">ביטול</button></div>`;
+    }
+    const canMerge = shvPrevAdjacent(r) !== -1;
+    return `<div class="flex-tools"><button type="button" class="btn-mini" onclick="openSplitShvShift(${rIdx})">✂️ פיצול לפי שעות</button>${canMerge ? `<button type="button" class="btn-mini" onclick="mergeShvShift(${rIdx})">🔗 איחוד עם המשמרת הקודמת</button>` : ""}</div>`;
+  }
+  function openSplitShvShift(rIdx) {
+    if (hasUnsavedShavzak()) { toast("יש שינויים שלא נשמרו - שמור טיוטה לפני פיצול", "err"); return; }
+    shvSplitOpen = rIdx; renderShavzakBoard();
+  }
+  async function doSplitShvShift(rIdx) {
+    const r = shvState.rows[rIdx];
+    const at = document.getElementById("shvSplitAt").value;
+    if (!at) { toast("בחר שעה", "err"); return; }
+    const res = await apiCall({ action: "shavzak_split_shift", viewMode: shvState.viewMode, targetDate: document.getElementById("shvTargetDate").value.trim(), taskName: r.taskName, shiftNumber: r.shiftNumber, splitAt: at });
+    if (!isOk(res)) { toast(res.message || "שגיאה", "err"); return; }
+    shvSplitOpen = -1;
+    toast(res.message, "ok");
+    await loadShavzakWorkspace();
+  }
+  function mergeShvShift(rIdx) {
+    if (hasUnsavedShavzak()) { toast("יש שינויים שלא נשמרו - שמור טיוטה קודם", "err"); return; }
+    const r = shvState.rows[rIdx];
+    const prev = shvState.rows[shvPrevAdjacent(r)];
+    confirmModal("איחוד משמרות", `לאחד את ${r.hoursLabel} עם ${prev.hoursLabel}? המשובצים במשמרת ${r.hoursLabel} יוסרו, והמשובצים במשמרת הקודמת יישארו לכל הזמן המאוחד.`, "אחד", async () => {
+      const res = await apiCall({ action: "shavzak_merge_shift", viewMode: shvState.viewMode, targetDate: document.getElementById("shvTargetDate").value.trim(), taskName: r.taskName, shiftNumber: r.shiftNumber });
+      if (!isOk(res)) { toast(res.message || "שגיאה", "err"); return; }
+      toast(res.message, "ok");
+      await loadShavzakWorkspace();
+    });
   }
 
   function editableRowsForProgress() {
@@ -3316,6 +3426,7 @@
         <div><label>ימים: <span style="color:#c4b5fd;">${escapeHtml(daysLabel(t.days))}</span></label></div>
       </div>
       <div class="day-chips">${DAY_SHORT.map((d, di) => `<span class="day-chip ${t.days.indexOf(di) !== -1 ? "on" : ""}" onclick="toggleTaskDay(${i},${di})">${d}</span>`).join("")}</div>
+      <label class="checkbox-row" style="margin:8px 0 0;font-size:0.82rem;color:#fde68a;"><input type="checkbox" ${t.flexible ? "checked" : ""} onchange="adminTasks[${i}].flexible=this.checked"> ⏱️ שעות גמישות - הקצינים קובעים שעות לכל מחלקה, והמפקדים יכולים לפצל</label>
     </div>`).join("");
   }
 
@@ -3358,7 +3469,8 @@
     }
     await adminAction(btn, "tasksStatus", { action: "admin_save_tasks", tasks: adminTasks.map(t => ({
       taskName: cleanHebrewText(t.taskName), startStr: t.startStr, endStr: t.endStr,
-      numShifts: parseInt(t.numShifts, 10), reqCmdrs: parseInt(t.reqCmdrs, 10) || 0, reqSoldiers: parseInt(t.reqSoldiers, 10) || 0, days: t.days
+      numShifts: parseInt(t.numShifts, 10), reqCmdrs: parseInt(t.reqCmdrs, 10) || 0, reqSoldiers: parseInt(t.reqSoldiers, 10) || 0, days: t.days,
+      flexible: Boolean(t.flexible)
     })) }, false);
   }
 
@@ -3477,7 +3589,7 @@
   function pickSkMission(i) {
     const m = skData.missions[i];
     const shifts = (skData.suggestions || {})[m.mission] || [];
-    skState = { mission: m.mission, equipment: m.equipment.map(item => ({ item, status: "", note: "" })), shifts, shiftIdx: -1, cmdrs: [], soldiers: [] };
+    skState = { mission: m.mission, equipment: m.equipment.map(e => ({ item: e.item, qty: e.qty || 0, status: "", note: "", count: "" })), shifts, shiftIdx: -1, cmdrs: [], soldiers: [] };
     applySkShift(skDefaultShift(shifts));
     document.getElementById("skGoals").value = "";
     renderSkMissions();
@@ -3537,11 +3649,13 @@
     document.getElementById("skAllOk").classList.toggle("hidden", eq.length === 0);
     const done = eq.filter(e => e.status).length, miss = eq.filter(e => e.status === "missing").length;
     document.getElementById("skEqCount").textContent = eq.length ? `(${done}/${eq.length} נבדקו${miss ? ` · ${miss} חסר` : ""})` : "";
-    document.getElementById("skEquipment").innerHTML = eq.map((e, i) => `<div class="sk-eq ${e.status === "ok" ? "ok" : e.status === "missing" ? "missing" : ""}">
+    document.getElementById("skEquipment").innerHTML = eq.map((e, i) => `<div class="sk-eq ${e.status === "ok" ? "ok" : e.status === "missing" ? "missing" : ""}" id="skEq${i}">
       <div class="sk-eq-row">
-        <span class="sk-eq-name">${escapeHtml(e.item)}</span>
-        <button type="button" class="sk-eq-btn ok ${e.status === "ok" ? "on" : ""}" onclick="skSetEq(${i},'ok')">✅ קיים</button>
-        <button type="button" class="sk-eq-btn miss ${e.status === "missing" ? "on" : ""}" onclick="skSetEq(${i},'missing')">❌ חסר</button>
+        <span class="sk-eq-name">${escapeHtml(e.item)}${e.qty ? `<br><span style="font-weight:normal;font-size:0.78rem;color:#94a3b8;">נדרש: ${e.qty}</span>` : ""}</span>
+        ${e.qty
+          ? `<span class="sk-qty">יש בפועל: <input type="number" inputmode="numeric" min="0" max="999" value="${escapeHtml(e.count)}" placeholder="?" onchange="skSetCount(${i}, this.value)"></span>`
+          : `<button type="button" class="sk-eq-btn ok ${e.status === "ok" ? "on" : ""}" onclick="skSetEq(${i},'ok')">✅ קיים</button>
+        <button type="button" class="sk-eq-btn miss ${e.status === "missing" ? "on" : ""}" onclick="skSetEq(${i},'missing')">❌ חסר</button>`}
       </div>
       ${e.status === "missing" ? `<input type="text" maxlength="200" placeholder="הערה (לא חובה): מה חסר / תקול..." value="${escapeHtml(e.note)}" oninput="skState.equipment[${i}].note=this.value">` : ""}
     </div>`).join("");
@@ -3554,9 +3668,22 @@
     renderSkEquipment();
   }
 
-  function skMarkAllOk() {
-    skState.equipment.forEach(e => { if (!e.status) e.status = "ok"; });
+  // פריט עם כמות: הסטטוס נקבע לפי הכמות שנספרה מול הנדרש
+  function skSetCount(i, v) {
+    const e = skState.equipment[i];
+    const t = String(v).trim();
+    e.count = /^\d{1,3}$/.test(t) ? String(parseInt(t, 10)) : "";
+    e.status = e.count === "" ? "" : (parseInt(e.count, 10) >= e.qty ? "ok" : "missing");
+    if (e.status !== "missing") e.note = "";
     renderSkEquipment();
+  }
+
+  // פריטים עם כמות לא מסומנים אוטומטית - חייבים לספור
+  function skMarkAllOk() {
+    skState.equipment.forEach(e => { if (!e.status && !e.qty) e.status = "ok"; });
+    renderSkEquipment();
+    const left = skState.equipment.filter(e => e.qty && e.count === "").length;
+    if (left) toast(`נשארו ${left} פריטים לספירת כמות`);
   }
 
   function skFmtTs(ts) {
@@ -3580,7 +3707,9 @@
     if (e.checks.length) {
       const miss = e.checks.filter(c => !c.ok);
       lines.push(miss.length ? `🧰 *ציוד:* ${e.checks.length - miss.length}/${e.checks.length} קיים ⚠️` : `🧰 *ציוד:* כל ${e.checks.length} הפריטים קיימים ✅`);
-      miss.forEach(c => lines.push(`❌ ${c.item}${c.note ? ` - ${c.note}` : ""}`));
+      miss.forEach(c => lines.push(`❌ ${c.item}${c.qty ? ` ${c.count}/${c.qty}` : ""}${c.note ? ` - ${c.note}` : ""}`));
+      const qtyOk = e.checks.filter(c => c.ok && c.qty);
+      if (qtyOk.length) lines.push(`🔢 ${qtyOk.map(c => `${c.item} ${c.count}/${c.qty}`).join(" · ")}`);
     } else lines.push("🧰 *ציוד:* לא הוגדר ציוד למשימה");
     lines.push("");
     lines.push(`✍️ מילא: ${e.by}${e.ts ? ` | ${skFmtTs(e.ts)}` : ""}`);
@@ -3595,10 +3724,10 @@
     if (!skState.cmdrs.length) { toast("יש להוסיף לפחות מפקד אחד", "err"); return; }
     if (!start || !end) { toast("יש למלא שעת התחלה וסיום", "err"); return; }
     if (!goals) { toast("יש למלא את מטרות המשימה", "err"); document.getElementById("skGoals").focus(); return; }
-    if (unmarked.length) { toast(`נשארו ${unmarked.length} פריטי ציוד לא מסומנים`, "err"); return; }
+    if (unmarked.length) { toast(`נשארו ${unmarked.length} פריטי ציוד לא מסומנים / לא נספרו`, "err"); const el = document.getElementById("skEq" + skState.equipment.indexOf(unmarked[0])); if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     setBtnBusy(btn, true, "שומר...");
     const res = await apiCall({ action: "shavzakon_submit", mission: skState.mission, cmdrs: skState.cmdrs, soldiers: skState.soldiers, start, end, goals,
-      equipment: skState.equipment.map(e => ({ item: e.item, status: e.status, note: e.note })) });
+      equipment: skState.equipment.map(e => ({ item: e.item, status: e.status, note: e.note, count: e.qty ? e.count : undefined })) });
     setBtnBusy(btn, false);
     if (!isOk(res)) { toast(res.message || "שגיאה בשמירה", "err"); return; }
     document.getElementById("skWaText").value = skWaMessage(res.entry);
@@ -3629,7 +3758,7 @@
         ${e.cmdrs.length > 1 ? `<div><b>מפקדים נוספים:</b> ${escapeHtml(e.cmdrs.slice(1).join(", "))}</div>` : ""}
         <div><b>לוחמים:</b> ${escapeHtml(e.soldiers.join(", ") || "-")}</div>
         <div style="margin-top:6px;"><b>מטרות:</b><div style="white-space:pre-wrap;">${escapeHtml(e.goals)}</div></div>
-        ${e.checks.length ? `<div style="margin-top:6px;"><b>ציוד:</b> ${e.checks.map(c => `${c.ok ? "✅" : "❌"} ${escapeHtml(c.item)}${c.note ? ` (${escapeHtml(c.note)})` : ""}`).join(" · ")}</div>` : ""}
+        ${e.checks.length ? `<div style="margin-top:6px;"><b>ציוד:</b> ${e.checks.map(c => `${c.ok ? "✅" : "❌"} ${escapeHtml(c.item)}${c.qty ? ` ${c.count}/${c.qty}` : ""}${c.note ? ` (${escapeHtml(c.note)})` : ""}`).join(" · ")}</div>` : ""}
         <button type="button" class="btn-action btn-wa" style="margin-top:10px;" onclick="shareSkEntry(${i})">📱 שליחה לווטסאפ</button>
       </div>
     </div>`).join("");
@@ -3644,9 +3773,11 @@
   async function loadAdminSkConfig() {
     const res = await apiCall({ action: "shavzakon_get_config" });
     if (!isOk(res)) { document.getElementById("adminSkList").innerHTML = `<div style="color:#fca5a5;">${escapeHtml(res.message)}</div>`; return; }
-    adminSk = (res.missions || []).map(m => ({ mission: m.mission, text: m.equipment.join("\n") }));
+    adminSk = (res.missions || []).map(m => ({ mission: m.mission, text: skEqToText(m.equipment) }));
     renderAdminSk();
   }
+
+  function skEqToText(eq) { return (eq || []).map(e => e.qty ? `${e.item} | ${e.qty}` : e.item).join("\n"); }
 
   function renderAdminSk() {
     document.getElementById("adminSkList").innerHTML = adminSk.map((m, i) => `<div class="task-edit">
@@ -3654,7 +3785,7 @@
         <input type="text" value="${escapeHtml(m.mission)}" placeholder="שם המשימה" style="font-weight:bold;" oninput="adminSk[${i}].mission=this.value">
         <button type="button" class="btn-trash" title="מחק" style="margin-bottom:8px;" onclick="deleteAdminSkMission(${i})">🗑️</button>
       </div>
-      <label style="font-size:0.78rem;margin:0 0 3px;">ציוד נדרש (פריט בכל שורה):</label>
+      <label style="font-size:0.78rem;margin:0 0 3px;">ציוד נדרש (פריט בכל שורה. פריט עם כמות: <span class="ltr">שם | כמות</span>, למשל "מחסניות | 12"):</label>
       <textarea rows="4" style="margin-bottom:0;" oninput="adminSk[${i}].text=this.value">${escapeHtml(m.text)}</textarea>
     </div>`).join("") || '<div style="color:#94a3b8;text-align:center;padding:10px;">אין משימות.</div>';
   }
@@ -3678,7 +3809,7 @@
     const res = await apiCall({ action: "shavzakon_save_config", missions });
     setBtnBusy(btn, false);
     showBox("skCfgStatus", res.message || (isOk(res) ? "נשמר" : "שגיאה"), isOk(res));
-    if (isOk(res)) { adminSk = res.missions.map(m => ({ mission: m.mission, text: m.equipment.join("\n") })); renderAdminSk(); }
+    if (isOk(res)) { adminSk = res.missions.map(m => ({ mission: m.mission, text: skEqToText(m.equipment) })); renderAdminSk(); }
   }
 
   function openWaText(areaId) { window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(document.getElementById(areaId).value), "_blank"); }
