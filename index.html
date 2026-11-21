@@ -215,6 +215,14 @@
     .sk-chip { background: #1e293b; border: 1px solid #475569; border-radius: 999px; padding: 5px 10px; font-size: 0.88rem; display: inline-flex; gap: 6px; align-items: center; }
     .sk-chip.lead { border-color: #38bdf8; background: #082f49; }
     .sk-chip button { background: none; border: none; color: #f87171; cursor: pointer; padding: 0; font-size: 0.95rem; line-height: 1; }
+    .sk-picker { position: relative; margin-bottom: 4px; }
+    .sk-picker input { margin-bottom: 0; }
+    .sk-results { background: #0f172a; border: 1px solid #38bdf8; border-radius: 8px; margin-top: 4px; max-height: 240px; overflow-y: auto; }
+    .sk-res { padding: 10px 12px; border-bottom: 1px solid #1e293b; cursor: pointer; display: flex; justify-content: space-between; gap: 8px; }
+    .sk-res:last-child { border-bottom: none; }
+    .sk-res:active, .sk-res:hover { background: #082f49; }
+    .sk-res small { color: #94a3b8; }
+    .sk-res-empty { padding: 10px 12px; color: #94a3b8; font-size: 0.85rem; }
     .sk-add { display: flex; gap: 6px; }
     .sk-add input { margin-bottom: 0; }
     .sk-add button { width: auto; flex: none; margin: 0; padding: 0 14px; }
@@ -507,11 +515,10 @@
             <div class="sk-step">2. מפקדים</div>
             <div class="sk-hint">הראשון ברשימה = מפקד המשימה.</div>
             <div id="skCmdrs" class="sk-chips"></div>
-            <div class="sk-add"><input type="text" id="skAddCmdr" list="skSoldierNames" placeholder="➕ הוספת מפקד..." onkeydown="if(event.key==='Enter'){event.preventDefault();skAddPerson('cmdrs')}"><button type="button" class="btn-mini" onclick="skAddPerson('cmdrs')">הוסף</button></div>
+            <div class="sk-picker"><input type="text" id="skAddCmdr" autocomplete="off" placeholder="🔍 הקלד שם להוספת מפקד..." oninput="skSearch('cmdrs')" onfocus="skSearch('cmdrs')" onblur="skHideResults('cmdrs')"><div id="skResCmdrs" class="sk-results hidden"></div></div>
             <div class="sk-step">3. לוחמים <span id="skSoldiersCount" style="color:#94a3b8;font-weight:normal;"></span></div>
             <div id="skSoldiers" class="sk-chips"></div>
-            <div class="sk-add"><input type="text" id="skAddSoldier" list="skSoldierNames" placeholder="➕ הוספת לוחם..." onkeydown="if(event.key==='Enter'){event.preventDefault();skAddPerson('soldiers')}"><button type="button" class="btn-mini" onclick="skAddPerson('soldiers')">הוסף</button></div>
-            <datalist id="skSoldierNames"></datalist>
+            <div class="sk-picker"><input type="text" id="skAddSoldier" autocomplete="off" placeholder="🔍 הקלד שם להוספת לוחם..." oninput="skSearch('soldiers')" onfocus="skSearch('soldiers')" onblur="skHideResults('soldiers')"><div id="skResSoldiers" class="sk-results hidden"></div></div>
             <div class="sk-step">4. שעות צפויות</div>
             <div class="sk-times">
               <div><label>התחלה</label><input type="time" id="skStart"></div>
@@ -3555,7 +3562,6 @@
     document.getElementById("skLoading").classList.add("hidden");
     document.getElementById("skForm").classList.remove("hidden");
     document.getElementById("skDayInfo").textContent = `יום ${res.dayName} ${res.date}` + (res.published ? "" : " · אין עדיין שבצ\"ק מפורסם להיום, ממלאים ידנית");
-    document.getElementById("skSoldierNames").innerHTML = (res.soldiers || []).map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.framework || "")}</option>`).join("");
     skState = null;
     document.getElementById("skDetails").classList.add("hidden");
     renderSkMissions();
@@ -3631,14 +3637,33 @@
     document.getElementById("skSoldiersCount").textContent = skState.soldiers.length ? `(${skState.soldiers.length})` : "";
   }
 
-  function skAddPerson(key) {
+  // חיפוש מתוך רשימת החיילים (מפקד מחלקה רואה רק את המחלקה שלו). אחרי בחירה אפשר מיד להוסיף עוד
+  let skResults = { cmdrs: [], soldiers: [] };
+  function skSearch(key) {
     const input = document.getElementById(key === "cmdrs" ? "skAddCmdr" : "skAddSoldier");
-    const name = input.value.trim().replace(/\s+/g, " ");
-    if (!name) return;
-    if (skState.cmdrs.includes(name) || skState.soldiers.includes(name)) { toast(`${name} כבר ברשימה`, "err"); return; }
-    skState[key].push(name);
+    const box = document.getElementById(key === "cmdrs" ? "skResCmdrs" : "skResSoldiers");
+    const q = input.value.trim().replace(/\s+/g, " ");
+    const taken = new Set(skState.cmdrs.concat(skState.soldiers));
+    const list = ((skData && skData.soldiers) || []).filter(s => !taken.has(s.name) && (!q || s.name.includes(q)));
+    skResults[key] = list.slice(0, 30);
+    box.innerHTML = skResults[key].length
+      ? skResults[key].map((s, i) => `<div class="sk-res" onpointerdown="event.preventDefault()" onclick="skPick('${key}', ${i})"><span>${escapeHtml(s.name)}</span><small>${escapeHtml(s.framework || "")}</small></div>`).join("")
+      : `<div class="sk-res-empty">${q ? "לא נמצא חייל בשם הזה" : "כל החיילים כבר ברשימה"}</div>`;
+    box.classList.remove("hidden");
+  }
+  function skPick(key, i) {
+    const s = skResults[key][i];
+    if (!s) return;
+    skState[key].push(s.name);
+    const input = document.getElementById(key === "cmdrs" ? "skAddCmdr" : "skAddSoldier");
     input.value = "";
     renderSkPeople();
+    skSearch(key);
+    input.focus();
+    toast(`${s.name} נוסף ✓`, "ok");
+  }
+  function skHideResults(key) {
+    setTimeout(() => { const box = document.getElementById(key === "cmdrs" ? "skResCmdrs" : "skResSoldiers"); if (box) box.classList.add("hidden"); }, 150);
   }
 
   function skRemovePerson(key, i) { skState[key].splice(i, 1); renderSkPeople(); }
