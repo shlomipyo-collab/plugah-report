@@ -3342,20 +3342,52 @@
         if (lines.length) msg += `📌 *${fw}*\n${lines.join("\n")}\n\n`;
       });
     } else {
-      let tot = 0, pres = 0, yam = 0, rel = 0, notReported = 0; const gims = [], vacs = [];
+      // דוח נוכחות פלוגתי: תמונת מצב, פילוח לפי מחלקות (לוחמים+מפקדים / רשומים) וחריגים
+      const cmdrSet = new Set(db.commanders || []);
+      const PLATOONS_ONLY = ["מחלקה 1", "מחלקה 2", "מחלקה 3"];
+      const byFw = {};
+      let tot = 0, presS = 0, presC = 0, platS = 0, platC = 0, yam = 0, rel = 0;
+      const gims = [], vacs = [], others = [], notRep = [];
       db.names.forEach((nm, i) => {
         if (!active.has(nm)) return;
-        if (targetFw !== "ALL" && normalizeFramework(db.frameworks[i]) !== targetFw) return;
+        const fw = normalizeFramework(db.frameworks[i]);
+        if (targetFw !== "ALL" && fw !== targetFw) return;
         tot++;
+        const f = byFw[fw] = byFw[fw] || { tot: 0, s: 0, c: 0 };
+        f.tot++;
         const st = String(db.detailed[i][colIdx] || "");
-        if (!st) notReported++;
-        if (String(db.presence[i][colIdx]) === "V") pres++;
-        if (st.includes("שוחרר")) rel++;
-        else { yam++; if (st.includes("גימלים") || st.includes("ג'")) gims.push(nm); else if (st.includes("חופשה")) vacs.push(nm); }
+        const isP = String(db.presence[i][colIdx]) === "V";
+        const isC = cmdrSet.has(nm);
+        if (isP) {
+          if (isC) { presC++; f.c++; } else { presS++; f.s++; }
+          if (PLATOONS_ONLY.includes(fw)) { if (isC) platC++; else platS++; }
+        }
+        if (st.includes("שוחרר")) { rel++; return; }
+        yam++;
+        if (isP) return;
+        if (!st) notRep.push(nm);
+        else if (st.includes("גימלים") || st.includes("ג'") || st.includes("רפואי")) gims.push(nm);
+        else if (st.includes("חופשה")) vacs.push(nm);
+        else others.push(`${nm} (${st})`);
       });
-      msg = `*דוח נוכחות - מסייעת 8109 [${eurDate}]*\n\n• סה"כ רשומים: ${tot}\n• נוכחים בפועל: ${pres}\n• זכאי ימ"מ: ${yam}\n• משוחררים: ${rel}` +
-        (notReported ? `\n• לא דווחו: ${notReported}` : "") +
-        `\n\n• גימלים (${gims.length}): ${gims.join(", ") || "אין"}\n• חופשות (${vacs.length}): ${vacs.join(", ") || "אין"}`;
+      const iso = document.getElementById("repPresDate").value;
+      const fwLines = (db.canonicalFrameworks || Object.keys(byFw)).filter(fw => byFw[fw])
+        .map(fw => `• ${fw}: ${byFw[fw].s}+${byFw[fw].c}/${byFw[fw].tot}`);
+      const excLines = [];
+      if (gims.length) excLines.push(`• גימלים / רפואי (${gims.length}): ${gims.join(", ")}`);
+      if (vacs.length) excLines.push(`• חופשות (${vacs.length}): ${vacs.join(", ")}`);
+      if (others.length) excLines.push(`• אחר (${others.length}): ${others.join(", ")}`);
+      if (notRep.length) excLines.push(`• לא דווחו (${notRep.length}): ${notRep.join(", ")}`);
+      msg = `*דוח נוכחות ${targetFw === "ALL" ? "פלוגתי" : "- " + targetFw} - ${iso}*\n\n` +
+        `📊 *תמונת מצב כללית:*\n` +
+        `• סה"כ רשומים: ${tot}\n` +
+        `• נוכחים בפועל: ${presS}+${presC} (סה"כ ${presS + presC})\n` +
+        (targetFw === "ALL" ? `• נוכחים בפועל - מחלקות: ${platS}+${platC} (סה"כ ${platS + platC})\n` : "") +
+        `• זכאי ימ"מ: ${yam}\n` +
+        `• משוחררים משמ"פ: ${rel}\n\n` +
+        `📋 *פילוח לפי מחלקות (נוכחים / רשומים):*\n${fwLines.join("\n")}\n` +
+        `_(לוחמים+מפקדים / רשומים)_\n\n` +
+        `⚠️ *חריגים והיעדרויות:*\n${excLines.join("\n") || "• אין"}`;
     }
     document.getElementById("hcRepText").value = msg;
     document.getElementById("hcRepOut").classList.remove("hidden");
