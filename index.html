@@ -92,6 +92,51 @@
     .btn-tab { flex: 1; min-height: 40px; padding: 8px 6px; border: 1px solid var(--line-strong); border-radius: var(--radius-pill); background: var(--surface); color: var(--ink); font-weight: 500; cursor: pointer; text-align: center; font-size: 14px }
     .btn-tab.active { background: var(--olive); color: var(--on-olive); border-color: var(--olive); }
 
+    /* ===== סרגל ניווט תחתון ===== */
+    .m-tabbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 900; background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -2px 10px rgba(30,33,27,0.06); padding: 4px 6px calc(4px + env(safe-area-inset-bottom)); }
+    .m-tabbar .tb-inner { display: flex; max-width: 560px; margin: 0 auto; }
+    .m-tab { flex: 1; width: auto; margin: 0; background: none; border: none; padding: 6px 2px 4px; min-height: 56px; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--ink-muted); font: 500 11.5px/15px var(--font-sans); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .m-tab .tb-pill { display: grid; place-items: center; width: 56px; height: 30px; border-radius: var(--radius-pill); transition: background .15s; }
+    .m-tab svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+    .m-tab.active { color: var(--olive); font-weight: 700; }
+    .m-tab.active .tb-pill { background: var(--olive-soft); }
+    .m-tab:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; border-radius: var(--radius-md); }
+    body.has-tabbar { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+    body.has-tabbar #toast { bottom: calc(80px + env(safe-area-inset-bottom)); }
+    body.has-tabbar .sticky-actions { bottom: calc(68px + env(safe-area-inset-bottom)); }
+
+    /* ===== מסך בית ===== */
+    .home-hello { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin: 2px 2px 14px; }
+    .home-hello .hh-name { font-family: var(--font-display); font-size: 24px; line-height: 30px; font-weight: 600; }
+    .home-hello .hh-date { font-size: 13px; color: var(--ink-muted); }
+    .home-refresh { width: auto; margin: 0; background: none; border: 1px solid var(--line-strong); color: var(--ink-muted); border-radius: var(--radius-pill); font: 500 12.5px var(--font-sans); padding: 5px 12px; cursor: pointer; }
+    .home-sec { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin: 18px 2px 8px; display: flex; align-items: center; gap: 8px; }
+    .home-sec .cnt { font: 700 12px var(--font-sans); background: var(--signal); color: var(--on-signal); border-radius: var(--radius-pill); padding: 1px 8px; }
+    .home-sec .cnt.zero { background: var(--ok); color: var(--on-olive); }
+    .home-mine { background: var(--olive-soft); border: 1px solid var(--olive); border-radius: var(--radius-lg); padding: 12px 14px; cursor: pointer; }
+    .home-mine .hm-k { font-size: 12.5px; color: var(--ink-muted); font-weight: 600; }
+    .home-mine .hm-v { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 24px; }
+    .home-mine .hm-row + .hm-row { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+    .home-mine .hm-h { font-size: 13.5px; color: var(--ink-muted); }
+    .todo-item { width: 100%; margin: 0 0 8px; display: flex; align-items: center; gap: 10px; text-align: right; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-inline-start: 4px solid var(--warn); border-radius: var(--radius-md); padding: 11px 12px; font: 500 14.5px/20px var(--font-sans); cursor: pointer; }
+    .todo-item.lvl-bad { border-inline-start-color: var(--signal); background: var(--signal-soft); }
+    .todo-item.lvl-info { border-inline-start-color: var(--info); }
+    .todo-item .ti-txt { flex: 1; }
+    .todo-item .ti-go { color: var(--ink-muted); font-size: 18px; }
+    .todo-empty { background: var(--ok-soft); color: var(--ok); border: 1px solid var(--ok); border-radius: var(--radius-md); padding: 11px 12px; font-weight: 600; text-align: center; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 10px 8px; text-align: center; cursor: pointer; box-shadow: var(--shadow-card); }
+    .stat .st-v { font-family: var(--font-display); font-size: 24px; font-weight: 700; line-height: 30px; direction: ltr; }
+    .stat .st-k { font-size: 12.5px; font-weight: 600; }
+    .stat .st-s { font-size: 11.5px; color: var(--ink-muted); line-height: 15px; margin-top: 2px; }
+    .stat.bad .st-v { color: var(--signal); } .stat.ok .st-v { color: var(--ok); } .stat.warn .st-v { color: var(--warn); }
+    .fw-table { width: 100%; border-collapse: collapse; font-size: 13.5px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; }
+    .fw-table th, .fw-table td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: center; }
+    .fw-table th { background: var(--surface-sunken); font-weight: 600; font-size: 12.5px; color: var(--ink-muted); }
+    .fw-table td:first-child, .fw-table th:first-child { text-align: right; }
+    .fw-table tr:last-child td { border-bottom: none; }
+    .chip { display: inline-block; border-radius: var(--radius-pill); padding: 1px 9px; font-size: 12px; font-weight: 600; }
+    .chip.ok { background: var(--ok-soft); color: var(--ok); } .chip.warn { background: var(--warn-soft); color: var(--warn); } .chip.bad { background: var(--signal-soft); color: var(--signal); } .chip.info { background: var(--info-soft); color: var(--info); }
     .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .hub-tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); padding: var(--space-4) var(--space-3); text-align: center; cursor: pointer; transition: border-color .15s, background .15s }
     .hub-tile.wide { grid-column: 1 / -1; border-color: var(--olive); background: var(--olive-soft) }
@@ -406,9 +451,14 @@
     <div id="loginStatus" class="status-box"></div>
   </div>
 
+  <!-- מסך בית (מפקד ומעלה) -->
+  <div id="screenHome" class="narrow-wrap hidden">
+    <div id="homeBody"><div class="loading-msg">טוען תמונת מצב...</div></div>
+  </div>
+
   <!-- מסך 2: דשבורד ראשי -->
   <div id="screenHub" class="card narrow-wrap hidden">
-    <h2 style="text-align:center;margin-bottom:14px;">בחר מסך פעולה:</h2>
+    <h2 id="hubTitle" style="text-align:center;margin-bottom:14px;">בחר מסך פעולה:</h2>
     <div id="hubTilesGrid" class="hub-grid"></div>
   </div>
 
@@ -1020,6 +1070,7 @@
   };
 })();
 </script>
+  <nav id="tabBar" class="m-tabbar hidden" aria-label="ניווט ראשי"><div class="tb-inner" id="tabBarInner"></div></nav>
 <script>
   // ==========================================
   // הגדרות
@@ -1343,20 +1394,181 @@
     document.getElementById("newPassInput").value = "";
     document.getElementById("confirmPassInput").value = "";
     document.getElementById("loginPassInput").value = "";
-    // חייל / מפקד / קצין / נאמן כ"א נכנסים ישר לצפייה בשבצ"ק. פיקוד עליון, מפל"ג ושלומי - לתפריט הראשי
-    const SHV_FIRST_ROLES = ["חייל", "מפקד", "קצין", "נאמן כ\"א"];
-    const roles = user.roles || [];
-    if (roles.length && roles.every(r => SHV_FIRST_ROLES.includes(r))) openScreen("shavzak_view");
-    else openMainHub();
+    // חייל פשוט נכנס ישר למשימה שלו. כל השאר - למסך הבית (תמונת מצב + דורש טיפול)
+    document.body.classList.add("has-tabbar");
+    document.getElementById("tabBar").classList.remove("hidden");
+    homeCache = null;
+    if (isPlainSoldier()) openScreen("shavzak_view");
+    else openHome();
   }
 
   function hideAllScreens() {
-    ["screenLogin", "screenHub", "screenShavzakView", "screenSignatures", "screenAttendance",
+    ["screenLogin", "screenHub", "screenHome", "screenShavzakView", "screenSignatures", "screenAttendance",
      "screenMaflag", "screenReports", "screenShavzakBuilder", "screenAdmin", "screenRadio", "screenShavzakon", "screenReservePlan"]
       .forEach(id => document.getElementById(id).classList.add("hidden"));
   }
 
-  function goHome() { confirmLeaveShavzak(openMainHub); }
+  function goHome() { navTab(homeKey()); }
+
+  // ==========================================
+  // סרגל ניווט תחתון + מסך בית
+  // ==========================================
+  let homeCache = null;
+  const TAB_ICONS = (() => {
+    const svg = d => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+    return {
+      home: svg('<path d="M3 10.5L12 3l9 7.5"></path><path d="M5 9v11h14V9"></path><path d="M10 20v-6h4v6"></path>'),
+      more: svg('<rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect>')
+    };
+  })();
+
+  // חייל פשוט = אין לו אף הרשאה מעבר לצפייה, חתימות וקשרים
+  function isPlainSoldier() {
+    const p = (currentUser && currentUser.permissions) || {};
+    return !(p.shavzakon || p.attendanceReport || p.shavzakPlatoon || p.shavzakOfficers || p.shavzakFinalApproval ||
+      p.maflagReturns || p.reportsCenter || p.adminPanel || p.reservePlan);
+  }
+  function homeKey() { return isPlainSoldier() ? "shavzak_view" : "home"; }
+
+  function tabsForUser() {
+    const p = (currentUser && currentUser.permissions) || {};
+    const plain = isPlainSoldier();
+    const tabs = [{ key: homeKey(), label: "בית", icon: TAB_ICONS.home }];
+    if (plain) {
+      tabs.push({ key: "signatures", label: "חתימות", icon: HUB_ICONS.signatures });
+    } else {
+      const shvKey = p.shavzakFinalApproval ? "shavzak_final" : p.shavzakOfficers ? "shavzak_officers" : p.shavzakPlatoon ? "shavzak_platoon" : "shavzak_view";
+      tabs.push({ key: shvKey, label: "שבצ\"ק", icon: HUB_ICONS.shavzak_view });
+    }
+    tabs.push({ key: "radio", label: "קשרים", icon: HUB_ICONS.radio });
+    if (!plain) {
+      if (p.reservePlan || p.adminPanel) tabs.push({ key: "reserve", label: "הערכות", icon: HUB_ICONS.reserve });
+      else if (p.attendanceReport) tabs.push({ key: "attendance", label: "נוכחות", icon: HUB_ICONS.attendance });
+      else tabs.push({ key: "signatures", label: "חתימות", icon: HUB_ICONS.signatures });
+    }
+    tabs.push({ key: "hub", label: "עוד", icon: TAB_ICONS.more });
+    return tabs;
+  }
+
+  function renderTabBar() {
+    const inner = document.getElementById("tabBarInner");
+    if (!inner || !currentUser) return;
+    const tabs = tabsForUser();
+    let active = "hub";
+    if (tabs.find(t => t.key === currentScreen)) active = currentScreen;
+    else if (currentScreen.indexOf("shavzak_") === 0) {
+      const st = tabs.find(t => t.key.indexOf("shavzak_") === 0 && t.key !== homeKey());
+      if (st) active = st.key;
+    }
+    inner.innerHTML = tabs.map(t => `<button type="button" class="m-tab${t.key === active ? " active" : ""}" ${t.key === active ? 'aria-current="page"' : ""} onclick="navTab('${t.key}')"><span class="tb-pill">${t.icon}</span><span>${escapeHtml(t.label)}</span></button>`).join("");
+  }
+
+  function navTab(key) {
+    confirmLeaveShavzak(() => {
+      if (key === "hub") openMainHub();
+      else if (key === "home") openHome();
+      else openScreen(key);
+    });
+  }
+
+  async function openHome() {
+    hideAllScreens();
+    currentScreen = "home";
+    shvState = null;
+    document.getElementById("btnBackToHub").classList.add("hidden");
+    document.getElementById("screenHome").classList.remove("hidden");
+    renderTabBar();
+    window.scrollTo(0, 0);
+    const box = document.getElementById("homeBody");
+    if (homeCache) renderHome(homeCache);
+    else box.innerHTML = `<div class="loading-msg">טוען תמונת מצב...</div>`;
+    const res = await apiCall({ action: "home_status" });
+    if (currentScreen !== "home") return;
+    if (!isOk(res)) {
+      if (!homeCache) box.innerHTML = `<div class="item-box" style="text-align:center;">⚠️ ${escapeHtml(res.message || "שגיאה בטעינת מסך הבית")}<br><button type="button" class="home-refresh" style="margin-top:8px;" onclick="openHome()">נסה שוב</button></div>`;
+      return;
+    }
+    homeCache = res;
+    renderHome(res);
+  }
+
+  function homeDayName(eur) {
+    const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(eur || "");
+    if (!m) return "";
+    const d = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]));
+    return "יום " + ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"][d.getDay()];
+  }
+
+  function renderHome(res) {
+    const box = document.getElementById("homeBody");
+    const first = String(currentUser.name || "").split(" ")[0];
+    const scopeLabel = res.scope === "ALL" ? "כל הפלוגה" : res.scope;
+    const p = currentUser.permissions || {};
+    let h = `<div class="home-hello"><div><div class="hh-name">שלום, ${escapeHtml(first)}</div><div class="hh-date">${escapeHtml(homeDayName(res.today))} ${escapeHtml(res.today)} · ${escapeHtml(scopeLabel)}</div></div>
+      <button type="button" class="home-refresh" onclick="openHome()">רענון</button></div>`;
+
+    // המשימה שלי
+    const mine = res.mine || {};
+    const missionTxt = list => list.map(m => `<div class="hm-v">${escapeHtml(m.taskName)}</div><div class="hm-h">${hrs(m.hoursLabel)} · ${escapeHtml(m.roleInTask)}</div>`).join("");
+    h += `<div class="home-mine" onclick="navTab('shavzak_view')" role="button" tabindex="0">
+      <div class="hm-row"><div class="hm-k">המשימה שלי היום</div>${(mine.today && mine.today.length) ? missionTxt(mine.today) : `<div class="hm-h">אין משימה רשומה היום</div>`}</div>
+      <div class="hm-row"><div class="hm-k">מחר</div>${!mine.hasTomorrow ? `<div class="hm-h">שבצ"ק מחר טרם פורסם</div>` : (mine.tomorrow && mine.tomorrow.length) ? missionTxt(mine.tomorrow) : `<div class="hm-h">לא משובץ</div>`}</div>
+    </div>`;
+
+    // דורש טיפול
+    const todo = res.todo || [];
+    const actionable = todo.filter(t => t.level !== "info").length;
+    h += `<div class="home-sec">דורש טיפול <span class="cnt${actionable ? "" : " zero"}">${actionable}</span></div>`;
+    h += todo.length
+      ? todo.map(t => `<button type="button" class="todo-item lvl-${escapeHtml(t.level)}" onclick="navTab('${escapeHtml(t.action)}')"><span class="ti-txt">${escapeHtml(t.text)}</span><span class="ti-go" aria-hidden="true">‹</span></button>`).join("")
+      : `<div class="todo-empty">✓ הכל מטופל כרגע</div>`;
+
+    // תמונת מצב
+    const stats = [];
+    if (res.attendance) {
+      const fws = res.attendance.frameworks.filter(f => f.total > 0);
+      const rep = fws.filter(f => f.reported);
+      const present = rep.reduce((a, f) => a + f.present, 0);
+      if (fws.length === 1) {
+        const f = fws[0];
+        stats.push({ cls: f.reported ? "ok" : "warn", v: f.reported ? `${f.present}/${f.total}` : "—", k: "נוכחות היום", s: f.reported ? "נוכחים מתוך המסגרת" : "טרם דווח", go: "attendance" });
+      } else {
+        stats.push({ cls: rep.length === fws.length ? "ok" : "warn", v: String(present), k: "נוכחות היום", s: `${rep.length}/${fws.length} מסגרות דיווחו`, go: p.reportsCenter ? "reports" : "attendance" });
+      }
+    }
+    if (res.radios) {
+      const r = res.radios;
+      stats.push({ cls: r.overdue.length ? "bad" : "", v: `${res.scope === "ALL" || p.maflagReturns ? r.out : r.outInScope}`, k: "קשרים בחוץ", s: r.overdue.length ? `${r.overdue.length} מעל 12 שעות` : (res.scope === "ALL" || p.maflagReturns ? `מתוך ${r.total}` : `של ${res.scope}`), go: (p.maflagReturns || p.reportsCenter || p.adminPanel) ? "radio_report" : "radio" });
+    }
+    let shvGo = p.shavzakFinalApproval ? "shavzak_final" : p.shavzakOfficers ? "shavzak_officers" : "shavzak_platoon";
+    if (res.shavzak) {
+      const sv = res.shavzak, pl = sv.platoons;
+      const PUB = "מאושר ופורסם";
+      const SUB = ["הועבר לאישור קצינים", "אושר ע\"י קצינים", "ממתין לאישור מ\"פ", PUB];
+      if (!sv.hasSkeleton) stats.push({ cls: "warn", v: "—", k: "שבצ\"ק מחר", s: "טרם נפתח", go: shvGo });
+      else if (pl.length && pl.every(x => x.status === PUB)) stats.push({ cls: "ok", v: "✓", k: "שבצ\"ק מחר", s: "פורסם", go: "shavzak_view" });
+      else if (pl.length === 1) stats.push({ cls: SUB.includes(pl[0].status) ? "ok" : "warn", v: `${pl[0].filled}/${pl[0].total}`, k: "שבצ\"ק מחר", s: pl[0].status, go: shvGo });
+      else stats.push({ cls: "", v: `${pl.filter(x => SUB.includes(x.status)).length}/${pl.length}`, k: "שבצ\"ק מחר", s: "מחלקות הגישו", go: shvGo });
+    }
+    if (stats.length) {
+      h += `<div class="home-sec">תמונת מצב</div><div class="stat-grid">` +
+        stats.map(st => `<div class="stat ${st.cls}" role="button" tabindex="0" onclick="navTab('${st.go}')"><div class="st-v">${escapeHtml(st.v)}</div><div class="st-k">${escapeHtml(st.k)}</div><div class="st-s">${escapeHtml(st.s)}</div></div>`).join("") + `</div>`;
+    }
+
+    // פירוט לפי מסגרת (כשרואים יותר ממסגרת אחת)
+    if (res.attendance && res.attendance.frameworks.filter(f => f.total > 0).length > 1) {
+      h += `<div class="home-sec">נוכחות לפי מסגרת</div><table class="fw-table"><thead><tr><th>מסגרת</th><th>נוכחים</th><th>לא נוכחים</th><th>סטטוס</th></tr></thead><tbody>` +
+        res.attendance.frameworks.filter(f => f.total > 0).map(f => `<tr><td>${escapeHtml(f.framework)}</td><td>${f.reported ? f.present : "—"}</td><td>${f.reported ? f.absent : "—"}</td><td>${f.reported ? '<span class="chip ok">דווח</span>' : '<span class="chip warn">טרם</span>'}</td></tr>`).join("") +
+        `</tbody></table>`;
+    }
+    if (res.shavzak && res.shavzak.hasSkeleton && res.shavzak.platoons.length > 1) {
+      const chipCls = st => st === "מאושר ופורסם" || st === "אושר ע\"י קצינים" ? "ok" : st === "הוחזר לתיקון" ? "bad" : st === "הועבר לאישור קצינים" || st === "ממתין לאישור מ\"פ" ? "info" : "warn";
+      h += `<div class="home-sec">שבצ"ק מחר (${escapeHtml(res.shavzak.date)})</div><table class="fw-table"><thead><tr><th>מחלקה</th><th>משובצים</th><th>סטטוס</th></tr></thead><tbody>` +
+        res.shavzak.platoons.map(x => `<tr><td>${escapeHtml(x.framework)}</td><td><span class="ltr">${x.filled}/${x.total}</span></td><td><span class="chip ${chipCls(x.status)}">${escapeHtml(x.status)}</span></td></tr>`).join("") +
+        `</tbody></table>`;
+    }
+    box.innerHTML = h;
+  }
 
   // אייקונים קוויים (בסגנון Lucide) לכפתורי התפריט הראשי - לפי ספר העיצוב
   const HUB_ICONS = (() => {
@@ -1432,7 +1644,9 @@
       card.innerHTML = `<div class="hub-icon">${HUB_ICONS[t.key] || t.icon}</div><div class="hub-title">${escapeHtml(t.title)}</div><div class="hub-desc">${escapeHtml(t.desc)}</div>`;
       grid.appendChild(card);
     });
+    document.getElementById("hubTitle").textContent = isPlainSoldier() ? "בחר מסך פעולה:" : "כל המסכים";
     document.getElementById("screenHub").classList.remove("hidden");
+    renderTabBar();
   }
 
   function logoutUser(silent) {
@@ -1447,6 +1661,9 @@
     document.getElementById("verifyPasswordBox").classList.add("hidden");
     hideBox("loginStatus");
     hideAllScreens();
+    homeCache = null;
+    document.body.classList.remove("has-tabbar");
+    document.getElementById("tabBar").classList.add("hidden");
     currentScreen = "login";
     document.getElementById("screenLogin").classList.remove("hidden");
   }
@@ -1455,7 +1672,8 @@
     hideAllScreens();
     { const ib = document.getElementById("installBar"); if (ib) ib.classList.add("hidden"); } // הצעת ההתקנה רק בדף הראשי
     currentScreen = screenKey;
-    document.getElementById("btnBackToHub").classList.remove("hidden");
+    document.getElementById("btnBackToHub").classList.add("hidden"); // הניווט עבר לסרגל התחתון
+    renderTabBar();
     window.scrollTo(0, 0);
 
     if (screenKey === "shavzak_view") {
