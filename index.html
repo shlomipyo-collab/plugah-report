@@ -118,6 +118,12 @@
     .home-mine .hm-v { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 24px; }
     .home-mine .hm-row + .hm-row { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
     .home-mine .hm-h { font-size: 13.5px; color: var(--ink-muted); }
+    .home-sk { background: var(--surface); border: 2px solid var(--olive); border-radius: var(--radius-lg); padding: 12px 14px; margin-bottom: 12px; box-shadow: var(--shadow-float); }
+    .home-sk .hs-tag { display: inline-block; background: var(--olive); color: var(--on-olive); font-size: 12px; font-weight: 700; border-radius: var(--radius-pill); padding: 2px 10px; margin-bottom: 6px; }
+    .home-sk .hs-title { font-family: var(--font-display); font-size: 19px; font-weight: 600; line-height: 25px; }
+    .home-sk .hs-line { font-size: 14px; margin-top: 4px; }
+    .home-sk .hs-goals { font-size: 14px; margin-top: 6px; white-space: pre-wrap; background: var(--surface-sunken); border-radius: var(--radius-md); padding: 8px 10px; max-height: 140px; overflow: auto; }
+    .home-sk .btn-action { margin-top: 10px; min-height: 42px; }
     .todo-item { width: 100%; margin: 0 0 8px; display: flex; align-items: center; gap: 10px; text-align: right; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-inline-start: 4px solid var(--warn); border-radius: var(--radius-md); padding: 11px 12px; font: 500 14.5px/20px var(--font-sans); cursor: pointer; }
     .todo-item.lvl-bad { border-inline-start-color: var(--signal); background: var(--signal-soft); }
     .todo-item.lvl-info { border-inline-start-color: var(--info); }
@@ -466,6 +472,7 @@
   <div id="screenShavzakView" class="narrow-wrap hidden">
     <div class="card">
       <h2>📅 שבצק - צפיה</h2>
+      <div id="soldierTodo"></div>
       <div id="soldierShvLoading" class="loading-msg">טוען משימות שבצ"ק...</div>
       <div id="soldierShvContent" class="hidden">
         <div id="todayMissionCard"></div>
@@ -1414,6 +1421,8 @@
   // סרגל ניווט תחתון + מסך בית
   // ==========================================
   let homeCache = null;
+  let homeActiveSk = null;
+  function shareHomeSk() { if (homeActiveSk) window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(skWaMessage(homeActiveSk)), "_blank"); }
   const TAB_ICONS = (() => {
     const svg = d => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
     return {
@@ -1507,6 +1516,19 @@
     let h = `<div class="home-hello"><div><div class="hh-name">שלום, ${escapeHtml(first)}</div><div class="hh-date">${escapeHtml(homeDayName(res.today))} ${escapeHtml(res.today)} · ${escapeHtml(scopeLabel)}</div></div>
       <button type="button" class="home-refresh" onclick="openHome()">רענון</button></div>`;
 
+    // שבצקון פעיל - בולט בראש המסך כל עוד המשימה רצה
+    homeActiveSk = res.activeShavzakon || null;
+    if (homeActiveSk) {
+      const e = homeActiveSk;
+      h += `<div class="home-sk"><span class="hs-tag">שבצקון פעיל</span>
+        <div class="hs-title">${escapeHtml(e.mission)} · ${hrs(e.hours)}</div>
+        <div class="hs-line"><b>מפקד:</b> ${escapeHtml(e.cmdrs.join(", "))}</div>
+        <div class="hs-line"><b>לוחמים (${e.soldiers.length}):</b> ${escapeHtml(e.soldiers.join(", ") || "-")}</div>
+        <div class="hs-line"><b>ציוד:</b> <span class="chip ${e.missingCount ? "bad" : "ok"}">${escapeHtml(e.equipStatus)}</span></div>
+        <div class="hs-goals">${escapeHtml(e.goals)}</div>
+        <button type="button" class="btn-action btn-wa" onclick="shareHomeSk()">📱 שליחה לווטסאפ</button></div>`;
+    }
+
     // המשימה שלי
     const mine = res.mine || {};
     const missionTxt = list => list.map(m => `<div class="hm-v">${escapeHtml(m.taskName)}</div><div class="hm-h">${hrs(m.hoursLabel)} · ${escapeHtml(m.roleInTask)}</div>`).join("");
@@ -1536,9 +1558,9 @@
         stats.push({ cls: rep.length === fws.length ? "ok" : "warn", v: String(present), k: "נוכחות היום", s: `${rep.length}/${fws.length} מסגרות דיווחו`, go: p.reportsCenter ? "reports" : "attendance" });
       }
     }
-    if (res.radios) {
+    if (res.radios) { // מפל"ג בלבד
       const r = res.radios;
-      stats.push({ cls: r.overdue.length ? "bad" : "", v: `${res.scope === "ALL" || p.maflagReturns ? r.out : r.outInScope}`, k: "קשרים בחוץ", s: r.overdue.length ? `${r.overdue.length} מעל 12 שעות` : (res.scope === "ALL" || p.maflagReturns ? `מתוך ${r.total}` : `של ${res.scope}`), go: (p.maflagReturns || p.reportsCenter || p.adminPanel) ? "radio_report" : "radio" });
+      stats.push({ cls: r.overdue.length ? "bad" : "", v: String(r.out), k: "קשרים בחוץ", s: r.overdue.length ? `${r.overdue.length} מעל 12 שעות` : `מתוך ${r.total}`, go: "radio_report" });
     }
     let shvGo = p.shavzakFinalApproval ? "shavzak_final" : p.shavzakOfficers ? "shavzak_officers" : "shavzak_platoon";
     if (res.shavzak) {
@@ -1730,6 +1752,14 @@
   // שבצק - צפיה
   // ==========================================
   async function loadSoldierShavzakTab() {
+    const todoBox = document.getElementById("soldierTodo");
+    todoBox.innerHTML = "";
+    if (isPlainSoldier()) { // תזכורות אישיות (למשל החזרת קשר אחרי משימה)
+      apiCall({ action: "home_status" }).then(h => {
+        if (!isOk(h) || currentScreen !== "shavzak_view") return;
+        todoBox.innerHTML = (h.todo || []).map(t => `<button type="button" class="todo-item lvl-${escapeHtml(t.level)}" onclick="navTab('${escapeHtml(t.action)}')"><span class="ti-txt">${escapeHtml(t.text)}</span><span class="ti-go" aria-hidden="true">‹</span></button>`).join("");
+      });
+    }
     document.getElementById("soldierShvLoading").classList.remove("hidden");
     document.getElementById("soldierShvLoading").textContent = "טוען משימות שבצ\"ק...";
     document.getElementById("soldierShvContent").classList.add("hidden");
