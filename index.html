@@ -203,6 +203,35 @@
     .shv-slot-empty { border: 1px dashed #64748b; background: #0f172a; cursor: pointer; }
     .shv-slot-empty.armed { border-color: #22c55e; background: #052e16; }
     .shv-slot-warn { color: #fbbf24; font-size: 0.78rem; }
+    /* הערכות למילואים */
+    .rp-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; margin-bottom: 10px; }
+    .rp-stat { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 8px 4px; text-align: center; }
+    .rp-stat b { display: block; font-size: 1.25rem; }
+    .rp-stat span { font-size: 0.72rem; color: #94a3b8; }
+    .rp-stat.ok b { color: #4ade80; } .rp-stat.part b { color: #fbbf24; } .rp-stat.no b { color: #f87171; } .rp-stat.days b { color: #7dd3fc; }
+    .rp-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px; -webkit-overflow-scrolling: touch; }
+    .rp-chip { flex: none; padding: 7px 12px; border-radius: 999px; border: 1px solid #475569; background: #0f172a; color: #cbd5e1; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
+    .rp-chip.on { background: #0369a1; border-color: #38bdf8; color: #fff; font-weight: bold; }
+    .rp-fw-head { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 2px 6px; color: #38bdf8; font-weight: bold; }
+    .rp-fw-head small { color: #94a3b8; font-weight: normal; font-size: 0.78rem; }
+    .rp-card { background: #0f172a; border: 1px solid #334155; border-right: 4px solid #475569; border-radius: 10px; padding: 9px 11px; margin-bottom: 7px; cursor: pointer; }
+    .rp-card:active { background: #13213a; }
+    .rp-card.s-ok { border-right-color: #22c55e; } .rp-card.s-part { border-right-color: #f59e0b; } .rp-card.s-no { border-right-color: #ef4444; }
+    .rp-card-top { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+    .rp-badge { font-size: 0.74rem; padding: 3px 8px; border-radius: 6px; font-weight: bold; white-space: nowrap; }
+    .rp-badge.s-ok { background: #14532d; color: #bbf7d0; } .rp-badge.s-part { background: #78350f; color: #fde68a; } .rp-badge.s-no { background: #7f1d1d; color: #fecaca; }
+    .rp-strip { height: 7px; border-radius: 4px; background: #334155; margin: 7px 0 5px; overflow: hidden; }
+    .rp-dates { font-size: 0.8rem; color: #cbd5e1; direction: ltr; text-align: right; }
+    .rp-note { font-size: 0.8rem; color: #94a3b8; margin-top: 3px; }
+    .rp-status-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+    .rp-status-btns button { padding: 10px 4px; border-radius: 9px; border: 1px solid #475569; background: #0f172a; color: #cbd5e1; font-weight: bold; cursor: pointer; margin: 0; }
+    .rp-status-btns button.on.s-ok { background: #166534; border-color: #22c55e; color: #fff; }
+    .rp-status-btns button.on.s-part { background: #92400e; border-color: #f59e0b; color: #fff; }
+    .rp-status-btns button.on.s-no { background: #991b1b; border-color: #ef4444; color: #fff; }
+    .rp-range { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+    .rp-range input { margin: 0; min-width: 0; flex: 1; padding: 8px; color-scheme: dark; }
+    .rp-sheet { max-height: 90vh; overflow-y: auto; }
+    .rp-sheet label { font-size: 0.85rem; margin-top: 6px; }
     /* שבצקון משימה */
     .sk-missions { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-bottom: 12px; }
     .sk-mission { padding: 12px 6px; border: 1px solid #334155; border-radius: 10px; background: #0f172a; text-align: center; font-weight: bold; cursor: pointer; user-select: none; }
@@ -493,6 +522,55 @@
   </div>
 
   <!-- מסך: קשרים -->
+  <div id="screenReservePlan" class="narrow-wrap hidden">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <h2 style="margin:0;">🗓️ הערכות למילואים</h2>
+        <button type="button" class="btn-mini home" onclick="openRpEdit(-1)">➕ הוספת חייל</button>
+      </div>
+      <div id="rpPeriod" class="sk-hint" style="margin:6px 0 10px;"></div>
+      <div id="rpLoading" class="loading-msg">טוען...</div>
+      <div id="rpBody" class="hidden">
+        <div id="rpStats" class="rp-stats"></div>
+        <div id="rpFwChips" class="rp-chips"></div>
+        <div id="rpStChips" class="rp-chips"></div>
+        <input type="text" id="rpSearch" placeholder="🔍 חיפוש לפי שם..." oninput="renderRp()">
+        <div id="rpList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="rpEditOverlay" class="sheet-overlay hidden" onclick="if(event.target===this)closeRpEdit()">
+    <div class="sheet rp-sheet">
+      <div class="sheet-head">
+        <div id="rpEditTitle" style="font-weight:bold;color:#38bdf8;"></div>
+        <button type="button" class="btn-mini" onclick="closeRpEdit()">✕</button>
+      </div>
+      <label>שם החייל</label>
+      <input type="text" id="rpName" maxlength="60">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div><label>מסגרת</label><select id="rpFw"></select></div>
+        <div><label>מספר אישי (לא חובה)</label><input type="text" id="rpPn" inputmode="numeric" maxlength="9"></div>
+      </div>
+      <label>סטטוס הגעה</label>
+      <div class="rp-status-btns">
+        <button type="button" class="s-ok" data-st="מגיע" onclick="setRpStatus('מגיע')">✅ מגיע</button>
+        <button type="button" class="s-part" data-st="מגיע חלקית" onclick="setRpStatus('מגיע חלקית')">🟡 מגיע חלקית</button>
+        <button type="button" class="s-no" data-st="לא מגיע" onclick="setRpStatus('לא מגיע')">❌ לא מגיע</button>
+      </div>
+      <div id="rpRangesBox" class="hidden">
+        <label>תאריכי נוכחות <span id="rpDaysCount" style="color:#94a3b8;font-weight:normal;"></span></label>
+        <div id="rpRanges"></div>
+        <button type="button" class="btn-add-line" onclick="addRpRange()">+ טווח תאריכים</button>
+      </div>
+      <div id="rpFullNote" class="sk-hint hidden"></div>
+      <label>הסבר <span id="rpNoteReq" style="color:#94a3b8;font-weight:normal;"></span></label>
+      <textarea id="rpNote" rows="3" maxlength="500" placeholder="למשל: חתונה, לימודים, חו״ל, לידה צפויה..."></textarea>
+      <button type="button" class="btn-action btn-success" onclick="saveRp(this)">💾 שמירה</button>
+      <button type="button" id="rpDeleteBtn" class="btn-action" style="background:#7f1d1d;margin-top:6px;" onclick="deleteRp()">🗑️ מחיקת החייל מההערכות</button>
+    </div>
+  </div>
+
   <div id="screenShavzakon" class="narrow-wrap hidden">
     <div class="card">
       <h2>📋 שבצקון משימה</h2>
@@ -1239,7 +1317,7 @@
 
   function hideAllScreens() {
     ["screenLogin", "screenHub", "screenShavzakView", "screenSignatures", "screenAttendance",
-     "screenMaflag", "screenReports", "screenShavzakBuilder", "screenAdmin", "screenRadio", "screenShavzakon"]
+     "screenMaflag", "screenReports", "screenShavzakBuilder", "screenAdmin", "screenRadio", "screenShavzakon", "screenReservePlan"]
       .forEach(id => document.getElementById(id).classList.add("hidden"));
   }
 
@@ -1257,6 +1335,7 @@
       { show: true, icon: "📅", title: "שבצק - צפיה", desc: "משימות היום ומחר ותמונת שבצ\"ק", key: "shavzak_view" },
       { show: true, icon: "✍️", title: "טופס חתימות", desc: "נשקייה ואפסנאות אישית", key: "signatures" },
       { show: true, icon: "📻", title: "קשרים", desc: "חתימה והחזרה של מכשיר קשר", key: "radio" },
+      { show: Boolean(perms.reservePlan || perms.adminPanel), icon: "🗓️", title: "הערכות למילואים", desc: "מי מגיע, באילו תאריכים ולמה - לפי מסגרות", key: "reserve" },
       { show: Boolean(perms.shavzakon || perms.adminPanel), icon: "📋", title: "שבצקון משימה", desc: "תדריך ובדיקת ציוד לפני עלייה למשימה", key: "shavzakon" },
       { show: Boolean(perms.attendanceReport), icon: "📋", title: "דיווח נוכחות", desc: perms.attendanceAllCompany ? "כלל הפלוגה" : (perms.allowedAttendanceFrameworks || []).join(", "), key: "attendance" },
       { show: Boolean(perms.maflagReturns), icon: "📦", title: "טופס זיכויים", desc: "זיכוי ציוד ודוחות מפל\"ג", key: "maflag" },
@@ -1307,6 +1386,9 @@
       document.getElementById("screenMaflag").classList.remove("hidden");
       switchMafSubTab("radio");
       loadMaflagWorkspace();
+    } else if (screenKey === "reserve") {
+      document.getElementById("screenReservePlan").classList.remove("hidden");
+      await loadReservePlan();
     } else if (screenKey === "shavzakon") {
       document.getElementById("screenShavzakon").classList.remove("hidden");
       switchSkTab("fill");
@@ -3563,6 +3645,146 @@
     });
     document.getElementById("crossCheckText").value = rep;
     document.getElementById("crossCheckOut").classList.remove("hidden");
+  }
+
+  // ==========================================
+  // הערכות למילואים
+  // ==========================================
+  let rpData = null, rpFw = "ALL", rpSt = "ALL", rpEdit = null;
+  const RP_CLS = { "מגיע": "s-ok", "מגיע חלקית": "s-part", "לא מגיע": "s-no" };
+
+  function rpDayNum(eur) { const m = String(eur).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m ? Math.round(Date.UTC(+m[3], +m[2] - 1, +m[1]) / 86400000) : null; }
+  function rpIsoFromEur(eur) { const m = String(eur).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m ? `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}` : ""; }
+  function rpShort(eur) { return String(eur).slice(0, 5); }
+
+  async function loadReservePlan() {
+    document.getElementById("rpLoading").classList.remove("hidden");
+    document.getElementById("rpBody").classList.add("hidden");
+    const res = await apiCall({ action: "reserve_plan_get" });
+    if (!isOk(res)) { document.getElementById("rpLoading").textContent = "⚠️ " + (res.message || "שגיאה בטעינה"); return; }
+    rpData = res;
+    document.getElementById("rpLoading").classList.add("hidden");
+    document.getElementById("rpBody").classList.remove("hidden");
+    document.getElementById("rpPeriod").textContent = `תקופת המילואים: ${res.period.start} - ${res.period.end} · ${res.period.days} ימים`;
+    renderRp();
+  }
+
+  function rpStrip(r) {
+    const p = rpData.period, s0 = rpDayNum(p.start), tot = p.days;
+    if (!r.ranges.length) return '<div class="rp-strip"></div>';
+    const stops = [];
+    r.ranges.forEach(x => {
+      const a = ((rpDayNum(x.from) - s0) / tot) * 100, b = ((rpDayNum(x.to) - s0 + 1) / tot) * 100;
+      stops.push(`transparent ${a}%, #22c55e ${a}%, #22c55e ${b}%, transparent ${b}%`);
+    });
+    // כל טווח כשכבה נפרדת
+    return `<div class="rp-strip" style="background:${r.ranges.map((x, i) => `linear-gradient(to left, ${stops[i]})`).join(",")}, #334155;"></div>`;
+  }
+
+  function renderRp() {
+    const rows = rpData.rows;
+    const q = document.getElementById("rpSearch").value.trim();
+    const inFw = rows.filter(r => rpFw === "ALL" || r.framework === rpFw);
+    const cnt = st => inFw.filter(r => r.status === st).length;
+    document.getElementById("rpStats").innerHTML =
+      `<div class="rp-stat ok"><b>${cnt("מגיע")}</b><span>מגיעים</span></div>` +
+      `<div class="rp-stat part"><b>${cnt("מגיע חלקית")}</b><span>חלקית</span></div>` +
+      `<div class="rp-stat no"><b>${cnt("לא מגיע")}</b><span>לא מגיעים</span></div>` +
+      `<div class="rp-stat days"><b>${inFw.reduce((a, r) => a + r.days, 0)}</b><span>ימי אדם</span></div>`;
+    const fws = rpData.frameworks.filter(f => rows.some(r => r.framework === f));
+    document.getElementById("rpFwChips").innerHTML = [["ALL", "כל הפלוגה", rows.length]].concat(fws.map(f => [f, f, rows.filter(r => r.framework === f).length]))
+      .map(([k, label, n]) => `<span class="rp-chip ${rpFw === k ? "on" : ""}" data-k="${escapeHtml(k)}" onclick="rpFw=this.dataset.k;renderRp()">${escapeHtml(label)} (${n})</span>`).join("");
+    document.getElementById("rpStChips").innerHTML = [["ALL", "כל הסטטוסים"], ["מגיע", "✅ מגיע"], ["מגיע חלקית", "🟡 חלקית"], ["לא מגיע", "❌ לא מגיע"]]
+      .map(([k, label]) => `<span class="rp-chip ${rpSt === k ? "on" : ""}" data-k="${k}" onclick="rpSt=this.dataset.k;renderRp()">${label}</span>`).join("");
+    const shown = inFw.filter(r => (rpSt === "ALL" || r.status === rpSt) && (!q || r.name.includes(q)));
+    const groups = rpFw === "ALL" ? fws : [rpFw];
+    let html = "";
+    groups.forEach(f => {
+      const g = shown.filter(r => r.framework === f);
+      if (!g.length) return;
+      const all = rows.filter(r => r.framework === f);
+      html += `<div class="rp-fw-head"><span>${escapeHtml(f)}</span><small>✅ ${all.filter(r => r.status === "מגיע").length} · 🟡 ${all.filter(r => r.status === "מגיע חלקית").length} · ❌ ${all.filter(r => r.status === "לא מגיע").length}</small></div>`;
+      html += g.map(r => `<div class="rp-card ${RP_CLS[r.status] || ""}" onclick="openRpEdit(${r.row})">
+        <div class="rp-card-top"><b>${escapeHtml(r.name)}</b><span class="rp-badge ${RP_CLS[r.status] || ""}">${escapeHtml(r.status || "?")} · ${r.days}/${rpData.period.days}</span></div>
+        ${rpStrip(r)}
+        ${r.status === "מגיע חלקית" ? `<div class="rp-dates">${r.ranges.map(x => x.from === x.to ? rpShort(x.from) : `${rpShort(x.from)}–${rpShort(x.to)}`).join(" , ")}</div>` : ""}
+        ${r.note ? `<div class="rp-note">💬 ${escapeHtml(r.note)}</div>` : ""}
+      </div>`).join("");
+    });
+    document.getElementById("rpList").innerHTML = html || '<div class="item-box" style="text-align:center;color:#94a3b8;">אין חיילים להצגה.</div>';
+  }
+
+  function openRpEdit(row) {
+    const r = row === -1 ? null : rpData.rows.find(x => x.row === row);
+    rpEdit = r ? { row: r.row, origName: r.name, status: r.status, ranges: r.ranges.map(x => ({ from: rpIsoFromEur(x.from), to: rpIsoFromEur(x.to) })) }
+               : { row: null, origName: "", status: "", ranges: [] };
+    document.getElementById("rpEditTitle").textContent = r ? `✏️ ${r.name}` : "➕ הוספת חייל להערכות";
+    document.getElementById("rpName").value = r ? r.name : "";
+    document.getElementById("rpPn").value = r ? r.pn : "";
+    document.getElementById("rpFw").innerHTML = rpData.frameworks.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join("");
+    document.getElementById("rpFw").value = r ? r.framework : (rpFw !== "ALL" ? rpFw : rpData.frameworks[0]);
+    document.getElementById("rpNote").value = r ? r.note : "";
+    document.getElementById("rpDeleteBtn").classList.toggle("hidden", !r);
+    renderRpEdit();
+    document.getElementById("rpEditOverlay").classList.remove("hidden");
+  }
+  function closeRpEdit() { document.getElementById("rpEditOverlay").classList.add("hidden"); rpEdit = null; }
+
+  function setRpStatus(st) {
+    rpEdit.status = st;
+    if (st === "מגיע חלקית" && !rpEdit.ranges.length) rpEdit.ranges.push({ from: rpIsoFromEur(rpData.period.start), to: rpIsoFromEur(rpData.period.end) });
+    renderRpEdit();
+  }
+  function addRpRange() { rpEdit.ranges.push({ from: "", to: "" }); renderRpEdit(); }
+  function rpRangeDays() {
+    const p = rpData.period, s0 = rpDayNum(p.start), e0 = rpDayNum(p.end), set = new Set();
+    rpEdit.ranges.forEach(x => { const a = rpDayNum(isoToEur(x.from)), b = rpDayNum(isoToEur(x.to)); if (a === null || b === null) return; for (let d = Math.max(a, s0); d <= Math.min(b, e0); d++) set.add(d); });
+    return set.size;
+  }
+  function renderRpEdit() {
+    const st = rpEdit.status;
+    document.querySelectorAll(".rp-status-btns button").forEach(b => b.classList.toggle("on", b.dataset.st === st));
+    document.getElementById("rpRangesBox").classList.toggle("hidden", st !== "מגיע חלקית");
+    const full = document.getElementById("rpFullNote");
+    full.classList.toggle("hidden", st !== "מגיע" && st !== "לא מגיע");
+    full.textContent = st === "מגיע" ? `כל התקופה: ${rpData.period.start} - ${rpData.period.end} (${rpData.period.days} ימים)` : st === "לא מגיע" ? "לא מגיע בכלל לתקופה." : "";
+    document.getElementById("rpNoteReq").textContent = st && st !== "מגיע" ? "(חובה)" : "(לא חובה)";
+    const min = rpIsoFromEur(rpData.period.start), max = rpIsoFromEur(rpData.period.end);
+    document.getElementById("rpRanges").innerHTML = rpEdit.ranges.map((x, i) => `<div class="rp-range">
+      <input type="date" min="${min}" max="${max}" value="${x.from}" onchange="rpEdit.ranges[${i}].from=this.value;updateRpDays()">
+      <span>עד</span>
+      <input type="date" min="${min}" max="${max}" value="${x.to}" onchange="rpEdit.ranges[${i}].to=this.value;updateRpDays()">
+      <button type="button" class="skel-flex-del" title="מחק טווח" onclick="rpEdit.ranges.splice(${i},1);renderRpEdit()">🗑️</button></div>`).join("");
+    updateRpDays();
+  }
+  function updateRpDays() { document.getElementById("rpDaysCount").textContent = `(${rpRangeDays()} מתוך ${rpData.period.days} ימים)`; }
+
+  async function saveRp(btn) {
+    const name = document.getElementById("rpName").value.trim();
+    const note = document.getElementById("rpNote").value.trim();
+    if (!name) { toast("יש להזין שם", "err"); return; }
+    if (!rpEdit.status) { toast("בחר סטטוס הגעה", "err"); return; }
+    if (rpEdit.status !== "מגיע" && !note) { toast("יש לכתוב הסבר", "err"); document.getElementById("rpNote").focus(); return; }
+    if (rpEdit.status === "מגיע חלקית" && rpEdit.ranges.some(x => !x.from || !x.to)) { toast("יש למלא תאריך התחלה וסיום בכל טווח", "err"); return; }
+    setBtnBusy(btn, true, "שומר...");
+    const res = await apiCall({ action: "reserve_plan_save", row: rpEdit.row, origName: rpEdit.origName, name, framework: document.getElementById("rpFw").value,
+      pn: document.getElementById("rpPn").value.trim(), status: rpEdit.status, note, ranges: rpEdit.status === "מגיע חלקית" ? rpEdit.ranges : [] });
+    setBtnBusy(btn, false);
+    if (!isOk(res)) { toast(res.message || "שגיאה בשמירה", "err"); return; }
+    toast(res.message, "ok");
+    closeRpEdit();
+    await loadReservePlan();
+  }
+
+  function deleteRp() {
+    const row = rpEdit.row, name = rpEdit.origName;
+    confirmModal("מחיקה מההערכות", `למחוק את ${name} מהערכות המילואים? (רק מהגיליון הזה - לא מרשימת החיילים של הפלוגה)`, "מחק", async () => {
+      const res = await apiCall({ action: "reserve_plan_delete", row, name });
+      if (!isOk(res)) { toast(res.message || "שגיאה", "err"); return; }
+      toast(res.message, "ok");
+      closeRpEdit();
+      await loadReservePlan();
+    });
   }
 
   // ==========================================
