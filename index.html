@@ -70,6 +70,7 @@
 
     .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .hub-tile { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.15s; }
+    .hub-tile.wide { grid-column: 1 / -1; border-color: #0369a1; background: linear-gradient(135deg, #0f172a, #082f49); }
     .hub-tile:hover, .hub-tile:active { border-color: #38bdf8; background: #172554; transform: translateY(-2px); }
     .hub-icon { font-size: 2rem; margin-bottom: 8px; }
     .hub-title { font-weight: bold; font-size: 1.05rem; color: #f8fafc; }
@@ -1332,10 +1333,11 @@
     grid.innerHTML = "";
     const perms = currentUser.permissions || {};
     const tiles = [
+      { show: Boolean(perms.reservePlan || perms.adminPanel), wide: true, icon: "🗓️", title: "הערכות למילואים",
+        desc: (perms.attendanceAllCompany || perms.adminPanel) ? "מי מגיע, באילו תאריכים ולמה - כל הפלוגה" : `מי מגיע, באילו תאריכים ולמה - ${currentUser.framework}`, key: "reserve" },
       { show: true, icon: "📅", title: "שבצק - צפיה", desc: "משימות היום ומחר ותמונת שבצ\"ק", key: "shavzak_view" },
       { show: true, icon: "✍️", title: "טופס חתימות", desc: "נשקייה ואפסנאות אישית", key: "signatures" },
       { show: true, icon: "📻", title: "קשרים", desc: "חתימה והחזרה של מכשיר קשר", key: "radio" },
-      { show: Boolean(perms.reservePlan || perms.adminPanel), icon: "🗓️", title: "הערכות למילואים", desc: "מי מגיע, באילו תאריכים ולמה - לפי מסגרות", key: "reserve" },
       { show: Boolean(perms.shavzakon || perms.adminPanel), icon: "📋", title: "שבצקון משימה", desc: "תדריך ובדיקת ציוד לפני עלייה למשימה", key: "shavzakon" },
       { show: Boolean(perms.attendanceReport), icon: "📋", title: "דיווח נוכחות", desc: perms.attendanceAllCompany ? "כלל הפלוגה" : (perms.allowedAttendanceFrameworks || []).join(", "), key: "attendance" },
       { show: Boolean(perms.maflagReturns), icon: "📦", title: "טופס זיכויים", desc: "זיכוי ציוד ודוחות מפל\"ג", key: "maflag" },
@@ -1348,7 +1350,7 @@
     ];
     tiles.filter(t => t.show).forEach(t => {
       const card = document.createElement("div");
-      card.className = "hub-tile";
+      card.className = "hub-tile" + (t.wide ? " wide" : "");
       card.onclick = () => openScreen(t.key);
       card.innerHTML = `<div class="hub-icon">${t.icon}</div><div class="hub-title">${escapeHtml(t.title)}</div><div class="hub-desc">${escapeHtml(t.desc)}</div>`;
       grid.appendChild(card);
@@ -3663,6 +3665,7 @@
     const res = await apiCall({ action: "reserve_plan_get" });
     if (!isOk(res)) { document.getElementById("rpLoading").textContent = "⚠️ " + (res.message || "שגיאה בטעינה"); return; }
     rpData = res;
+    if (res.scope !== "ALL") rpFw = res.scope; // קצין רואה רק את המסגרת שלו
     document.getElementById("rpLoading").classList.add("hidden");
     document.getElementById("rpBody").classList.remove("hidden");
     document.getElementById("rpPeriod").textContent = `תקופת המילואים: ${res.period.start} - ${res.period.end} · ${res.period.days} ימים`;
@@ -3692,6 +3695,7 @@
       `<div class="rp-stat no"><b>${cnt("לא מגיע")}</b><span>לא מגיעים</span></div>` +
       `<div class="rp-stat days"><b>${inFw.reduce((a, r) => a + r.days, 0)}</b><span>ימי אדם</span></div>`;
     const fws = rpData.frameworks.filter(f => rows.some(r => r.framework === f));
+    document.getElementById("rpFwChips").classList.toggle("hidden", rpData.scope !== "ALL");
     document.getElementById("rpFwChips").innerHTML = [["ALL", "כל הפלוגה", rows.length]].concat(fws.map(f => [f, f, rows.filter(r => r.framework === f).length]))
       .map(([k, label, n]) => `<span class="rp-chip ${rpFw === k ? "on" : ""}" data-k="${escapeHtml(k)}" onclick="rpFw=this.dataset.k;renderRp()">${escapeHtml(label)} (${n})</span>`).join("");
     document.getElementById("rpStChips").innerHTML = [["ALL", "כל הסטטוסים"], ["מגיע", "✅ מגיע"], ["מגיע חלקית", "🟡 חלקית"], ["לא מגיע", "❌ לא מגיע"]]
@@ -3723,6 +3727,7 @@
     document.getElementById("rpPn").value = r ? r.pn : "";
     document.getElementById("rpFw").innerHTML = rpData.frameworks.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join("");
     document.getElementById("rpFw").value = r ? r.framework : (rpFw !== "ALL" ? rpFw : rpData.frameworks[0]);
+    document.getElementById("rpFw").disabled = rpData.scope !== "ALL";
     document.getElementById("rpNote").value = r ? r.note : "";
     document.getElementById("rpDeleteBtn").classList.toggle("hidden", !r);
     renderRpEdit();
