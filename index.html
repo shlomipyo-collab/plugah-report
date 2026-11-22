@@ -1579,6 +1579,10 @@
     return lines.length ? lines : [""];
   }
 
+  // סמל הפלוגה לפינת תמונת השבצ"ק (קובץ מקומי, כדי שאפשר יהיה לשמור את התמונה)
+  const SHV_LOGO = new Image();
+  SHV_LOGO.src = "icons/icon-192.png";
+
   function buildShavzakCanvas(b) {
     const FONT = "Arial, 'Segoe UI', Tahoma, sans-serif";
     const DAY_START = 360, DAY_END = 1800;           // 06:00 עד 06:00 למחרת
@@ -1638,7 +1642,7 @@
 
     // כותרת ארוכה מטבלה צרה - מרחיבים את עמודות המשימות כדי שהכותרת לא תיחתך
     m.font = `bold 22px ${FONT}`;
-    const titleNeed = m.measureText(b.title || "").width + 30;
+    const titleNeed = m.measureText(b.title || "").width + 30 + 120; // מקום לסמל בפינה
     const baseW = 74 + 66 * 2 + tasks.reduce((a, t) => a + colW[t], 0);
     if (titleNeed > baseW && tasks.length) {
       const extra = Math.ceil((titleNeed - baseW) / tasks.length);
@@ -1664,6 +1668,9 @@
     ctx.fillText(b.title || "שבצ\"ק", W / 2, margin + 20);
     ctx.font = `13px ${FONT}`; ctx.fillStyle = C.muted;
     ctx.fillText("לו\"ז 06:00 עד 06:00 למחרת", W / 2, margin + 42);
+    if (SHV_LOGO.complete && SHV_LOGO.naturalWidth) {
+      try { ctx.drawImage(SHV_LOGO, W - margin - 46, margin + 2, 46, 46); } catch (e) {}
+    }
 
     const top = margin + titleH, gridTop = top + headH, gridBottom = gridTop + gridH;
     const yOf = min => gridTop + (min - DAY_START) / 60 * hourH;
