@@ -491,7 +491,7 @@
     </div>
     <div class="card"><h2>מי הפעיל התראות</h2><div id="pushAdmStats"></div></div>
     <div class="card"><h2>מתוזמנות</h2><div id="pushAdmSched"></div></div>
-    <div class="card"><h2>יומן התראות</h2><div style="color:var(--ink-muted);font-size:13px;margin-bottom:8px;">ידניות + אוטומטיות (שבצקון בתחילת משימה, החזרת קשר בסיום, נוכחות ב-10:00, פרסום שבצ"ק)</div><div id="pushAdmLog"></div></div>
+    <div class="card"><h2>יומן התראות</h2><div style="color:var(--ink-muted);font-size:13px;margin-bottom:8px;">ידניות + אוטומטיות: שבצ"ק פורסם, שבצקון (5 דק' אחרי תחילת משימה), החזרת קשר (חצי שעה אחרי סיום), נוכחות למחר (18:00), שלד (19:00), שיבוץ ואישורים, "לא פורסם" (22:00, 23:30)</div><div id="pushAdmLog"></div></div>
   </div>
 
   <!-- מסך 2: דשבורד ראשי -->
@@ -1439,7 +1439,7 @@
     document.body.classList.add("has-tabbar");
     document.getElementById("tabBar").classList.remove("hidden");
     homeCache = null;
-    if (pendingGo && canOpenScreen(pendingGo)) { const g = pendingGo; pendingGo = null; navTab(g); }
+    if (pendingGo && resolveGo(pendingGo)) { const g = resolveGo(pendingGo); pendingGo = null; navTab(g); }
     else if (isPlainSoldier()) openScreen("shavzak_view");
     else openHome();
     pendingGo = null;
@@ -1552,10 +1552,18 @@
   function canOpenScreen(key) {
     const p = (currentUser && currentUser.permissions) || {};
     const map = { home: !isPlainSoldier(), shavzak_view: true, radio: true, signatures: true, shavzakon: p.shavzakon || p.adminPanel,
-      attendance: p.attendanceReport || p.adminPanel, reserve: p.reservePlan || p.adminPanel };
+      attendance: p.attendanceReport || p.adminPanel, reserve: p.reservePlan || p.adminPanel,
+      shavzak_platoon: p.shavzakPlatoon && !p.shavzakOfficers, shavzak_officers: p.shavzakOfficers, shavzak_final: p.shavzakFinalApproval };
     return Boolean(map[key]);
   }
-  function goFromPush(key) { if (currentUser && canOpenScreen(key)) navTab(key); }
+  function resolveGo(key) {
+    if (!currentUser || !key) return null;
+    if (canOpenScreen(key)) return key;
+    if (key.indexOf("shavzak_") === 0) { const t = tabsForUser().find(x => x.key.indexOf("shavzak_") === 0 && x.key !== homeKey()); return t ? t.key : "shavzak_view"; }
+    if (key === "home") return homeKey();
+    return null;
+  }
+  function goFromPush(key) { const k = resolveGo(key); if (k) navTab(k); }
   if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", ev => { if (ev.data && ev.data.type === "go") goFromPush(ev.data.go); });
 
   // ---------- מסך ניהול התראות (שלומי) ----------
