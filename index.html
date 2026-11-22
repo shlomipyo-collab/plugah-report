@@ -124,6 +124,13 @@
     .home-sk .hs-line { font-size: 14px; margin-top: 4px; }
     .home-sk .hs-goals { font-size: 14px; margin-top: 6px; white-space: pre-wrap; background: var(--surface-sunken); border-radius: var(--radius-md); padding: 8px 10px; max-height: 140px; overflow: auto; }
     .home-sk .btn-action { margin-top: 10px; min-height: 42px; }
+    .push-card { display: flex; align-items: center; gap: 10px; background: var(--info-soft); border: 1px solid var(--info); border-radius: var(--radius-lg); padding: 10px 12px; margin-bottom: 12px; }
+    .push-card .pc-ic { font-size: 22px; }
+    .push-card .pc-txt { flex: 1; font-size: 14px; line-height: 19px; }
+    .push-card .pc-txt span { color: var(--ink-muted); font-size: 12.5px; }
+    .push-card .pc-btns { display: flex; align-items: center; gap: 4px; }
+    .push-card .pc-x { width: auto; margin: 0; background: none; border: none; color: var(--ink-muted); font-size: 16px; padding: 4px 6px; cursor: pointer; }
+    .push-hub-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-sunken); font-size: 14px; }
     .todo-item { width: 100%; margin: 0 0 8px; display: flex; align-items: center; gap: 10px; text-align: right; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-inline-start: 4px solid var(--warn); border-radius: var(--radius-md); padding: 11px 12px; font: 500 14.5px/20px var(--font-sans); cursor: pointer; }
     .todo-item.lvl-bad { border-inline-start-color: var(--signal); background: var(--signal-soft); }
     .todo-item.lvl-info { border-inline-start-color: var(--info); }
@@ -462,16 +469,43 @@
     <div id="homeBody"><div class="loading-msg">טוען תמונת מצב...</div></div>
   </div>
 
+  <!-- ניהול התראות (שלומי) -->
+  <div id="screenPush" class="narrow-wrap hidden">
+    <div class="card">
+      <h2>שליחת התראה</h2>
+      <label>כותרת:</label><input type="text" id="pushTitle" maxlength="80" placeholder="למשל: עדכון לו&quot;ז">
+      <label>תוכן:</label><textarea id="pushBody" rows="3" maxlength="400" placeholder="מה רוצים להגיד?"></textarea>
+      <label>למי:</label>
+      <div id="pushAudTypes" class="sk-chips">
+        <button type="button" class="rp-chip on" data-t="all" onclick="setPushAudType('all')">כל הפלוגה</button>
+        <button type="button" class="rp-chip" data-t="fw" onclick="setPushAudType('fw')">מסגרות</button>
+        <button type="button" class="rp-chip" data-t="role" onclick="setPushAudType('role')">תפקידים</button>
+        <button type="button" class="rp-chip" data-t="people" onclick="setPushAudType('people')">חיילים מסוימים</button>
+      </div>
+      <div id="pushAudBody"></div>
+      <label>לחיצה על ההתראה תפתח:</label>
+      <select id="pushGo"><option value="">את האפליקציה</option><option value="shavzak_view">שבצ"ק - צפיה</option><option value="radio">קשרים</option><option value="shavzakon">שבצקון משימה</option><option value="attendance">דיווח נוכחות</option><option value="signatures">טופס חתימות</option></select>
+      <div class="checkbox-row"><input type="checkbox" id="pushSchedOn" onchange="document.getElementById('pushAt').classList.toggle('hidden', !this.checked)"><label for="pushSchedOn">לתזמן למועד אחר</label></div>
+      <input type="datetime-local" id="pushAt" class="hidden">
+      <button type="button" class="btn-action btn-primary" onclick="sendPushAdmin(this)">🔔 שליחה</button>
+    </div>
+    <div class="card"><h2>מי הפעיל התראות</h2><div id="pushAdmStats"></div></div>
+    <div class="card"><h2>מתוזמנות</h2><div id="pushAdmSched"></div></div>
+    <div class="card"><h2>יומן התראות</h2><div style="color:var(--ink-muted);font-size:13px;margin-bottom:8px;">ידניות + אוטומטיות (שבצקון בתחילת משימה, החזרת קשר בסיום, נוכחות ב-10:00, פרסום שבצ"ק)</div><div id="pushAdmLog"></div></div>
+  </div>
+
   <!-- מסך 2: דשבורד ראשי -->
   <div id="screenHub" class="card narrow-wrap hidden">
     <h2 id="hubTitle" style="text-align:center;margin-bottom:14px;">בחר מסך פעולה:</h2>
     <div id="hubTilesGrid" class="hub-grid"></div>
+    <div id="hubPushSlot"></div>
   </div>
 
   <!-- מסך 3: שבצק - צפיה -->
   <div id="screenShavzakView" class="narrow-wrap hidden">
     <div class="card">
       <h2>📅 שבצק - צפיה</h2>
+      <div id="soldierPushSlot"></div>
       <div id="soldierTodo"></div>
       <div id="soldierShvLoading" class="loading-msg">טוען משימות שבצ"ק...</div>
       <div id="soldierShvContent" class="hidden">
@@ -1405,17 +1439,186 @@
     document.body.classList.add("has-tabbar");
     document.getElementById("tabBar").classList.remove("hidden");
     homeCache = null;
-    if (isPlainSoldier()) openScreen("shavzak_view");
+    if (pendingGo && canOpenScreen(pendingGo)) { const g = pendingGo; pendingGo = null; navTab(g); }
+    else if (isPlainSoldier()) openScreen("shavzak_view");
     else openHome();
+    pendingGo = null;
+    refreshPushAfterLogin();
   }
 
   function hideAllScreens() {
-    ["screenLogin", "screenHub", "screenHome", "screenShavzakView", "screenSignatures", "screenAttendance",
+    ["screenLogin", "screenHub", "screenHome", "screenPush", "screenShavzakView", "screenSignatures", "screenAttendance",
      "screenMaflag", "screenReports", "screenShavzakBuilder", "screenAdmin", "screenRadio", "screenShavzakon", "screenReservePlan"]
       .forEach(id => document.getElementById(id).classList.add("hidden"));
   }
 
   function goHome() { navTab(homeKey()); }
+
+  // ==========================================
+  // התראות פוש (Firebase Cloud Messaging)
+  // ==========================================
+  const FB_CONFIG = { apiKey: "AIzaSyD4iwIfmg2P4WsiwcbXrgU0FcU5dIPmBwg", authDomain: "pluga-8109.firebaseapp.com", projectId: "pluga-8109",
+    storageBucket: "pluga-8109.firebasestorage.app", messagingSenderId: "1058909212585", appId: "1:1058909212585:web:5c86b6756c6dc19656feb8" };
+  const FB_VAPID = "BDToxzpQpazEM_Qjfzoo7P2QACrUBJ_qrXnV2UTi5cIzNOrVe4dGJ1S38gZDz1K-9uxblLmKd2FzZjguAy0DZcA";
+  const FB_SDK = "https://www.gstatic.com/firebasejs/13.4.0/";
+  let fbMessaging = null;
+  const isIOSDevice = () => /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandaloneApp = () => (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+
+  function pushSupport() {
+    if (isIOSDevice() && !isStandaloneApp()) return "ios_install";
+    if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) return "none";
+    return Notification.permission; // default / granted / denied
+  }
+  function pushDeviceLabel() {
+    const ua = navigator.userAgent;
+    return (isIOSDevice() ? "iPhone" : /android/i.test(ua) ? "Android" : /windows/i.test(ua) ? "Windows" : /mac/i.test(ua) ? "Mac" : "אחר") + (isStandaloneApp() ? " · אפליקציה" : " · דפדפן");
+  }
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  async function getFcmToken() {
+    const reg = await navigator.serviceWorker.register("sw.js");
+    await navigator.serviceWorker.ready;
+    if (!fbMessaging) {
+      const { initializeApp } = await import(FB_SDK + "firebase-app.js");
+      const { getMessaging } = await import(FB_SDK + "firebase-messaging.js");
+      fbMessaging = getMessaging(initializeApp(FB_CONFIG));
+    }
+    const { getToken } = await import(FB_SDK + "firebase-messaging.js");
+    return getToken(fbMessaging, { vapidKey: FB_VAPID, serviceWorkerRegistration: reg });
+  }
+
+  // רישום הטוקן בשרת (בכל כניסה - כדי שהמכשיר תמיד יהיה משויך למשתמש המחובר)
+  async function registerPush(loud) {
+    try {
+      const tok = await getFcmToken();
+      if (!tok) throw new Error("לא התקבל טוקן");
+      const res = await apiCall({ action: "push_register", fcmToken: tok, device: pushDeviceLabel() });
+      if (!isOk(res)) throw new Error(res.message || "שגיאה");
+      lsSet("pushToken", tok);
+      lsSet("pushRegFor", currentUser.personalNumber + "|" + new Date().toDateString());
+      if (loud) toast("🔔 ההתראות הופעלו", "ok");
+      return true;
+    } catch (e) {
+      console.log("push register failed", e);
+      if (loud) toast("לא הצלחנו להפעיל התראות: " + (e && e.message ? e.message : e), "err");
+      return false;
+    }
+  }
+
+  async function enablePush(btn) {
+    if (btn) setBtnBusy(btn, true, "מפעיל...");
+    let perm = "denied";
+    try { perm = await Notification.requestPermission(); } catch (e) {}
+    if (perm === "granted") await registerPush(true);
+    else toast(perm === "denied" ? "ההתראות חסומות. אפשר לאשר אותן בהגדרות הטלפון ← האתר/האפליקציה" : "ההתראות לא הופעלו", "err");
+    if (btn) setBtnBusy(btn, false);
+    renderPushPrompts();
+  }
+
+  function dismissPushPrompt() { lsSet("pushPromptDismissedAt", String(Date.now())); renderPushPrompts(); }
+
+  // הכרטיס "הפעל התראות" - במסך הבית / במסך המשימה של חייל
+  function pushPromptHtml() {
+    const st = pushSupport();
+    const dismissed = Number(lsGet("pushPromptDismissedAt") || 0);
+    if (Date.now() - dismissed < 3 * 24 * 3600 * 1000) return "";
+    if (st === "default") return `<div class="push-card"><div class="pc-ic">🔔</div><div class="pc-txt"><b>קבל התראות לטלפון</b><br><span>תזכורות למשימה, להחזרת קשר ופרסום השבצ"ק</span></div>
+      <div class="pc-btns"><button type="button" class="btn-mini home" onclick="enablePush(this)">הפעל</button><button type="button" class="pc-x" onclick="dismissPushPrompt()" aria-label="לא עכשיו">✕</button></div></div>`;
+    if (st === "ios_install") return `<div class="push-card"><div class="pc-ic">📲</div><div class="pc-txt"><b>רוצה התראות באייפון?</b><br><span>צריך קודם להתקין: שיתוף ⬆️ ← "הוסף למסך הבית", ולפתוח מהאייקון</span></div>
+      <div class="pc-btns"><button type="button" class="pc-x" onclick="dismissPushPrompt()" aria-label="סגור">✕</button></div></div>`;
+    return "";
+  }
+  function renderPushPrompts() {
+    ["homePushSlot", "soldierPushSlot", "hubPushSlot"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = id === "hubPushSlot" ? pushHubRowHtml() : pushPromptHtml(); });
+  }
+  function pushHubRowHtml() {
+    const st = pushSupport();
+    const label = st === "granted" ? "🔔 התראות פעילות במכשיר הזה" : st === "denied" ? "🔕 ההתראות חסומות (אפשר לשנות בהגדרות הטלפון)" : st === "ios_install" ? "📲 להתראות באייפון - התקן את האפליקציה למסך הבית" : st === "none" ? "המכשיר הזה לא תומך בהתראות" : "🔕 התראות כבויות";
+    return `<div class="push-hub-row"><span>${label}</span>${st === "default" ? `<button type="button" class="btn-mini home" onclick="enablePush(this)">הפעל</button>` : ""}</div>`;
+  }
+
+  // אחרי כניסה: אם כבר אושר - מרעננים את הרישום (פעם ביום לכל משתמש)
+  function refreshPushAfterLogin() {
+    if (pushSupport() !== "granted" || !currentUser) return;
+    if (lsGet("pushRegFor") === currentUser.personalNumber + "|" + new Date().toDateString()) return;
+    registerPush(false);
+  }
+
+  // פתיחה מהתראה: ?go=מסך או הודעה מה-service worker
+  let pendingGo = null;
+  try { const g = new URLSearchParams(location.search).get("go"); if (g) { pendingGo = g; history.replaceState(null, "", location.pathname); } } catch (e) {}
+  function canOpenScreen(key) {
+    const p = (currentUser && currentUser.permissions) || {};
+    const map = { home: !isPlainSoldier(), shavzak_view: true, radio: true, signatures: true, shavzakon: p.shavzakon || p.adminPanel,
+      attendance: p.attendanceReport || p.adminPanel, reserve: p.reservePlan || p.adminPanel };
+    return Boolean(map[key]);
+  }
+  function goFromPush(key) { if (currentUser && canOpenScreen(key)) navTab(key); }
+  if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", ev => { if (ev.data && ev.data.type === "go") goFromPush(ev.data.go); });
+
+  // ---------- מסך ניהול התראות (שלומי) ----------
+  let pushAdm = { info: null, type: "all", fws: [], roles: [], people: [] };
+  async function loadPushAdmin() {
+    const box = document.getElementById("pushAdmStats");
+    box.innerHTML = '<div class="loading-msg">טוען...</div>';
+    const res = await apiCall({ action: "push_admin_info" });
+    if (!isOk(res)) { box.innerHTML = `<div style="color:var(--signal);">${escapeHtml(res.message || "שגיאה")}</div>`; return; }
+    pushAdm.info = res;
+    box.innerHTML = `<div class="stat-grid" style="grid-template-columns:1fr 1fr;margin-bottom:10px;"><div class="stat"><div class="st-v">${res.totalSubscribed}/${res.totalSoldiers}</div><div class="st-k">הפעילו התראות</div></div>
+      <div class="stat"><div class="st-v">${res.scheduled.length}</div><div class="st-k">מתוזמנות</div></div></div>
+      <table class="fw-table"><thead><tr><th>מסגרת</th><th>הפעילו</th><th>מתוך</th></tr></thead><tbody>${res.frameworks.filter(f => f.total).map(f => `<tr><td>${escapeHtml(f.framework)}</td><td>${f.subscribed}</td><td>${f.total}</td></tr>`).join("")}</tbody></table>`;
+    renderPushAudience();
+    document.getElementById("pushAdmSched").innerHTML = res.scheduled.length ? res.scheduled.map(s => `<div class="item-box" style="display:flex;gap:8px;align-items:center;"><div style="flex:1;"><b>${escapeHtml(s.title)}</b> · ${escapeHtml(skFmtTs(s.at))}<br><span style="color:var(--ink-muted);font-size:13px;">${escapeHtml(s.body)}</span></div><button type="button" class="btn-mini danger" onclick="cancelPushSched('${escapeHtml(s.id)}')">ביטול</button></div>`).join("") : '<div style="color:var(--ink-muted);font-size:14px;">אין התראות מתוזמנות</div>';
+    document.getElementById("pushAdmLog").innerHTML = res.log.length ? res.log.map(l => `<div class="item-box"><div style="display:flex;justify-content:space-between;gap:8px;"><b>${escapeHtml(l.title)}</b><span class="chip ${/ידני|מתוזמן/.test(l.kind) ? "info" : "ok"}">${escapeHtml(l.kind)}</span></div>
+      <div style="font-size:14px;">${escapeHtml(l.body)}</div><div style="color:var(--ink-muted);font-size:12.5px;margin-top:2px;">${escapeHtml(skFmtTs(l.ts))} · ${escapeHtml(l.audience)} · נשלחו ${l.sent}${l.failed ? ` · נכשלו ${l.failed}` : ""}</div></div>`).join("") : '<div style="color:var(--ink-muted);font-size:14px;">עוד לא נשלחו התראות</div>';
+  }
+  function setPushAudType(t) { pushAdm.type = t; renderPushAudience(); }
+  function togglePushVal(kind, v) { const a = pushAdm[kind]; const i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else a.push(v); renderPushAudience(); }
+  function renderPushAudience() {
+    const info = pushAdm.info; if (!info) return;
+    document.querySelectorAll("#pushAudTypes .rp-chip").forEach(b => b.classList.toggle("on", b.dataset.t === pushAdm.type));
+    const box = document.getElementById("pushAudBody");
+    if (pushAdm.type === "fw") box.innerHTML = `<div class="sk-chips">${ALL_FRAMEWORKS.map(f => `<button type="button" class="rp-chip${pushAdm.fws.includes(f) ? " on" : ""}" onclick="togglePushVal('fws','${escapeHtml(f)}')">${escapeHtml(f)}</button>`).join("")}</div>`;
+    else if (pushAdm.type === "role") box.innerHTML = `<div class="sk-chips">${info.roles.map(f => `<button type="button" class="rp-chip${pushAdm.roles.includes(f) ? " on" : ""}" onclick="togglePushVal('roles','${escapeHtml(f)}')">${escapeHtml(f)}</button>`).join("")}</div>`;
+    else if (pushAdm.type === "people") {
+      box.innerHTML = `<div class="sk-chips">${pushAdm.people.map((k, i) => `<span class="sk-chip">${escapeHtml(k.split("|")[1])}<button type="button" onclick="pushAdm.people.splice(${i},1);renderPushAudience()" aria-label="הסר">✕</button></span>`).join("")}</div>
+        <div class="sk-picker"><input type="text" id="pushPeopleQ" placeholder="הקלד שם חייל..." oninput="pushPeopleSearch()" autocomplete="off"><div id="pushPeopleRes"></div></div>`;
+    } else box.innerHTML = `<div style="color:var(--ink-muted);font-size:14px;">כל חיילי הפלוגה שהפעילו התראות</div>`;
+  }
+  function pushPeopleSearch() {
+    const q = document.getElementById("pushPeopleQ").value.trim();
+    const out = document.getElementById("pushPeopleRes");
+    if (!q) { out.innerHTML = ""; return; }
+    const hits = pushAdm.info.soldiers.filter(s => s.name.includes(q) && !pushAdm.people.includes(s.key)).slice(0, 8);
+    out.innerHTML = hits.length ? `<div class="sk-results">${hits.map(s => `<div class="sk-res" onclick="pushAdm.people.push('${escapeHtml(s.key)}');renderPushAudience();document.getElementById('pushPeopleQ').focus()"><span>${escapeHtml(s.name)}</span><small>${escapeHtml(s.framework)}</small></div>`).join("")}</div>` : "";
+  }
+  async function sendPushAdmin(btn) {
+    const title = document.getElementById("pushTitle").value.trim(), body = document.getElementById("pushBody").value.trim();
+    if (!title || !body) { toast("יש למלא כותרת ותוכן", "err"); return; }
+    const values = pushAdm.type === "fw" ? pushAdm.fws : pushAdm.type === "role" ? pushAdm.roles : pushAdm.type === "people" ? pushAdm.people : [];
+    if (pushAdm.type !== "all" && !values.length) { toast("בחר למי לשלוח", "err"); return; }
+    const sched = document.getElementById("pushSchedOn").checked ? document.getElementById("pushAt").value : "";
+    if (document.getElementById("pushSchedOn").checked && !sched) { toast("בחר מועד שליחה", "err"); return; }
+    const go = document.getElementById("pushGo").value;
+    const doSend = async () => {
+      setBtnBusy(btn, true, "שולח...");
+      const res = await apiCall({ action: "push_admin_send", title, body, go, audience: { type: pushAdm.type, values }, sendAt: sched ? new Date(sched).toISOString() : "" });
+      setBtnBusy(btn, false);
+      if (!isOk(res)) { toast(res.message || "שגיאה", "err"); return; }
+      toast(res.message, "ok");
+      document.getElementById("pushTitle").value = ""; document.getElementById("pushBody").value = "";
+      loadPushAdmin();
+    };
+    if (pushAdm.type === "all" && !sched) confirmModal("שליחה לכל הפלוגה", `לשלוח עכשיו את "${title}" לכל מי שהפעיל התראות?`, "שלח", doSend);
+    else doSend();
+  }
+  async function cancelPushSched(id) {
+    const res = await apiCall({ action: "push_admin_cancel", id });
+    toast(res.message || "", isOk(res) ? "ok" : "err");
+    loadPushAdmin();
+  }
 
   // ==========================================
   // סרגל ניווט תחתון + מסך בית
@@ -1516,6 +1719,8 @@
     let h = `<div class="home-hello"><div><div class="hh-name">שלום, ${escapeHtml(first)}</div><div class="hh-date">${escapeHtml(homeDayName(res.today))} ${escapeHtml(res.today)} · ${escapeHtml(scopeLabel)}</div></div>
       <button type="button" class="home-refresh" onclick="openHome()">רענון</button></div>`;
 
+    h += `<div id="homePushSlot">${pushPromptHtml()}</div>`;
+
     // שבצקון פעיל - בולט בראש המסך כל עוד המשימה רצה
     homeActiveSk = res.activeShavzakon || null;
     if (homeActiveSk) {
@@ -1608,6 +1813,7 @@
       shavzak_platoon: svg('<rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><path d="M17.5 14v7M14 17.5h7"></path>'),
       shavzak_officers: svg('<path d="M12 3l2.7 5.5 6 .9-4.4 4.2 1 6-5.3-2.8-5.3 2.8 1-6L3.3 9.4l6-.9z"></path>'),
       shavzak_final: svg('<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"></path><path d="M8.5 12l2.5 2.5 4.5-4.5"></path>'),
+      push_admin: svg('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>'),
       admin: svg('<circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path>')
     };
   })();
@@ -1657,7 +1863,8 @@
       { show: Boolean(perms.shavzakPlatoon && !perms.shavzakOfficers), icon: "🪖", title: "בניית שבצק", desc: `שיבוץ חיילי ${currentUser.framework}`, key: "shavzak_platoon" },
       { show: Boolean(perms.shavzakOfficers), icon: "⭐", title: "שבצק - קצינים", desc: "חלוקת משימות למחלקות ושיבוץ", key: "shavzak_officers" },
       { show: Boolean(perms.shavzakFinalApproval), icon: "🎖️", title: "שבצק - אישור סופי", desc: "בקרה ואישור מ\"פ לשבצ\"ק", key: "shavzak_final" },
-      { show: Boolean(perms.adminPanel), icon: "🛠️", title: "ממשק אדמין", desc: "ניהול חיילים, העברות והצלבות", key: "admin" }
+      { show: Boolean(perms.adminPanel), icon: "🛠️", title: "ממשק אדמין", desc: "ניהול חיילים, העברות והצלבות", key: "admin" },
+      { show: Boolean(perms.adminPanel), icon: "🔔", title: "התראות", desc: "שליחה ידנית, תזמון ויומן", key: "push_admin" }
     ];
     tiles.filter(t => t.show).forEach(t => {
       const card = document.createElement("div");
@@ -1669,9 +1876,11 @@
     document.getElementById("hubTitle").textContent = isPlainSoldier() ? "בחר מסך פעולה:" : "כל המסכים";
     document.getElementById("screenHub").classList.remove("hidden");
     renderTabBar();
+    renderPushPrompts();
   }
 
   function logoutUser(silent) {
+    { const pt = lsGet("pushToken"); if (authToken && pt) { apiCall({ action: "push_unregister", fcmToken: pt }); lsSet("pushRegFor", ""); } }
     if (authToken && !silent) apiCall({ action: "logout" });
     currentUser = null; authToken = null; shvState = null; sharedDB = null; soldierGearData = null; mafLoadedSoldier = null;
     mobileWarningShown = false; shvForceSkeletonEdit = false;
@@ -1742,6 +1951,9 @@
       }
       document.getElementById("screenShavzakBuilder").classList.remove("hidden");
       initShavzakBuilderScreen();
+    } else if (screenKey === "push_admin") {
+      document.getElementById("screenPush").classList.remove("hidden");
+      await loadPushAdmin();
     } else if (screenKey === "admin") {
       document.getElementById("screenAdmin").classList.remove("hidden");
       await loadShlomiWorkspace();
@@ -1752,6 +1964,7 @@
   // שבצק - צפיה
   // ==========================================
   async function loadSoldierShavzakTab() {
+    renderPushPrompts();
     const todoBox = document.getElementById("soldierTodo");
     todoBox.innerHTML = "";
     if (isPlainSoldier()) { // תזכורות אישיות (למשל החזרת קשר אחרי משימה)
