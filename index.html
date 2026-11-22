@@ -5,7 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>מסייעת 8109 - פורטל פלוגתי</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#f5f4ef">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+  <script>
+    // מצב בהיר/כהה: לפי בחירה ידנית, אחרת לפי הגדרת המכשיר
+    (function () { try { var t = localStorage.getItem("theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {} })();
+  </script>
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,166 +20,188 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="מסייעת 8109">
   <style>
-    :root { color-scheme: dark; --primary: #0284c7; --bg: #0f172a; --card: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --success: #16a34a; --danger: #dc2626; --warning: #d97706; }
+    /* ===== ספר העיצוב של מסייעת 8109: טוקנים (בהיר / כהה) ===== */
+    :root { color-scheme: light; --bg:#f5f4ef;--surface:#ffffff;--surface-sunken:#ecebe3;--line:#dedccf;--line-strong:#858979;--ink:#1e211b;--ink-muted:#5b6052;--olive:#566236;--olive-strong:#46512b;--olive-soft:#e6e9d8;--on-olive:#ffffff;--sand:#c7b68a;--sand-soft:#f1ebdc;--sand-ink:#6b5a2e;--signal:#b23427;--signal-soft:#f8e1de;--on-signal:#ffffff;--ok:#2d7044;--ok-soft:#dcefe2;--warn:#86560c;--warn-soft:#f6ead2;--info:#2f5f80;--info-soft:#dfe9f0;--focus:#566236;--shadow-card:0 1px 2px rgba(30,33,27,0.06);--shadow-float:0 8px 24px rgba(30,33,27,0.14);
+      --font-display: Rubik, Heebo, "Arial Hebrew", Arial, sans-serif; --font-sans: Heebo, "Segoe UI", "Arial Hebrew", Arial, sans-serif;
+      --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --radius-pill: 999px;
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-7: 48px;
+      --primary: var(--olive); --card: var(--surface); --border: var(--line); --text: var(--ink); --muted: var(--ink-muted); --success: var(--ok); --danger: var(--signal); --warning: var(--warn); }
+    :root[data-theme="dark"] { color-scheme: dark; --bg:#131510;--surface:#1b1e17;--surface-sunken:#0e100c;--line:#30342a;--line-strong:#6b705f;--ink:#eceee4;--ink-muted:#a4a896;--olive:#a3b06f;--olive-strong:#b8c486;--olive-soft:#2c3320;--on-olive:#131510;--sand:#cdbd90;--sand-soft:#302b1d;--sand-ink:#d9c99b;--signal:#f0695c;--signal-soft:#3b1f1b;--on-signal:#131510;--ok:#6cc18a;--ok-soft:#1a3022;--warn:#e0a548;--warn-soft:#3a2d14;--info:#7fb0d2;--info-soft:#1c2b36;--focus:#c7d38f;--shadow-card:none;--shadow-float:0 8px 24px rgba(0,0,0,0.5); }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; --bg:#131510;--surface:#1b1e17;--surface-sunken:#0e100c;--line:#30342a;--line-strong:#6b705f;--ink:#eceee4;--ink-muted:#a4a896;--olive:#a3b06f;--olive-strong:#b8c486;--olive-soft:#2c3320;--on-olive:#131510;--sand:#cdbd90;--sand-soft:#302b1d;--sand-ink:#d9c99b;--signal:#f0695c;--signal-soft:#3b1f1b;--on-signal:#131510;--ok:#6cc18a;--ok-soft:#1a3022;--warn:#e0a548;--warn-soft:#3a2d14;--info:#7fb0d2;--info-soft:#1c2b36;--focus:#c7d38f;--shadow-card:none;--shadow-float:0 8px 24px rgba(0,0,0,0.5); } }
+    .m-num, .num { font-variant-numeric: tabular-nums; }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+    /* סמן כנף - רק לפני כותרות אזור */
+    .m-wing { display: inline-flex; gap: 3px; flex: none; }
+    .m-wing i { display: block; width: 7px; height: 18px; background: var(--olive); transform: skewX(-24deg); }
+    .m-wing i + i { background: var(--sand); width: 5px; }
     * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0 auto; padding: 14px; max-width: 980px; }
+    body { font-family: var(--font-sans); font-size: 16px; line-height: 1.5; background: var(--bg); color: var(--ink); margin: 0 auto; padding: var(--space-4); max-width: 980px; -webkit-font-smoothing: antialiased; }
     .narrow-wrap { max-width: 560px; margin: 0 auto; }
-    .brand-header { text-align: center; margin-bottom: 14px; padding-bottom: 8px; }
-    .brand-header img { max-width: 100px; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); margin-bottom: 6px; border: 1px solid #475569; }
-    .brand-title { font-size: 1.45rem; font-weight: 900; letter-spacing: 1px; }
-    .brand-line { height: 3px; width: 60px; background: #38bdf8; margin: 6px auto 0; border-radius: 2px; }
-    #installBar { max-width: 560px; margin: 0 auto 14px; background: #082f49; border: 1px solid #38bdf8; border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+    .m-appbar { display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: 6px var(--space-4); margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) var(--space-4); background: var(--surface); border-bottom: 1px solid var(--line); }
+    .m-appbar img { height: 40px; width: 60px; object-fit: cover; border-radius: var(--radius-sm); flex: none; }
+    .m-appbar-title { font-family: var(--font-display); font-weight: 700; font-size: 18px; line-height: 22px; }
+    .m-appbar-sub { font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+    .m-icon-btn { margin-inline-start: auto; width: 40px; height: 40px; border-radius: var(--radius-md); border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); display: grid; place-items: center; cursor: pointer; padding: 0; }
+    .m-icon-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+    #installBar { max-width: 560px; margin: 0 auto 14px; background: var(--olive-soft); border: 1px solid var(--olive); border-radius: 12px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
     #installBar img { width: 42px; height: 42px; border-radius: 9px; flex: none; }
     #installBar .ib-txt { flex: 1; font-size: 0.9rem; line-height: 1.35; }
     #installBar button { margin: 0; width: auto; padding: 8px 14px; flex: none; }
-    #installBar .ib-x { background: transparent; border: none; color: #94a3b8; font-size: 1.1rem; padding: 4px 6px; }
+    #installBar .ib-x { background: transparent; border: none; color: var(--ink-muted); font-size: 1.1rem; padding: 4px 6px; }
     @media all and (display-mode: standalone) { body { padding-top: max(14px, env(safe-area-inset-top)); } }
 
     /* פס טעינה עליון */
     #netBar { position: fixed; top: 0; right: 0; left: 0; height: 3px; z-index: 10000; overflow: hidden; opacity: 0; transition: opacity .2s; pointer-events: none; }
     #netBar.active { opacity: 1; }
-    #netBar::before { content: ""; position: absolute; top: 0; height: 100%; width: 40%; background: #38bdf8; animation: netslide 1s infinite linear; }
+    #netBar::before { content: ""; position: absolute; top: 0; height: 100%; width: 40%; background: var(--olive); animation: netslide 1s infinite linear; }
     @keyframes netslide { from { right: -40%; } to { right: 100%; } }
 
     /* הודעות קופצות */
-    #toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%) translateY(120px); background: #1e293b; color: #f8fafc; border: 1px solid #38bdf8; padding: 12px 18px; border-radius: 10px; z-index: 10001; max-width: 92vw; font-weight: bold; font-size: 0.92rem; box-shadow: 0 6px 18px rgba(0,0,0,0.5); transition: transform .25s, opacity .25s; white-space: pre-line; text-align: center; opacity: 0; pointer-events: none; }
+    #toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--surface); color: var(--ink); border: 1px solid var(--olive); padding: 12px 18px; border-radius: 10px; z-index: 10001; max-width: 92vw; font-weight: bold; font-size: 0.92rem; box-shadow: 0 6px 18px rgba(0,0,0,0.5); transition: transform .25s, opacity .25s; white-space: pre-line; text-align: center; opacity: 0; pointer-events: none; }
     #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    #toast.err { border-color: #ef4444; background: #450a0a; }
-    #toast.ok { border-color: #22c55e; background: #052e16; }
+    #toast.err { border-color: var(--signal); background: var(--signal-soft); }
+    #toast.ok { border-color: var(--ok); background: var(--ok-soft); }
 
-    .user-profile-bar { background: #1e293b; padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; border: 1px solid #38bdf8; max-width: 640px; margin-left: auto; margin-right: auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .profile-info-main { font-size: 1.05rem; font-weight: bold; color: #fff; }
-    .profile-info-sub { font-size: 0.85rem; color: #7dd3fc; margin-top: 3px; }
+    .user-profile-bar { background: var(--surface); padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); margin: 0 auto var(--space-4); border: 1px solid var(--line); box-shadow: var(--shadow-card); max-width: 640px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap }
+    .profile-info-main { font-family: var(--font-display); font-size: 17px; line-height: 24px; font-weight: 600; color: var(--ink) }
+    .profile-info-sub { font-size: 13px; line-height: 18px; color: var(--ink-muted); margin-top: 2px }
     .top-bar-actions { display: flex; gap: 6px; }
-    .btn-mini { padding: 7px 11px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #e2e8f0; font-size: 0.82rem; font-weight: bold; cursor: pointer; }
-    .btn-mini.home { border-color: #38bdf8; color: #38bdf8; }
-    .btn-mini.danger { border-color: #dc2626; color: #fca5a5; }
+    .btn-mini { font: inherit; height: 34px; padding: 0 var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap }
+    .btn-mini.home { border-color: var(--olive); color: var(--olive) }
+    .btn-mini.danger { border-color: var(--signal); color: var(--signal) }
 
-    .card { background: var(--card); border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 1px solid var(--border); }
-    h2 { margin: 0 0 12px; font-size: 1.2rem; color: #38bdf8; }
-    label { display: block; font-weight: bold; margin: 8px 0 5px; font-size: 0.9rem; color: #cbd5e1; }
-    input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 11px; margin-bottom: 12px; border: 1px solid #475569; border-radius: 8px; font-size: 1rem; background: #0f172a; color: #fff; font-family: inherit; }
-    select:disabled { opacity: 0.9; background: #1e293b; color: #38bdf8; font-weight: bold; }
+    .card { background: var(--surface); border-radius: var(--radius-lg); padding: var(--space-4); margin-bottom: var(--space-4); box-shadow: var(--shadow-card); border: 1px solid var(--line) }
+    h2 { margin: 0 0 var(--space-3); font-family: var(--font-display); font-size: 20px; line-height: 26px; font-weight: 600; color: var(--ink) }
+    label { display: block; font-weight: 500; margin: 8px 0 6px; font-size: 13px; line-height: 18px; color: var(--ink-muted) }
+    input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="time"], select, textarea { width: 100%; min-height: 44px; padding: 10px var(--space-3); margin-bottom: 12px; border: 1px solid var(--line-strong); border-radius: var(--radius-md); font: inherit; font-size: 16px; background: var(--surface); color: var(--ink); }
+    input::placeholder, textarea::placeholder { color: var(--ink-muted); }
+    input:focus, select:focus, textarea:focus { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+    select:disabled { opacity: 1; background: var(--surface-sunken); color: var(--ink); font-weight: 600 }
     textarea { resize: vertical; }
-    .btn-action { width: 100%; border: none; padding: 13px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; color: #fff; margin-top: 4px; }
+    .btn-action { width: 100%; min-height: 48px; border: 1px solid transparent; padding: 12px var(--space-4); font: inherit; font-size: 15px; font-weight: 600; border-radius: var(--radius-md); cursor: pointer; color: var(--on-olive); margin-top: 4px }
     .btn-primary { background: var(--primary); }
     .btn-success { background: var(--success); }
     .btn-danger { background: var(--danger); }
     .btn-warning { background: var(--warning); }
-    .btn-purple { background: #8b5cf6; }
+    .btn-purple { background: var(--info); }
     .btn-wa { background: #25D366; }
-    .btn-secondary { background: #334155; }
-    .btn-action:disabled { background: #475569; cursor: not-allowed; opacity: .75; }
-    .btn-add-line { background: transparent; border: 1px dashed #38bdf8; color: #38bdf8; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 12px; }
+    .btn-secondary { background: var(--surface); color: var(--ink) !important; border-color: var(--line-strong) !important }
+    .btn-action:disabled { background: var(--surface-sunken); cursor: not-allowed; opacity: .75; }
+    .btn-add-line { background: transparent; border: 1px dashed var(--olive); color: var(--olive); width: 100%; min-height: 44px; padding: 10px; border-radius: var(--radius-md); font: inherit; font-weight: 600; cursor: pointer; margin-bottom: 12px }
     .btn-tab-container { display: flex; gap: 8px; margin-bottom: 16px; }
-    .btn-tab { flex: 1; padding: 11px 6px; border: 1px solid #475569; border-radius: 8px; background: #1e293b; color: #94a3b8; font-weight: bold; cursor: pointer; text-align: center; font-size: 0.9rem; }
-    .btn-tab.active { background: #0284c7; color: #fff; border-color: #0284c7; }
+    .btn-tab { flex: 1; min-height: 40px; padding: 8px 6px; border: 1px solid var(--line-strong); border-radius: var(--radius-pill); background: var(--surface); color: var(--ink); font-weight: 500; cursor: pointer; text-align: center; font-size: 14px }
+    .btn-tab.active { background: var(--olive); color: var(--on-olive); border-color: var(--olive); }
 
     .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .hub-tile { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.15s; }
-    .hub-tile.wide { grid-column: 1 / -1; border-color: #0369a1; background: linear-gradient(135deg, #0f172a, #082f49); }
-    .hub-tile:hover, .hub-tile:active { border-color: #38bdf8; background: #172554; transform: translateY(-2px); }
-    .hub-icon { font-size: 2rem; margin-bottom: 8px; }
-    .hub-title { font-weight: bold; font-size: 1.05rem; color: #f8fafc; }
-    .hub-desc { font-size: 0.78rem; color: #94a3b8; margin-top: 4px; }
+    .hub-tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); padding: var(--space-4) var(--space-3); text-align: center; cursor: pointer; transition: border-color .15s, background .15s }
+    .hub-tile.wide { grid-column: 1 / -1; border-color: var(--olive); background: var(--olive-soft) }
+    .hub-tile:hover, .hub-tile:active { border-color: var(--olive); background: var(--olive-soft) }
+    .hub-icon { width: 44px; height: 44px; margin: 0 auto 8px; border-radius: var(--radius-md); background: var(--olive-soft); color: var(--olive); display: grid; place-items: center }
+    .hub-title { font-family: var(--font-display); font-weight: 600; font-size: 17px; line-height: 24px; color: var(--ink) }
+    .hub-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+    .hub-tile.wide .hub-icon { background: var(--olive); color: var(--on-olive); }
+    .card > h2:first-child, .card > div:first-child > h2:first-child { display: flex; align-items: center; gap: var(--space-3); }
+    .card > h2:first-child::before, .card > div:first-child > h2:first-child::before { content: ""; flex: none; width: 15px; height: 18px; background: linear-gradient(90deg, var(--sand) 0 5px, transparent 5px 8px, var(--olive) 8px 15px); transform: skewX(-24deg); }
+    .btn-tab.active { font-weight: 600; }
+    .hub-desc { font-size: 13px; line-height: 18px; color: var(--ink-muted); margin-top: 2px }
 
     .status-box { padding: 10px; border-radius: 8px; margin-top: 10px; display: none; text-align: center; font-weight: bold; font-size: 0.9rem; white-space: pre-line; }
-    .status-ok { background: #064e3b; color: #a7f3d0; border: 1px solid #059669; }
-    .status-err { background: #7f1d1d; color: #fecaca; border: 1px solid #dc2626; }
-    .loading-msg { text-align: center; color: #94a3b8; padding: 14px; }
-    .item-box { background: #0f172a; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #334155; }
+    .status-ok { background: var(--ok-soft); color: var(--ok); border: 1px solid var(--ok); }
+    .status-err { background: var(--signal-soft); color: var(--signal); border: 1px solid var(--signal); }
+    .loading-msg { text-align: center; color: var(--ink-muted); padding: 14px; }
+    .item-box { background: var(--surface-sunken); padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--line); }
     .hidden { display: none !important; }
     .date-input-group { display: flex; gap: 8px; margin-bottom: 12px; }
     .date-input-group input[type="text"] { margin-bottom: 0; font-weight: bold; text-align: center; }
-    .date-pick-btn { position: relative; width: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; border: 1px solid #475569; border-radius: 8px; background: #0f172a; cursor: pointer; margin: 0; overflow: hidden; }
-    .date-pick-btn:hover { border-color: #38bdf8; }
+    .date-pick-btn { position: relative; width: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-sunken); cursor: pointer; margin: 0; overflow: hidden; }
+    .date-pick-btn:hover { border-color: var(--olive); }
     .date-pick-btn input[type="date"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; margin: 0; padding: 0; border: none; cursor: pointer; }
-    .task-edit { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .task-edit { background: var(--surface-sunken); border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
     .task-edit .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
     .task-edit input[type="time"] { min-width: 0; }
     .task-edit .grid3 label { margin: 0 0 3px; font-size: 0.78rem; }
     .task-edit input { margin-bottom: 8px; padding: 8px; }
     .day-chips { display: flex; gap: 5px; flex-wrap: wrap; margin: 4px 0 8px; }
-    .day-chip { min-width: 34px; text-align: center; padding: 6px 4px; border-radius: 7px; border: 1px solid #475569; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 0.85rem; user-select: none; }
-    .day-chip.on { background: #6d28d9; border-color: #a78bfa; color: #fff; }
+    .day-chip { min-width: 34px; text-align: center; padding: 6px 4px; border-radius: 7px; border: 1px solid var(--line-strong); color: var(--ink-muted); cursor: pointer; font-weight: bold; font-size: 0.85rem; user-select: none; }
+    .day-chip.on { background: var(--info); border-color: var(--info); color: var(--on-olive); }
     .desktop-only { }
     .mobile-only { display: none; }
     @media (max-width: 768px) { .desktop-only { display: none !important; } .mobile-only { display: block; } }
     @media (max-width: 768px) { .sticky-actions { padding: 10px; } .sticky-actions .btn-action { padding: 10px 6px; font-size: 0.9rem; } .progress-row { margin-bottom: 6px; font-size: 0.82rem; } }
-    .progress-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.9rem; font-weight: bold; color: #7dd3fc; }
-    .swap-banner { position: sticky; top: 4px; z-index: 6; background: #4c1d95; border: 2px solid #a78bfa; color: #fff; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: bold; }
-    .shv-slot-row.swap-target { outline: 2px dashed #a78bfa; cursor: pointer; }
-    .shv-slot-row.swap-source { background: #4c1d95; border-color: #a78bfa; }
+    .progress-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.9rem; font-weight: bold; color: var(--olive); }
+    .swap-banner { position: sticky; top: 4px; z-index: 6; background: var(--info-soft); border: 2px solid var(--info); color: var(--ink); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: bold; }
+    .shv-slot-row.swap-target { outline: 2px dashed var(--info); cursor: pointer; }
+    .shv-slot-row.swap-source { background: var(--info-soft); border-color: var(--info); }
     .shv-slot-row.flash { animation: flashSlot 1.2s ease 2; }
-    @keyframes flashSlot { 50% { background: #854d0e; border-color: #fbbf24; } }
-    .btn-swap { background: #312e81; color: #c7d2fe; border: 1px solid #6366f1; border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; }
+    @keyframes flashSlot { 50% { background: var(--warn-soft); border-color: var(--warn); } }
+    .btn-swap { background: var(--info-soft); color: var(--olive); border: 1px solid var(--info); border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; }
     .slot-actions { display: flex; gap: 5px; }
-    .row-issues { background: #450a0a; border: 1px solid #b91c1c; color: #fecaca; border-radius: 7px; padding: 6px 9px; font-size: 0.8rem; margin-bottom: 8px; }
+    .row-issues { background: var(--signal-soft); border: 1px solid var(--signal); color: var(--signal); border-radius: 7px; padding: 6px 9px; font-size: 0.8rem; margin-bottom: 8px; }
     .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9998; display: flex; align-items: flex-end; justify-content: center; }
-    .sheet { background: #1e293b; border-top: 2px solid #38bdf8; border-radius: 16px 16px 0 0; width: 100%; max-width: 620px; max-height: 82vh; display: flex; flex-direction: column; padding: 14px; }
+    .sheet { background: var(--surface); border-top: 2px solid var(--olive); border-radius: 16px 16px 0 0; width: 100%; max-width: 620px; max-height: 82vh; display: flex; flex-direction: column; padding: 14px; }
     .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
     .sheet-list { overflow-y: auto; flex: 1; margin-bottom: 8px; min-height: 120px; }
-    .sheet-item { background: #0f172a; border: 1px solid #334155; border-radius: 9px; padding: 10px 12px; margin-bottom: 6px; cursor: pointer; }
-    .sheet-item:active, .sheet-item:hover { border-color: #22c55e; }
-    .sheet-item.warn { border-color: #a16207; }
-    .sheet-info { font-size: 0.75rem; color: #fbbf24; margin-top: 3px; }
-    .sheet-sep { font-size: 0.75rem; color: #94a3b8; margin: 8px 2px 4px; }
-    .pl-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #334155; flex-wrap: wrap; }
+    .sheet-item { background: var(--surface-sunken); border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; margin-bottom: 6px; cursor: pointer; }
+    .sheet-item:active, .sheet-item:hover { border-color: var(--ok); }
+    .sheet-item.warn { border-color: var(--warn); }
+    .sheet-info { font-size: 0.75rem; color: var(--warn); margin-top: 3px; }
+    .sheet-sep { font-size: 0.75rem; color: var(--ink-muted); margin: 8px 2px 4px; }
+    .pl-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
     .pl-row:last-child { border-bottom: none; }
     .pl-status { font-size: 0.82rem; padding: 3px 8px; border-radius: 6px; font-weight: bold; white-space: nowrap; }
     .pl-actions { display: flex; gap: 6px; }
     .mode-tabs { display: flex; gap: 6px; margin-top: 10px; }
     .mode-tabs .btn-tab { padding: 8px 6px; }
     .review-box { border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
-    .review-box.ok { background: #052e16; border: 1px solid #22c55e; color: #bbf7d0; }
-    .review-box.bad { background: #450a0a; border: 2px solid #ef4444; color: #fecaca; }
-    .review-item { padding: 6px 8px; border-radius: 6px; margin: 4px 0; background: rgba(0,0,0,0.25); cursor: pointer; font-size: 0.88rem; }
-    .review-item:hover { background: rgba(255,255,255,0.08); }
-    .review-img-wrap { background: #fff; border-radius: 8px; overflow: auto; margin-bottom: 12px; }
+    .review-box.ok { background: var(--ok-soft); border: 1px solid var(--ok); color: var(--ok); }
+    .review-box.bad { background: var(--signal-soft); border: 2px solid var(--signal); color: var(--signal); }
+    .review-item { padding: 6px 8px; border-radius: var(--radius-sm); margin: 4px 0; background: var(--surface-sunken); cursor: pointer; font-size: 14px }
+    .review-item:hover { background: var(--olive-soft) }
+    .review-img-wrap { background: var(--surface); border-radius: 8px; overflow: auto; margin-bottom: 12px; }
     .review-img-wrap img { display: block; max-width: none; margin: 0 auto; }
     .skel-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    .skel-table th, .skel-table td { border: 1px solid #334155; padding: 6px 4px; text-align: center; }
-    .skel-table th { background: #0f172a; color: #38bdf8; position: sticky; top: 0; }
-    .skel-table td.lbl { text-align: right; color: #cbd5e1; font-size: 0.8rem; }
-    .skel-table tr.task-head td { background: #172554; color: #fff; font-weight: bold; }
-    .skel-time { width: 104px; padding: 4px 3px; margin: 2px 0; border: 1px solid #475569; border-radius: 6px; background: #0f172a; color: #fff; font-size: 0.8rem; color-scheme: dark; }
-    .skel-flex-add { font-size: 0.72rem; padding: 3px 7px; border-radius: 6px; border: 1px dashed #38bdf8; background: transparent; color: #7dd3fc; cursor: pointer; margin-right: 6px; font-weight: bold; }
-    .skel-flex-del { background: none; border: none; color: #f87171; cursor: pointer; font-size: 0.85rem; padding: 0 2px; }
+    .skel-table th, .skel-table td { border: 1px solid var(--line); padding: 6px 4px; text-align: center; }
+    .skel-table th { background: var(--surface-sunken); color: var(--olive); position: sticky; top: 0; }
+    .skel-table td.lbl { text-align: right; color: var(--ink); font-size: 0.8rem; }
+    .skel-table tr.task-head td { background: var(--olive-soft); color: var(--ink); font-weight: bold; }
+    .skel-time { width: 104px; padding: 4px 3px; margin: 2px 0; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface-sunken); color: var(--ink); font-size: 0.8rem; }
+    .skel-flex-add { font-size: 0.72rem; padding: 3px 7px; border-radius: 6px; border: 1px dashed var(--olive); background: transparent; color: var(--olive); cursor: pointer; margin-right: 6px; font-weight: bold; }
+    .skel-flex-del { background: none; border: none; color: var(--signal); cursor: pointer; font-size: 0.85rem; padding: 0 2px; }
     .flex-tools { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: -4px 0 10px; }
-    .flex-tools input[type="time"] { width: 110px; padding: 6px; margin: 0; border: 1px solid #475569; border-radius: 6px; background: #0f172a; color: #fff; color-scheme: dark; }
-    .sk-qty { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #cbd5e1; }
+    .flex-tools input[type="time"] { width: 110px; padding: 6px; margin: 0; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface-sunken); color: var(--ink); }
+    .sk-qty { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--ink); }
     .sk-qty input { width: 74px; margin: 0; padding: 7px; text-align: center; font-weight: bold; }
-    .skel-cell { cursor: pointer; min-width: 44px; color: #475569; font-size: 1rem; }
-    .skel-cell:hover { background: #1e3a8a; }
-    .skel-cell.on { background: #0369a1; color: #fff; font-weight: bold; }
-    .skel-all { cursor: pointer; font-size: 0.72rem; color: #93c5fd; }
+    .skel-cell { cursor: pointer; min-width: 44px; color: var(--ink-muted); font-size: 1rem; }
+    .skel-cell:hover { background: var(--olive-soft); }
+    .skel-cell.on { background: var(--olive); color: var(--on-olive); font-weight: bold; }
+    .skel-all { cursor: pointer; font-size: 0.72rem; color: var(--olive); }
     .skel-all:hover { text-decoration: underline; }
     .radio-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 10px; }
     @media (max-width: 420px) { .radio-grid { grid-template-columns: repeat(5, 1fr); } }
-    .radio-btn { aspect-ratio: 1; border-radius: 10px; border: 2px solid #334155; background: #0f172a; color: #e2e8f0; font-weight: 900; font-size: 1.15rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; padding: 2px; }
-    .radio-btn small { font-size: 0.55rem; font-weight: normal; color: #94a3b8; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-    .radio-btn.free { border-color: #15803d; }
-    .radio-btn.taken { border-color: #a16207; background: #1c1407; }
-    .radio-btn.mine { border-color: #0284c7; background: #082f49; }
-    .radio-btn.sel { outline: 3px solid #22c55e; outline-offset: 1px; }
-    .radio-picked { background: #0f172a; border: 1px solid #475569; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 0.88rem; }
-    .radio-photo-prev { max-width: 100%; max-height: 220px; border-radius: 8px; border: 1px solid #475569; margin-bottom: 10px; display: block; }
-    .radio-mine-item { background: #082f49; border: 1px solid #0284c7; border-radius: 9px; padding: 9px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .radio-btn { aspect-ratio: 1; border-radius: 10px; border: 2px solid var(--line); background: var(--surface-sunken); color: var(--ink); font-weight: 900; font-size: 1.15rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; padding: 2px; }
+    .radio-btn small { font-size: 0.55rem; font-weight: normal; color: var(--ink-muted); max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .radio-btn.free { border-color: var(--ok); }
+    .radio-btn.taken { border-color: var(--warn); background: var(--warn-soft); }
+    .radio-btn.mine { border-color: var(--olive); background: var(--olive-soft); }
+    .radio-btn.sel { outline: 3px solid var(--ok); outline-offset: 1px; }
+    .radio-picked { background: var(--surface-sunken); border: 1px solid var(--line-strong); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 0.88rem; }
+    .radio-photo-prev { max-width: 100%; max-height: 220px; border-radius: 8px; border: 1px solid var(--line-strong); margin-bottom: 10px; display: block; }
+    .radio-mine-item { background: var(--olive-soft); border: 1px solid var(--olive); border-radius: 9px; padding: 9px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
     .rr-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    .rr-table th, .rr-table td { border: 1px solid #334155; padding: 6px 5px; text-align: center; }
-    .rr-table th { background: #0f172a; color: #38bdf8; }
-    .rr-hamal { background: #052e16; border: 1px solid #22c55e; color: #bbf7d0; border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
-    .rr-move { border-bottom: 1px solid #334155; padding: 7px 2px; font-size: 0.83rem; }
+    .rr-table th, .rr-table td { border: 1px solid var(--line); padding: 6px 5px; text-align: center; }
+    .rr-table th { background: var(--surface-sunken); color: var(--olive); }
+    .rr-hamal { background: var(--ok-soft); border: 1px solid var(--ok); color: var(--ok); border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
+    .rr-move { border-bottom: 1px solid var(--line); padding: 7px 2px; font-size: 0.83rem; }
     .rr-move:last-child { border-bottom: none; }
-    .unreported-box { background: #451a03; border: 1px solid #d97706; color: #fde68a; border-radius: 8px; padding: 8px 10px; font-size: 0.8rem; margin-bottom: 10px; line-height: 1.5; }
+    .unreported-box { background: var(--warn-soft); border: 1px solid var(--warn); color: var(--warn); border-radius: 8px; padding: 8px 10px; font-size: 0.8rem; margin-bottom: 10px; line-height: 1.5; }
     .radio-group { display: flex; gap: 8px; margin-bottom: 10px; }
-    .radio-card { flex: 1; text-align: center; padding: 10px 4px; border: 1px solid #334155; border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: #0f172a; user-select: none; }
+    .radio-card { flex: 1; text-align: center; padding: 10px 4px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: var(--surface-sunken); user-select: none; }
     .radio-card input { display: none; }
-    .radio-card.active-green { background: #166534; border-color: #22c55e; color: #fff; font-weight: bold; }
-    .radio-card.active-red { background: #991b1b; border-color: #ef4444; color: #fff; font-weight: bold; }
-    .wp-kit-container { display: none; margin-top: 10px; padding: 12px; background: #1e293b; border-radius: 8px; border: 1px solid #475569; }
+    .radio-card.active-green { background: var(--ok); border-color: var(--ok); color: var(--on-olive); font-weight: bold; }
+    .radio-card.active-red { background: var(--signal); border-color: var(--signal); color: var(--on-olive); font-weight: bold; }
+    .wp-kit-container { display: none; margin-top: 10px; padding: 12px; background: var(--surface); border-radius: 8px; border: 1px solid var(--line-strong); }
     .kit-check, .return-check { display: flex; align-items: center; gap: 8px; margin-top: 8px; cursor: pointer; font-size: 0.95rem; }
-    .return-check { color: #f87171; font-weight: bold; }
+    .return-check { color: var(--signal); font-weight: bold; }
     .checkbox-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .checkbox-row input { width: 20px; height: 20px; margin: 0; }
     .btn-row { display: flex; gap: 8px; margin-top: 8px; }
@@ -180,114 +209,114 @@
     .att-bulk button { flex: 1; }
 
     /* שבצ"ק */
-    .shv-mission-hero { background: linear-gradient(135deg, #1e3a8a, #0f172a); border: 2px solid #38bdf8; border-radius: 12px; padding: 18px; margin-bottom: 14px; text-align: center; }
-    .shv-hero-day { font-size: 0.9rem; color: #7dd3fc; font-weight: bold; margin-bottom: 4px; }
-    .shv-hero-task { font-size: 1.5rem; font-weight: 900; color: #fff; margin: 4px 0; }
-    .shv-hero-hours { font-size: 1.15rem; color: #fde047; font-weight: bold; }
+    .shv-mission-hero { background: linear-gradient(135deg, var(--olive-soft), var(--surface-sunken)); border: 2px solid var(--olive); border-radius: 12px; padding: 18px; margin-bottom: 14px; text-align: center; }
+    .shv-hero-day { font-size: 0.9rem; color: var(--olive); font-weight: bold; margin-bottom: 4px; }
+    .shv-hero-task { font-size: 1.5rem; font-weight: 900; color: var(--ink); margin: 4px 0; }
+    .shv-hero-hours { font-size: 1.15rem; color: var(--warn); font-weight: bold; }
     .shv-workspace-grid { display: grid; grid-template-columns: 290px 1fr; gap: 14px; align-items: start; }
     @media (max-width: 768px) { .shv-workspace-grid { grid-template-columns: 1fr; } .shv-pool-panel { position: static !important; max-height: 46vh; overflow-y: auto; } }
-    .shv-pool-panel { background: #1e293b; border: 1px solid #38bdf8; border-radius: 12px; padding: 14px; position: sticky; top: 10px; max-height: calc(100vh - 20px); overflow-y: auto; }
-    .shv-soldier-chip { display: flex; justify-content: space-between; align-items: center; background: #0f172a; border: 1px solid #475569; padding: 9px 11px; border-radius: 8px; margin-bottom: 7px; cursor: pointer; gap: 6px; }
-    .shv-soldier-chip.busy { border-color: #a16207; }
-    .shv-soldier-chip.selected-chip { border: 2px solid #22c55e; background: #14532d; }
+    .shv-pool-panel { background: var(--surface); border: 1px solid var(--olive); border-radius: 12px; padding: 14px; position: sticky; top: 10px; max-height: calc(100vh - 20px); overflow-y: auto; }
+    .shv-soldier-chip { display: flex; justify-content: space-between; align-items: center; background: var(--surface-sunken); border: 1px solid var(--line-strong); padding: 9px 11px; border-radius: 8px; margin-bottom: 7px; cursor: pointer; gap: 6px; }
+    .shv-soldier-chip.busy { border-color: var(--warn); }
+    .shv-soldier-chip.selected-chip { border: 2px solid var(--ok); background: var(--ok-soft); }
     .chip-badge { font-size: 0.72rem; padding: 2px 6px; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 2px; }
-    .badge-cmdr { background: #0369a1; color: #e0f2fe; }
-    .badge-arrive { background: #065f46; color: #6ee7b7; }
-    .badge-leave { background: #92400e; color: #fde68a; }
-    .badge-busy { background: #713f12; color: #fde68a; }
-    .badge-fw { background: #334155; color: #cbd5e1; }
-    .chip-hours { font-size: 0.72rem; color: #fbbf24; margin-top: 3px; }
-    .shv-shift-card { background: #0f172a; border: 1px solid #0284c7; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
-    .shv-shift-card.dirty { border-color: #f59e0b; }
-    .shv-shift-locked { background: #161e2e; border: 1px dashed #334155; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: #94a3b8; gap: 8px; flex-wrap: wrap; }
-    .shv-slot-row { display: flex; justify-content: space-between; align-items: center; background: #1e293b; border: 1px solid #475569; padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; gap: 6px; }
-    .shv-slot-empty { border: 1px dashed #64748b; background: #0f172a; cursor: pointer; }
-    .shv-slot-empty.armed { border-color: #22c55e; background: #052e16; }
-    .shv-slot-warn { color: #fbbf24; font-size: 0.78rem; }
+    .badge-cmdr { background: var(--olive); color: var(--on-olive); }
+    .badge-arrive { background: var(--ok-soft); color: var(--ok); }
+    .badge-leave { background: var(--warn); color: var(--warn); }
+    .badge-busy { background: var(--warn-soft); color: var(--warn); }
+    .badge-fw { background: var(--surface-sunken); color: var(--ink); }
+    .chip-hours { font-size: 0.72rem; color: var(--warn); margin-top: 3px; }
+    .shv-shift-card { background: var(--surface-sunken); border: 1px solid var(--olive); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+    .shv-shift-card.dirty { border-color: var(--warn); }
+    .shv-shift-locked { background: var(--surface-sunken); border: 1px dashed var(--line); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: var(--ink-muted); gap: 8px; flex-wrap: wrap; }
+    .shv-slot-row { display: flex; justify-content: space-between; align-items: center; background: var(--surface); border: 1px solid var(--line-strong); padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; gap: 6px; }
+    .shv-slot-empty { border: 1px dashed var(--line-strong); background: var(--surface-sunken); cursor: pointer; }
+    .shv-slot-empty.armed { border-color: var(--ok); background: var(--ok-soft); }
+    .shv-slot-warn { color: var(--warn); font-size: 0.78rem; }
     /* הערכות למילואים */
     .rp-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; margin-bottom: 10px; }
-    .rp-stat { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 8px 4px; text-align: center; }
+    .rp-stat { background: var(--surface-sunken); border: 1px solid var(--line); border-radius: 10px; padding: 8px 4px; text-align: center; }
     .rp-stat b { display: block; font-size: 1.25rem; }
-    .rp-stat span { font-size: 0.72rem; color: #94a3b8; }
-    .rp-stat.ok b { color: #4ade80; } .rp-stat.part b { color: #fbbf24; } .rp-stat.no b { color: #f87171; } .rp-stat.days b { color: #7dd3fc; }
+    .rp-stat span { font-size: 0.72rem; color: var(--ink-muted); }
+    .rp-stat.ok b { color: var(--ok); } .rp-stat.part b { color: var(--warn); } .rp-stat.no b { color: var(--signal); } .rp-stat.days b { color: var(--olive); }
     .rp-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px; -webkit-overflow-scrolling: touch; }
-    .rp-chip { flex: none; padding: 7px 12px; border-radius: 999px; border: 1px solid #475569; background: #0f172a; color: #cbd5e1; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
-    .rp-chip.on { background: #0369a1; border-color: #38bdf8; color: #fff; font-weight: bold; }
-    .rp-fw-head { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 2px 6px; color: #38bdf8; font-weight: bold; }
-    .rp-fw-head small { color: #94a3b8; font-weight: normal; font-size: 0.78rem; }
-    .rp-card { background: #0f172a; border: 1px solid #334155; border-right: 4px solid #475569; border-radius: 10px; padding: 9px 11px; margin-bottom: 7px; cursor: pointer; }
-    .rp-card:active { background: #13213a; }
-    .rp-card.s-ok { border-right-color: #22c55e; } .rp-card.s-part { border-right-color: #f59e0b; } .rp-card.s-no { border-right-color: #ef4444; }
+    .rp-chip { flex: none; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface-sunken); color: var(--ink); font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
+    .rp-chip.on { background: var(--olive); border-color: var(--olive); color: var(--on-olive); font-weight: bold; }
+    .rp-fw-head { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 2px 6px; color: var(--olive); font-weight: bold; }
+    .rp-fw-head small { color: var(--ink-muted); font-weight: normal; font-size: 0.78rem; }
+    .rp-card { background: var(--surface-sunken); border: 1px solid var(--line); border-right: 4px solid var(--line-strong); border-radius: 10px; padding: 9px 11px; margin-bottom: 7px; cursor: pointer; }
+    .rp-card:active { background: var(--olive-soft); }
+    .rp-card.s-ok { border-inline-start-color: var(--ok); } .rp-card.s-part { border-inline-start-color: var(--warn); } .rp-card.s-no { border-inline-start-color: var(--signal); }
     .rp-card-top { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
     .rp-badge { font-size: 0.74rem; padding: 3px 8px; border-radius: 6px; font-weight: bold; white-space: nowrap; }
-    .rp-badge.s-ok { background: #14532d; color: #bbf7d0; } .rp-badge.s-part { background: #78350f; color: #fde68a; } .rp-badge.s-no { background: #7f1d1d; color: #fecaca; }
-    .rp-strip { height: 7px; border-radius: 4px; background: #334155; margin: 7px 0 5px; overflow: hidden; }
-    .rp-dates { font-size: 0.8rem; color: #cbd5e1; direction: ltr; text-align: right; }
-    .rp-note { font-size: 0.8rem; color: #94a3b8; margin-top: 3px; }
+    .rp-badge.s-ok { background: var(--ok-soft); color: var(--ok); } .rp-badge.s-part { background: var(--warn-soft); color: var(--warn); } .rp-badge.s-no { background: var(--signal-soft); color: var(--signal); }
+    .rp-strip { height: 7px; border-radius: 4px; background: var(--surface-sunken); margin: 7px 0 5px; overflow: hidden; }
+    .rp-dates { font-size: 0.8rem; color: var(--ink); direction: ltr; text-align: right; }
+    .rp-note { font-size: 0.8rem; color: var(--ink-muted); margin-top: 3px; }
     .rp-status-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
-    .rp-status-btns button { padding: 10px 4px; border-radius: 9px; border: 1px solid #475569; background: #0f172a; color: #cbd5e1; font-weight: bold; cursor: pointer; margin: 0; }
-    .rp-status-btns button.on.s-ok { background: #166534; border-color: #22c55e; color: #fff; }
-    .rp-status-btns button.on.s-part { background: #92400e; border-color: #f59e0b; color: #fff; }
-    .rp-status-btns button.on.s-no { background: #991b1b; border-color: #ef4444; color: #fff; }
+    .rp-status-btns button { padding: 10px 4px; border-radius: 9px; border: 1px solid var(--line-strong); background: var(--surface-sunken); color: var(--ink); font-weight: bold; cursor: pointer; margin: 0; }
+    .rp-status-btns button.on.s-ok { background: var(--ok); border-color: var(--ok); color: var(--on-olive); }
+    .rp-status-btns button.on.s-part { background: var(--warn); border-color: var(--warn); color: var(--on-olive); }
+    .rp-status-btns button.on.s-no { background: var(--signal); border-color: var(--signal); color: var(--on-olive); }
     .rp-range { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
-    .rp-range input { margin: 0; min-width: 0; flex: 1; padding: 8px; color-scheme: dark; }
+    .rp-range input { margin: 0; min-width: 0; flex: 1; padding: 8px; }
     .rp-sheet { max-height: 90vh; overflow-y: auto; }
     .rp-sheet label { font-size: 0.85rem; margin-top: 6px; }
     /* שבצקון משימה */
     .sk-missions { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-bottom: 12px; }
-    .sk-mission { padding: 12px 6px; border: 1px solid #334155; border-radius: 10px; background: #0f172a; text-align: center; font-weight: bold; cursor: pointer; user-select: none; }
-    .sk-mission.on { background: #0369a1; border-color: #38bdf8; color: #fff; }
-    .sk-mission small { display: block; font-weight: normal; color: #94a3b8; font-size: 0.72rem; margin-top: 3px; }
-    .sk-mission.on small { color: #e0f2fe; }
-    .sk-step { font-weight: bold; color: #38bdf8; margin: 14px 0 6px; font-size: 0.95rem; }
-    .sk-hint { font-size: 0.8rem; color: #94a3b8; margin: -4px 0 8px; line-height: 1.45; }
+    .sk-mission { padding: 12px 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-sunken); text-align: center; font-weight: bold; cursor: pointer; user-select: none; }
+    .sk-mission.on { background: var(--olive); border-color: var(--olive); color: var(--on-olive); }
+    .sk-mission small { display: block; font-weight: normal; color: var(--ink-muted); font-size: 0.72rem; margin-top: 3px; }
+    .sk-mission.on small { color: var(--on-olive); }
+    .sk-step { font-weight: bold; color: var(--olive); margin: 14px 0 6px; font-size: 0.95rem; }
+    .sk-hint { font-size: 0.8rem; color: var(--ink-muted); margin: -4px 0 8px; line-height: 1.45; }
     .sk-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; min-height: 8px; }
-    .sk-chip { background: #1e293b; border: 1px solid #475569; border-radius: 999px; padding: 5px 10px; font-size: 0.88rem; display: inline-flex; gap: 6px; align-items: center; }
-    .sk-chip.lead { border-color: #38bdf8; background: #082f49; }
-    .sk-chip button { background: none; border: none; color: #f87171; cursor: pointer; padding: 0; font-size: 0.95rem; line-height: 1; }
+    .sk-chip { background: var(--surface); border: 1px solid var(--line-strong); border-radius: 999px; padding: 5px 10px; font-size: 0.88rem; display: inline-flex; gap: 6px; align-items: center; }
+    .sk-chip.lead { border-color: var(--olive); background: var(--olive-soft); }
+    .sk-chip button { background: none; border: none; color: var(--signal); cursor: pointer; padding: 0; font-size: 0.95rem; line-height: 1; }
     .sk-picker { position: relative; margin-bottom: 4px; }
     .sk-picker input { margin-bottom: 0; }
-    .sk-results { background: #0f172a; border: 1px solid #38bdf8; border-radius: 8px; margin-top: 4px; max-height: 240px; overflow-y: auto; }
-    .sk-res { padding: 10px 12px; border-bottom: 1px solid #1e293b; cursor: pointer; display: flex; justify-content: space-between; gap: 8px; }
+    .sk-results { background: var(--surface-sunken); border: 1px solid var(--olive); border-radius: 8px; margin-top: 4px; max-height: 240px; overflow-y: auto; }
+    .sk-res { padding: 10px 12px; border-bottom: 1px solid var(--line); cursor: pointer; display: flex; justify-content: space-between; gap: 8px; }
     .sk-res:last-child { border-bottom: none; }
-    .sk-res:active, .sk-res:hover { background: #082f49; }
-    .sk-res small { color: #94a3b8; }
-    .sk-res-empty { padding: 10px 12px; color: #94a3b8; font-size: 0.85rem; }
+    .sk-res:active, .sk-res:hover { background: var(--olive-soft); }
+    .sk-res small { color: var(--ink-muted); }
+    .sk-res-empty { padding: 10px 12px; color: var(--ink-muted); font-size: 0.85rem; }
     .sk-add { display: flex; gap: 6px; }
     .sk-add input { margin-bottom: 0; }
     .sk-add button { width: auto; flex: none; margin: 0; padding: 0 14px; }
     .sk-times { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .sk-times input { min-width: 0; width: 100%; padding: 11px; margin-bottom: 8px; border: 1px solid #475569; border-radius: 8px; background: #0f172a; color: #fff; font-size: 1rem; font-family: inherit; color-scheme: dark; }
-    .sk-eq { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 9px 10px; margin-bottom: 7px; }
-    .sk-eq.missing { border-color: #ef4444; background: #2a0f12; }
-    .sk-eq.ok { border-color: #166534; }
+    .sk-times input { min-width: 0; width: 100%; padding: 11px; margin-bottom: 8px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-sunken); color: var(--ink); font-size: 1rem; font-family: inherit; }
+    .sk-eq { background: var(--surface-sunken); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; margin-bottom: 7px; }
+    .sk-eq.missing { border-color: var(--signal); background: var(--signal-soft); }
+    .sk-eq.ok { border-color: var(--ok); }
     .sk-eq-row { display: flex; align-items: center; gap: 8px; }
     .sk-eq-name { flex: 1; font-weight: bold; }
-    .sk-eq-btn { padding: 7px 10px; border-radius: 8px; border: 1px solid #475569; background: #1e293b; color: #cbd5e1; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
-    .sk-eq-btn.ok.on { background: #166534; border-color: #22c55e; color: #fff; }
-    .sk-eq-btn.miss.on { background: #991b1b; border-color: #ef4444; color: #fff; }
+    .sk-eq-btn { padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+    .sk-eq-btn.ok.on { background: var(--ok); border-color: var(--ok); color: var(--on-olive); }
+    .sk-eq-btn.miss.on { background: var(--signal); border-color: var(--signal); color: var(--on-olive); }
     .sk-eq input { margin: 8px 0 0; padding: 8px; }
     .sk-shift-pick { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-    .sk-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 11px 12px; margin-bottom: 9px; }
-    .sk-card.has-missing { border-color: #ef4444; }
+    .sk-card { background: var(--surface-sunken); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; margin-bottom: 9px; }
+    .sk-card.has-missing { border-color: var(--signal); }
     .sk-card-head { display: flex; justify-content: space-between; gap: 8px; cursor: pointer; }
     .sk-card-title { font-weight: bold; font-size: 1rem; }
-    .sk-card-sub { color: #94a3b8; font-size: 0.82rem; margin-top: 2px; }
-    .sk-card-body { margin-top: 10px; font-size: 0.9rem; line-height: 1.55; border-top: 1px solid #334155; padding-top: 8px; }
-    .sk-card-body b { color: #7dd3fc; }
+    .sk-card-sub { color: var(--ink-muted); font-size: 0.82rem; margin-top: 2px; }
+    .sk-card-body { margin-top: 10px; font-size: 0.9rem; line-height: 1.55; border-top: 1px solid var(--line); padding-top: 8px; }
+    .sk-card-body b { color: var(--olive); }
     .sk-eq-badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; font-weight: bold; white-space: nowrap; align-self: flex-start; }
-    .sk-eq-badge.ok { background: #14532d; color: #bbf7d0; }
-    .sk-eq-badge.bad { background: #7f1d1d; color: #fecaca; }
-    .btn-trash { background: #7f1d1d; color: #fecaca; border: 1px solid #dc2626; border-radius: 6px; padding: 5px 9px; cursor: pointer; font-size: 0.9rem; }
-    .btn-unassigned { background: #334155; color: #cbd5e1; border: 1px solid #64748b; border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 0.78rem; white-space: nowrap; }
-    .warning-banner { background: #7f1d1d; border: 1px solid #ef4444; color: #fecaca; padding: 14px; border-radius: 10px; margin-bottom: 14px; font-size: 0.95rem; text-align: center; }
-    .info-banner { background: #064e3b; border: 1px solid #10b981; color: #a7f3d0; padding: 14px; border-radius: 10px; margin-bottom: 14px; font-size: 0.95rem; text-align: center; }
+    .sk-eq-badge.ok { background: var(--ok-soft); color: var(--ok); }
+    .sk-eq-badge.bad { background: var(--signal-soft); color: var(--signal); }
+    .btn-trash { background: var(--signal-soft); color: var(--signal); border: 1px solid var(--signal); border-radius: 6px; padding: 5px 9px; cursor: pointer; font-size: 0.9rem; }
+    .btn-unassigned { background: var(--surface-sunken); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 0.78rem; white-space: nowrap; }
+    .warning-banner { background: var(--signal-soft); border: 1px solid var(--signal); color: var(--signal); padding: 14px; border-radius: 10px; margin-bottom: 14px; font-size: 0.95rem; text-align: center; }
+    .info-banner { background: var(--ok-soft); border: 1px solid var(--ok); color: var(--ok); padding: 14px; border-radius: 10px; margin-bottom: 14px; font-size: 0.95rem; text-align: center; }
     .summary-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 8px; }
-    .summary-table th, .summary-table td { border: 1px solid #334155; padding: 7px 5px; text-align: center; }
-    .summary-table th { background: #0f172a; color: #38bdf8; }
-    .summary-table tr:nth-child(even) { background: #162032; }
+    .summary-table th, .summary-table td { border: 1px solid var(--line); padding: 7px 5px; text-align: center; }
+    .summary-table th { background: var(--surface-sunken); color: var(--olive); }
+    .summary-table tr:nth-child(even) { background: var(--olive-soft); }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.78); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
-    .modal-box { background: #1e293b; border: 2px solid #38bdf8; border-radius: 14px; padding: 22px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
+    .modal-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: var(--space-5); max-width: 440px; width: 100%; text-align: center; box-shadow: var(--shadow-float) }
     .ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
     .sticky-actions { position: sticky; bottom: 0; z-index: 5; }
   </style>
@@ -296,16 +325,21 @@
   <div id="netBar"></div>
   <div id="toast"></div>
 
-  <div class="brand-header">
-    <img src="https://drive.google.com/thumbnail?id=1Suw_VFwFdSaiBw1-zRJ8sBzTTINynRvm&sz=w600" alt="מסייעת 8109">
-    <div class="brand-title">מסייעת 8109</div>
-    <div class="brand-line"></div>
-  </div>
+  <header class="m-appbar">
+    <img src="https://drive.google.com/thumbnail?id=1Suw_VFwFdSaiBw1-zRJ8sBzTTINynRvm&sz=w600" alt="סמל מסייעת 8109">
+    <div>
+      <div class="m-appbar-title">מסייעת 8109</div>
+      <div class="m-appbar-sub">ממשק ניהול פלוגה</div>
+    </div>
+    <button type="button" class="m-icon-btn" id="themeToggle" onclick="toggleTheme()" aria-label="מעבר בין מצב בהיר לכהה" title="מצב בהיר / כהה">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+    </button>
+  </header>
 
   <div id="installBar" class="hidden">
     <img src="icons/icon-192.png" alt="">
-    <div class="ib-txt"><b>התקן את מסייעת 8109 כאפליקציה</b><br><span id="installHint" style="color:#94a3b8;">אייקון במסך הבית, נפתח במסך מלא</span></div>
-    <button id="installBtn" type="button" style="background:#0284c7;color:#fff;border:none;border-radius:8px;font-weight:bold;">📲 התקן</button>
+    <div class="ib-txt"><b>התקן את מסייעת 8109 כאפליקציה</b><br><span id="installHint" style="color:var(--ink-muted);">אייקון במסך הבית, נפתח במסך מלא</span></div>
+    <button id="installBtn" type="button" style="background:var(--olive);color:var(--on-olive);border:none;border-radius:8px;font-weight:bold;">📲 התקן</button>
     <button class="ib-x" type="button" onclick="dismissInstall()" aria-label="סגור">✕</button>
   </div>
 
@@ -324,8 +358,8 @@
   <div id="customModal" class="modal-overlay hidden">
     <div class="modal-box">
       <div style="font-size:2.2rem;margin-bottom:8px;" id="modalIcon">💻</div>
-      <h3 style="margin:0 0 10px;color:#38bdf8;" id="modalTitle">הודעת מערכת</h3>
-      <p style="color:#e2e8f0;font-size:1rem;line-height:1.5;margin-bottom:18px;white-space:pre-line;" id="modalBody"></p>
+      <h3 style="margin:0 0 10px;color:var(--olive);" id="modalTitle">הודעת מערכת</h3>
+      <p style="color:var(--ink);font-size:1rem;line-height:1.5;margin-bottom:18px;white-space:pre-line;" id="modalBody"></p>
       <div class="btn-row">
         <button type="button" class="btn-action btn-primary" id="modalOkBtn">אישור</button>
         <button type="button" class="btn-action btn-secondary hidden" id="modalCancelBtn">ביטול</button>
@@ -336,8 +370,8 @@
   <!-- מודאל תמונת שבצ"ק -->
   <div id="shvImageModal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width:min(1100px,96vw);max-height:92vh;overflow:auto;">
-      <h3 style="margin:0 0 10px;color:#38bdf8;" id="shvImageTitle">📋 שבצ"ק פלוגתי רשמי</h3>
-      <img id="shvGeneratedImg" style="width:100%;border-radius:8px;border:1px solid #475569;margin-bottom:12px;" alt="שבצק">
+      <h3 style="margin:0 0 10px;color:var(--olive);" id="shvImageTitle">📋 שבצ"ק פלוגתי רשמי</h3>
+      <img id="shvGeneratedImg" style="width:100%;border-radius:8px;border:1px solid var(--line-strong);margin-bottom:12px;" alt="שבצק">
       <div class="btn-row">
         <button type="button" class="btn-action btn-wa" onclick="shareShavzakImage()">📱 שתף תמונה</button>
         <button type="button" class="btn-action btn-primary" onclick="downloadShavzakImage()">⬇️ הורד תמונה</button>
@@ -353,8 +387,8 @@
     <input type="text" id="loginPn" placeholder="מספר אישי..." inputmode="numeric" autocomplete="username" onkeydown="if(event.key==='Enter')checkPersonalNumber()">
     <button type="button" id="btnCheckPn" class="btn-action btn-primary" onclick="checkPersonalNumber()">המשך</button>
 
-    <div id="setPasswordBox" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid #334155;">
-      <div style="color:#38bdf8;font-weight:bold;margin-bottom:8px;" id="welcomeNewAuth"></div>
+    <div id="setPasswordBox" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--line);">
+      <div style="color:var(--olive);font-weight:bold;margin-bottom:8px;" id="welcomeNewAuth"></div>
       <label>בחר סיסמה אישית לכניסות הבאות (לפחות 4 תווים):</label>
       <input type="password" id="newPassInput" placeholder="הזן סיסמה חדשה..." autocomplete="new-password">
       <label>אימות סיסמה:</label>
@@ -362,8 +396,8 @@
       <button type="button" id="btnSavePass" class="btn-action btn-success" onclick="saveNewPassword()">💾 שמור סיסמה והתחבר</button>
     </div>
 
-    <div id="verifyPasswordBox" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid #334155;">
-      <div style="color:#cbd5e1;font-weight:bold;margin-bottom:8px;" id="welcomeReturningAuth"></div>
+    <div id="verifyPasswordBox" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--line);">
+      <div style="color:var(--ink);font-weight:bold;margin-bottom:8px;" id="welcomeReturningAuth"></div>
       <label>הזן סיסמה:</label>
       <input type="password" id="loginPassInput" placeholder="סיסמה..." autocomplete="current-password" onkeydown="if(event.key==='Enter')verifyExistingPassword()">
       <button type="button" id="btnVerifyPass" class="btn-action btn-primary" onclick="verifyExistingPassword()">🔓 התחבר למערכת</button>
@@ -417,19 +451,19 @@
             </select>
             <input type="text" id="licenseOther" style="display:none;" placeholder="פרט רישיון...">
           </div>
-          <label style="color:#f87171;">נשק נוכחי (סמן כדי להזדכות):</label>
+          <label style="color:var(--signal);">נשק נוכחי (סמן כדי להזדכות):</label>
           <div id="weaponsCurrentList"></div>
-          <label style="color:#38bdf8;margin-top:10px;">הוספת נשק/אמל"ח לחתימה:</label>
+          <label style="color:var(--olive);margin-top:10px;">הוספת נשק/אמל"ח לחתימה:</label>
           <div id="weaponsNewContainer"></div>
           <button type="button" class="btn-add-line" onclick="addWeaponRow()">+ הוסף נשק/אמל"ח</button>
           <button type="button" id="btnSaveWeapons" class="btn-action btn-success" onclick="submitWeaponsAction()">💾 שמור נשקייה</button>
         </div>
 
         <div id="logisticsSection" class="hidden">
-          <label style="color:#38bdf8;">ציוד אפסנאות עליו אתה חתום כרגע:</label>
+          <label style="color:var(--olive);">ציוד אפסנאות עליו אתה חתום כרגע:</label>
           <div id="logisticsCurrentList" style="margin-bottom:12px;"></div>
-          <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:12px;">* זיכוי ציוד אפסנאות מתבצע בטופס זיכויים מול המפל"ג.</div>
-          <label style="color:#38bdf8;">חתימה על ציוד אפסנאות נוסף:</label>
+          <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:12px;">* זיכוי ציוד אפסנאות מתבצע בטופס זיכויים מול המפל"ג.</div>
+          <label style="color:var(--olive);">חתימה על ציוד אפסנאות נוסף:</label>
           <div id="logisticsNewContainer"></div>
           <button type="button" class="btn-add-line" onclick="addLogisticsRow()">+ הוסף פריט אפסנאות</button>
           <button type="button" id="btnSaveLogistics" class="btn-action btn-success" onclick="submitLogisticsAction()">💾 חתום על ציוד אפסנאות</button>
@@ -446,7 +480,7 @@
       <label>תאריך תוקף הדוח (dd/mm/yyyy):</label>
       <div class="date-input-group">
         <input type="text" id="attReportDate" placeholder="dd/mm/yyyy">
-        <label class="date-pick-btn" title="בחר תאריך"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M7 13h2M11 13h2M15 13h2M7 17h2M11 17h2"/></svg><input type="date" id="attDatePicker" onclick="openNativePicker(this)"></label>
+        <label class="date-pick-btn" title="בחר תאריך"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M7 13h2M11 13h2M15 13h2M7 17h2M11 17h2"/></svg><input type="date" id="attDatePicker" onclick="openNativePicker(this)"></label>
       </div>
       <label>מסגרת:</label>
       <select id="attFrameworkSelect" onchange="loadAndRenderAttendanceSoldiers()"></select>
@@ -455,7 +489,7 @@
       <div id="attBulkWrap" class="att-bulk hidden">
         <button type="button" class="btn-mini" onclick="setAllAttendance(true)">✅ סמן את כולם נוכחים</button>
       </div>
-      <div id="attCounter" style="font-size:0.85rem;color:#7dd3fc;"></div>
+      <div id="attCounter" style="font-size:0.85rem;color:var(--olive);"></div>
     </div>
     <div id="attSoldiersContainer"></div>
     <div id="attStatusBox" class="status-box"></div>
@@ -478,13 +512,13 @@
       <select id="mafSoldierSelect" onchange="onMafSoldierSelected()"></select>
 
       <div id="mafSoldierDetails" class="hidden" style="margin-top:14px;">
-        <div style="background:#0f172a;padding:12px;border-radius:8px;margin-bottom:12px;border:1px solid #475569;">
-          <div style="font-weight:bold;color:#38bdf8;font-size:1.1rem;" id="mafSName"></div>
-          <div style="color:#cbd5e1;font-size:0.9rem;" id="mafSMeta"></div>
+        <div style="background:var(--surface-sunken);padding:12px;border-radius:8px;margin-bottom:12px;border:1px solid var(--line-strong);">
+          <div style="font-weight:bold;color:var(--olive);font-size:1.1rem;" id="mafSName"></div>
+          <div style="color:var(--ink);font-size:0.9rem;" id="mafSMeta"></div>
         </div>
-        <label style="color:#38bdf8;">📦 ציוד אפסנאות וציוד נלווה:</label>
+        <label style="color:var(--olive);">📦 ציוד אפסנאות וציוד נלווה:</label>
         <div id="mafLogisticsList"></div>
-        <label style="color:#f87171;margin-top:10px;">🔫 נשק ואמצעי לחימה:</label>
+        <label style="color:var(--signal);margin-top:10px;">🔫 נשק ואמצעי לחימה:</label>
         <div id="mafWeaponsList"></div>
 
         <button type="button" id="btnMafReturn" class="btn-action btn-danger" onclick="submitMaflagReturns()">🔴 בצע זיכוי לפריטים המסומנים</button>
@@ -544,7 +578,7 @@
   <div id="rpEditOverlay" class="sheet-overlay hidden" onclick="if(event.target===this)closeRpEdit()">
     <div class="sheet rp-sheet">
       <div class="sheet-head">
-        <div id="rpEditTitle" style="font-weight:bold;color:#38bdf8;"></div>
+        <div id="rpEditTitle" style="font-weight:bold;color:var(--olive);"></div>
         <button type="button" class="btn-mini" onclick="closeRpEdit()">✕</button>
       </div>
       <label>שם החייל</label>
@@ -560,15 +594,15 @@
         <button type="button" class="s-no" data-st="לא מגיע" onclick="setRpStatus('לא מגיע')">❌ לא מגיע</button>
       </div>
       <div id="rpRangesBox" class="hidden">
-        <label>תאריכי נוכחות <span id="rpDaysCount" style="color:#94a3b8;font-weight:normal;"></span></label>
+        <label>תאריכי נוכחות <span id="rpDaysCount" style="color:var(--ink-muted);font-weight:normal;"></span></label>
         <div id="rpRanges"></div>
         <button type="button" class="btn-add-line" onclick="addRpRange()">+ טווח תאריכים</button>
       </div>
       <div id="rpFullNote" class="sk-hint hidden"></div>
-      <label>הסבר <span id="rpNoteReq" style="color:#94a3b8;font-weight:normal;"></span></label>
+      <label>הסבר <span id="rpNoteReq" style="color:var(--ink-muted);font-weight:normal;"></span></label>
       <textarea id="rpNote" rows="3" maxlength="500" placeholder="למשל: חתונה, לימודים, חו״ל, לידה צפויה..."></textarea>
       <button type="button" class="btn-action btn-success" onclick="saveRp(this)">💾 שמירה</button>
-      <button type="button" id="rpDeleteBtn" class="btn-action" style="background:#7f1d1d;margin-top:6px;" onclick="deleteRp()">🗑️ מחיקת החייל מההערכות</button>
+      <button type="button" id="rpDeleteBtn" class="btn-action" style="background:var(--signal);color:var(--on-signal);margin-top:6px;" onclick="deleteRp()">🗑️ מחיקת החייל מההערכות</button>
     </div>
   </div>
 
@@ -595,7 +629,7 @@
             <div class="sk-hint">הראשון ברשימה = מפקד המשימה.</div>
             <div id="skCmdrs" class="sk-chips"></div>
             <div class="sk-picker"><input type="text" id="skAddCmdr" autocomplete="off" placeholder="🔍 הקלד שם להוספת מפקד..." oninput="skSearch('cmdrs')" onfocus="skSearch('cmdrs')" onblur="skHideResults('cmdrs')"><div id="skResCmdrs" class="sk-results hidden"></div></div>
-            <div class="sk-step">3. לוחמים <span id="skSoldiersCount" style="color:#94a3b8;font-weight:normal;"></span></div>
+            <div class="sk-step">3. לוחמים <span id="skSoldiersCount" style="color:var(--ink-muted);font-weight:normal;"></span></div>
             <div id="skSoldiers" class="sk-chips"></div>
             <div class="sk-picker"><input type="text" id="skAddSoldier" autocomplete="off" placeholder="🔍 הקלד שם להוספת לוחם..." oninput="skSearch('soldiers')" onfocus="skSearch('soldiers')" onblur="skHideResults('soldiers')"><div id="skResSoldiers" class="sk-results hidden"></div></div>
             <div class="sk-step">4. שעות צפויות</div>
@@ -605,7 +639,7 @@
             </div>
             <div class="sk-step">5. מטרות המשימה</div>
             <textarea id="skGoals" rows="4" maxlength="1500" placeholder="מה המטרות, דגשים, ציר תנועה, נקודות חשובות..."></textarea>
-            <div class="sk-step">6. בדיקת ציוד בכלי / במתקן <span id="skEqCount" style="color:#94a3b8;font-weight:normal;"></span></div>
+            <div class="sk-step">6. בדיקת ציוד בכלי / במתקן <span id="skEqCount" style="color:var(--ink-muted);font-weight:normal;"></span></div>
             <div id="skEqEmpty" class="sk-hint hidden">לא הוגדר ציוד למשימה הזו.</div>
             <button type="button" id="skAllOk" class="btn-mini" style="margin-bottom:8px;" onclick="skMarkAllOk()">✅ סמן הכול כקיים</button>
             <div id="skEquipment"></div>
@@ -619,7 +653,7 @@
             <button type="button" class="btn-action btn-wa" onclick="openWaText('skWaText')">📱 וואטסאפ</button>
             <button type="button" class="btn-action btn-primary" onclick="copyTextArea('skWaText')">📋 העתק</button>
           </div>
-          <button type="button" class="btn-action" style="background:#334155;margin-top:8px;" onclick="newShavzakon()">📝 שבצקון חדש</button>
+          <button type="button" class="btn-action btn-secondary" style="margin-top:8px;" onclick="newShavzakon()">📝 שבצקון חדש</button>
         </div>
       </div>
 
@@ -654,7 +688,7 @@
       </div>
 
       <div id="radioReturnSection" class="hidden">
-        <div id="radioReturnEmpty" class="item-box hidden" style="text-align:center;color:#94a3b8;">אין קשר שרשום עליך כרגע.</div>
+        <div id="radioReturnEmpty" class="item-box hidden" style="text-align:center;color:var(--ink-muted);">אין קשר שרשום עליך כרגע.</div>
         <div id="radioReturnForm">
           <label>1. איזה מכשיר:</label>
           <select id="radioReturnDevice"></select>
@@ -684,7 +718,7 @@
   <!-- תמונת קשר -->
   <div id="radioPhotoModal" class="modal-overlay hidden" onclick="if(event.target===this)this.classList.add('hidden')">
     <div class="modal-box" style="max-width:560px;">
-      <h3 style="margin:0 0 10px;color:#38bdf8;" id="radioPhotoTitle">📷 תמונת מכשיר</h3>
+      <h3 style="margin:0 0 10px;color:var(--olive);" id="radioPhotoTitle">📷 תמונת מכשיר</h3>
       <div id="radioPhotoBody" class="loading-msg">טוען תמונה...</div>
       <button type="button" class="btn-action btn-danger" style="margin-top:10px;" onclick="document.getElementById('radioPhotoModal').classList.add('hidden')">סגור</button>
     </div>
@@ -744,13 +778,13 @@
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
         <h2 style="margin:0;" id="shvBuilderTitle">📅 בניית שבצ"ק</h2>
-        <button type="button" id="btnToggleSkeletonMode" class="btn-mini hidden" style="border-color:#38bdf8;color:#38bdf8;" onclick="toggleSkeletonEditMode()">🔄 ערוך חלוקת משימות למחלקות</button>
+        <button type="button" id="btnToggleSkeletonMode" class="btn-mini hidden" style="border-color:var(--olive);color:var(--olive);" onclick="toggleSkeletonEditMode()">🔄 ערוך חלוקת משימות למחלקות</button>
       </div>
       <label>תאריך השבצ"ק (לו"ז 06:00 עד 06:00 למחרת):</label>
       <div class="date-input-group">
         <input type="text" id="shvTargetDate" placeholder="dd/mm/yyyy">
-        <label class="date-pick-btn" title="בחר תאריך"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M7 13h2M11 13h2M15 13h2M7 17h2M11 17h2"/></svg><input type="date" id="shvDatePicker" onclick="openNativePicker(this)"></label>
-        <button type="button" class="btn-mini" style="background:#0284c7;color:#fff;border:none;padding:0 14px;" onclick="confirmLeaveShavzak(() => loadShavzakWorkspace())">טען</button>
+        <label class="date-pick-btn" title="בחר תאריך"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M7 13h2M11 13h2M15 13h2M7 17h2M11 17h2"/></svg><input type="date" id="shvDatePicker" onclick="openNativePicker(this)"></label>
+        <button type="button" class="btn-mini" style="background:var(--olive);color:var(--on-olive);border:none;padding:0 14px;" onclick="confirmLeaveShavzak(() => loadShavzakWorkspace())">טען</button>
       </div>
     </div>
 
@@ -763,7 +797,7 @@
     <div id="shvStage1Wrap" class="hidden">
       <div class="shv-workspace-grid">
         <div class="shv-pool-panel">
-          <h3 style="margin:0 0 6px;font-size:1.05rem;color:#38bdf8;">📊 מצבת נוכחים לשבצ"ק</h3>
+          <h3 style="margin:0 0 6px;font-size:1.05rem;color:var(--olive);">📊 מצבת נוכחים לשבצ"ק</h3>
           <div id="shvSummaryTableContainer"></div>
           <div id="shvDemandSummary" style="margin-top:12px;"></div>
         </div>
@@ -786,7 +820,7 @@
         <div id="shvSwapBanner" class="swap-banner hidden"></div>
         <div class="shv-workspace-grid">
           <div class="shv-pool-panel desktop-only">
-            <h3 style="margin:0 0 6px;font-size:1.05rem;color:#38bdf8;">👥 חיילים נוכחים</h3>
+            <h3 style="margin:0 0 6px;font-size:1.05rem;color:var(--olive);">👥 חיילים נוכחים</h3>
             <div id="shvPoolFilterWrap" class="hidden">
               <select id="shvPoolFwFilter" style="padding:7px;font-size:0.85rem;margin-bottom:8px;" onchange="renderShavzakUI()">
                 <option value="ALL">כלל המחלקות והמסופחים</option>
@@ -797,7 +831,7 @@
               </select>
             </div>
             <input type="text" id="shvPoolSearch" placeholder="🔍 חיפוש חייל..." style="padding:8px;font-size:0.9rem;margin-bottom:8px;" oninput="renderShavzakPool()">
-            <div style="font-size:0.8rem;color:#94a3b8;margin-bottom:10px;">אפשר ללחוץ על משבצת ריקה ולבחור מרשימה, או לבחור חייל כאן ואז משבצת.</div>
+            <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:10px;">אפשר ללחוץ על משבצת ריקה ולבחור מרשימה, או לבחור חייל כאן ואז משבצת.</div>
             <div id="shvUnreported"></div>
             <div id="shvAvailablePool"></div>
           </div>
@@ -813,7 +847,7 @@
           <span id="shvProgress"></span>
           <button type="button" id="btnNextEmpty" class="btn-mini" onclick="jumpToNextEmpty()">⬇ למשבצת הריקה הבאה</button>
         </div>
-        <div id="shvDirtyNote" class="hidden" style="color:#fbbf24;font-size:0.85rem;font-weight:bold;margin-bottom:6px;">● יש שינויים שלא נשמרו</div>
+        <div id="shvDirtyNote" class="hidden" style="color:var(--warn);font-size:0.85rem;font-weight:bold;margin-bottom:6px;">● יש שינויים שלא נשמרו</div>
         <div id="shvActionRow" class="btn-row"></div>
         <div id="shvSaveStatus" class="status-box"></div>
       </div>
@@ -824,7 +858,7 @@
   <div id="slotSheet" class="sheet-overlay hidden" onclick="if(event.target===this)closeSlotSheet()">
     <div class="sheet">
       <div class="sheet-head">
-        <div id="slotSheetTitle" style="font-weight:bold;color:#38bdf8;"></div>
+        <div id="slotSheetTitle" style="font-weight:bold;color:var(--olive);"></div>
         <button type="button" class="btn-mini" onclick="closeSlotSheet()">✕</button>
       </div>
       <input type="text" id="slotSheetSearch" placeholder="🔍 חיפוש חייל..." oninput="renderSlotSheet()">
@@ -836,7 +870,7 @@
   <!-- הערה להחזרה לתיקון -->
   <div id="noteModal" class="modal-overlay hidden">
     <div class="modal-box" style="text-align:right;">
-      <h3 style="margin:0 0 10px;color:#fbbf24;" id="noteModalTitle">↩ החזרה לתיקון</h3>
+      <h3 style="margin:0 0 10px;color:var(--warn);" id="noteModalTitle">↩ החזרה לתיקון</h3>
       <label>הערה למפקד המחלקה:</label>
       <textarea id="noteModalText" rows="5"></textarea>
       <div class="btn-row">
@@ -886,9 +920,9 @@
       <div id="mStatus" class="status-box"></div>
     </div>
 
-    <div class="card" style="border-color:#8b5cf6;">
+    <div class="card" style="border-color:var(--info);">
       <h2>🗂️ ניהול משימות לשבצ"ק</h2>
-      <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:10px;line-height:1.5;">
+      <div style="font-size:0.82rem;color:var(--ink-muted);margin-bottom:10px;line-height:1.5;">
         לכל משימה מסמנים באילו ימים היא פעילה. כך בונים שבצ"ק מותאם לשישי ולשבת: למשל "שמירה" עם 3 משמרות בימי חול, ו"שמירה" עם 4 משמרות רק בשישי-שבת (אפשר לשכפל משימה ולשנות).
       </div>
       <label>הצג משימות ליום:</label>
@@ -906,9 +940,9 @@
       <div id="tasksStatus" class="status-box"></div>
     </div>
 
-    <div class="card" style="border-color:#0ea5e9;">
+    <div class="card" style="border-color:var(--olive);">
       <h2>🧰 שבצקון - משימות וציוד</h2>
-      <div style="font-size:0.82rem;color:#94a3b8;margin-bottom:10px;line-height:1.5;">
+      <div style="font-size:0.82rem;color:var(--ink-muted);margin-bottom:10px;line-height:1.5;">
         המשימות שמופיעות בשבצקון, ולכל משימה רשימת הציוד שהמפקד בודק בכלי או במתקן (פריט בכל שורה).
         לפריט שצריך לספור, כותבים אחרי השם קו ישר וכמות - למשל <b>מחסניות | 12</b> - והמפקד ירשום כמה יש בפועל.
         כשלמשימה יש את אותו שם כמו בשבצ"ק, המערכת מציעה אוטומטית את הצוות והשעות מהשבצ"ק המפורסם.
@@ -927,7 +961,7 @@
       <div id="pStatus" class="status-box"></div>
     </div>
 
-    <div class="card" style="border-color:#0284c7;">
+    <div class="card" style="border-color:var(--olive);">
       <h2>🔍 בדיקת פערים (עבור ירוק בעיניים)</h2>
       <label>הדבק רשימת מספרים אישיים:</label>
       <textarea id="pastedPnInput" rows="4" placeholder="הדבק כאן מ&quot;א מאקסל או וואטסאפ..."></textarea>
@@ -1324,6 +1358,49 @@
 
   function goHome() { confirmLeaveShavzak(openMainHub); }
 
+  // אייקונים קוויים (בסגנון Lucide) לכפתורי התפריט הראשי - לפי ספר העיצוב
+  const HUB_ICONS = (() => {
+    const svg = d => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+    return {
+      reserve: svg('<rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4M7 14h4M13 17h4"></path>'),
+      shavzak_view: svg('<rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path><path d="M8 14h2M14 14h2M8 17h2"></path>'),
+      signatures: svg('<path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path>'),
+      radio: svg('<rect x="7" y="8" width="10" height="13" rx="2"></rect><path d="M10 8V3M10 12h4M10 15h4"></path>'),
+      shavzakon: svg('<rect x="6" y="4" width="12" height="17" rx="2"></rect><path d="M9 4V3h6v1"></path><path d="M9 13l2 2 4-4"></path>'),
+      attendance: svg('<circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"></path><path d="M15.5 5.2a3 3 0 0 1 0 5.6M17 14.6c1.8.5 3 1.9 3.5 4.4"></path>'),
+      maflag: svg('<path d="M21 8l-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path>'),
+      radio_report: svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path>'),
+      reports: svg('<path d="M4 4h11l5 5v11H4z"></path><path d="M15 4v5h5M8 13h8M8 17h5"></path>'),
+      shavzak_platoon: svg('<rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><path d="M17.5 14v7M14 17.5h7"></path>'),
+      shavzak_officers: svg('<path d="M12 3l2.7 5.5 6 .9-4.4 4.2 1 6-5.3-2.8-5.3 2.8 1-6L3.3 9.4l6-.9z"></path>'),
+      shavzak_final: svg('<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"></path><path d="M8.5 12l2.5 2.5 4.5-4.5"></path>'),
+      admin: svg('<circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path>')
+    };
+  })();
+
+  // מצב בהיר / כהה
+  function currentTheme() {
+    const t = document.documentElement.getAttribute("data-theme");
+    if (t) return t;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  function applyThemeChrome() {
+    const dark = currentTheme() === "dark";
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", dark ? "#131510" : "#f5f4ef");
+    const btn = document.getElementById("themeToggle");
+    if (btn) btn.innerHTML = dark
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>';
+  }
+  function toggleTheme() {
+    const next = currentTheme() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch (e) {}
+    applyThemeChrome();
+  }
+  document.addEventListener("DOMContentLoaded", applyThemeChrome);
+
   function openMainHub() {
     hideAllScreens();
     currentScreen = "hub";
@@ -1352,7 +1429,7 @@
       const card = document.createElement("div");
       card.className = "hub-tile" + (t.wide ? " wide" : "");
       card.onclick = () => openScreen(t.key);
-      card.innerHTML = `<div class="hub-icon">${t.icon}</div><div class="hub-title">${escapeHtml(t.title)}</div><div class="hub-desc">${escapeHtml(t.desc)}</div>`;
+      card.innerHTML = `<div class="hub-icon">${HUB_ICONS[t.key] || t.icon}</div><div class="hub-title">${escapeHtml(t.title)}</div><div class="hub-desc">${escapeHtml(t.desc)}</div>`;
       grid.appendChild(card);
     });
     document.getElementById("screenHub").classList.remove("hidden");
@@ -1448,8 +1525,8 @@
     document.getElementById("soldierShvContent").classList.remove("hidden");
 
     const hero = (m, day, date, green) => `
-      <div class="shv-mission-hero" ${green ? 'style="border-color:#22c55e;background:linear-gradient(135deg,#064e3b,#0f172a);"' : ""}>
-        <div class="shv-hero-day" ${green ? 'style="color:#6ee7b7;"' : ""}>${day} (${escapeHtml(date)})</div>
+      <div class="shv-mission-hero" ${green ? 'style="border-color:var(--ok);background:linear-gradient(135deg,var(--ok-soft),var(--surface-sunken));"' : ""}>
+        <div class="shv-hero-day" ${green ? 'style="color:var(--ok);"' : ""}>${day} (${escapeHtml(date)})</div>
         <div class="shv-hero-task">${escapeHtml(m.taskName)}</div>
         <div class="shv-hero-hours">🕒 ${hrs(m.hoursLabel)} (${escapeHtml(m.roleInTask)})</div>
       </div>`;
@@ -1458,16 +1535,16 @@
     if (res.todayMissions && res.todayMissions.length) {
       todayDiv.innerHTML = res.todayMissions.map(m => hero(m, "📌 המשימה שלך היום", res.todayDate, false)).join("");
     } else {
-      todayDiv.innerHTML = `<div class="item-box" style="text-align:center;color:#94a3b8;">אין משימה רשומה עבורך להיום (${escapeHtml(res.todayDate)}).</div>`;
+      todayDiv.innerHTML = `<div class="item-box" style="text-align:center;color:var(--ink-muted);">אין משימה רשומה עבורך להיום (${escapeHtml(res.todayDate)}).</div>`;
     }
 
     const tmrDiv = document.getElementById("tomorrowMissionCard");
     if (res.hasTomorrowShavzak) {
       tmrDiv.innerHTML = (res.tomorrowMissions && res.tomorrowMissions.length)
         ? res.tomorrowMissions.map(m => hero(m, "⏭️ המשימה שלך למחר", res.tomorrowDate, true)).join("")
-        : `<div class="item-box" style="text-align:center;color:#94a3b8;">פורסם שבצ"ק למחר (${escapeHtml(res.tomorrowDate)}) - אינך משובץ למשימה.</div>`;
+        : `<div class="item-box" style="text-align:center;color:var(--ink-muted);">פורסם שבצ"ק למחר (${escapeHtml(res.tomorrowDate)}) - אינך משובץ למשימה.</div>`;
     } else {
-      tmrDiv.innerHTML = `<div class="item-box" style="text-align:center;color:#64748b;font-size:0.85rem;">שבצ"ק למחר טרם פורסם.</div>`;
+      tmrDiv.innerHTML = `<div class="item-box" style="text-align:center;color:var(--ink-muted);font-size:0.85rem;">שבצ"ק למחר טרם פורסם.</div>`;
     }
 
     soldierShvBlocks = { today: res.todayBlockForImage, tomorrow: res.tomorrowBlockForImage };
@@ -1715,13 +1792,13 @@
     OK: "אושר ע\"י קצינים", RETURNED: "הוחזר לתיקון", PENDING: "ממתין לאישור מ\"פ", PUBLISHED: "מאושר ופורסם"
   };
   const ST_VIEW = {
-    [ST.OPEN]: { t: "⏳ טרם התחילה", bg: "#334155", fg: "#cbd5e1" },
-    [ST.DRAFT]: { t: "✏️ בשיבוץ", bg: "#713f12", fg: "#fde68a" },
-    [ST.SUBMITTED]: { t: "📨 הוגש לקצינים", bg: "#1e3a8a", fg: "#bfdbfe" },
-    [ST.OK]: { t: "✅ אושר", bg: "#14532d", fg: "#bbf7d0" },
-    [ST.RETURNED]: { t: "↩ הוחזר לתיקון", bg: "#7f1d1d", fg: "#fecaca" },
-    [ST.PENDING]: { t: "📤 אצל מ\"פ", bg: "#4c1d95", fg: "#ddd6fe" },
-    [ST.PUBLISHED]: { t: "🎖️ פורסם", bg: "#14532d", fg: "#bbf7d0" }
+    [ST.OPEN]: { t: "⏳ טרם התחילה", bg: "var(--surface-sunken)", fg: "var(--ink-muted)" },
+    [ST.DRAFT]: { t: "✏️ בשיבוץ", bg: "var(--warn-soft)", fg: "var(--warn)" },
+    [ST.SUBMITTED]: { t: "📨 הוגש לקצינים", bg: "var(--info-soft)", fg: "var(--info)" },
+    [ST.OK]: { t: "✅ אושר", bg: "var(--ok-soft)", fg: "var(--ok)" },
+    [ST.RETURNED]: { t: "↩ הוחזר לתיקון", bg: "var(--signal-soft)", fg: "var(--signal)" },
+    [ST.PENDING]: { t: "📤 אצל מ\"פ", bg: "var(--olive-soft)", fg: "var(--olive)" },
+    [ST.PUBLISHED]: { t: "🎖️ פורסם", bg: "var(--ok-soft)", fg: "var(--ok)" }
   };
   const PLATOON_SHORT = { "מחלקה 1": "מ'1", "מחלקה 2": "מ'2", "מחלקה 3": "מ'3", "מסופחים": "מסופ'" };
 
@@ -1884,11 +1961,11 @@
     let totS = 0, totC = 0, totA = 0;
     const rowsHtml = summaryList.map(item => {
       totS += item.soldiersCount; totC += item.cmdrsCount; totA += item.totalCount;
-      return `<tr><td style="font-weight:bold;color:#e2e8f0;">${escapeHtml(item.framework)}</td><td>${item.soldiersCount}</td><td>${item.cmdrsCount}</td><td style="font-weight:bold;color:#38bdf8;">${item.totalCount}</td></tr>`;
+      return `<tr><td style="font-weight:bold;color:var(--ink);">${escapeHtml(item.framework)}</td><td>${item.soldiersCount}</td><td>${item.cmdrsCount}</td><td style="font-weight:bold;color:var(--olive);">${item.totalCount}</td></tr>`;
     }).join("");
     document.getElementById("shvSummaryTableContainer").innerHTML = `<table class="summary-table">
       <thead><tr><th>מסגרת</th><th>חיילים</th><th>מפקדים</th><th>סה"כ</th></tr></thead>
-      <tbody>${rowsHtml}<tr style="background:#0f172a;font-weight:bold;color:#fde047;"><td>סה"כ</td><td>${totS}</td><td>${totC}</td><td>${totA}</td></tr></tbody>
+      <tbody>${rowsHtml}<tr style="background:var(--surface-sunken);font-weight:bold;color:var(--warn);"><td>סה"כ</td><td>${totS}</td><td>${totC}</td><td>${totA}</td></tr></tbody>
     </table>`;
     shvStage1Summary = summaryList;
   }
@@ -1899,12 +1976,12 @@
     shvSkeletonShifts.forEach((sh, idx) => { demand[shvSkelPlatoons[idx]] += sh.reqCmdrs + sh.reqSoldiers; });
     const avail = {};
     shvStage1Summary.forEach(x => { avail[x.framework] = x; });
-    document.getElementById("shvDemandSummary").innerHTML = `<div style="font-size:0.85rem;color:#38bdf8;font-weight:bold;margin-bottom:4px;">📐 משבצות שהוקצו מול נוכחים:</div>
+    document.getElementById("shvDemandSummary").innerHTML = `<div style="font-size:0.85rem;color:var(--olive);font-weight:bold;margin-bottom:4px;">📐 משבצות שהוקצו מול נוכחים:</div>
       <table class="summary-table"><thead><tr><th>מסגרת</th><th>משבצות</th><th>נוכחים</th></tr></thead><tbody>` +
       SHAVZAK_PLATOONS.map(p => {
         const have = avail[p] ? avail[p].totalCount : 0;
-        return `<tr><td>${escapeHtml(p)}</td><td style="color:${demand[p] > have ? "#fca5a5" : "#a7f3d0"};font-weight:bold;">${demand[p]}</td><td>${have}</td></tr>`;
-      }).join("") + `</tbody></table><div style="font-size:0.72rem;color:#94a3b8;margin-top:4px;">* משבצות = סכום כל המשמרות (חייל יכול לכסות כמה משמרות).</div>`;
+        return `<tr><td>${escapeHtml(p)}</td><td style="color:${demand[p] > have ? "var(--signal)" : "var(--ok)"};font-weight:bold;">${demand[p]}</td><td>${have}</td></tr>`;
+      }).join("") + `</tbody></table><div style="font-size:0.72rem;color:var(--ink-muted);margin-top:4px;">* משבצות = סכום כל המשמרות (חייל יכול לכסות כמה משמרות).</div>`;
   }
 
   async function renderStage1TasksList(existingRows) {
@@ -1938,7 +2015,7 @@
     shvSkelPlatoons = shvSkeletonShifts.map(sh => sh.presetPlatoon || existingMap[sh.shiftKey] || (!existingRows.length && prefillMap[sh.shiftKey]) || "מחלקה 1");
 
     let note = `📆 תבנית משימות ל${escapeHtml(res.dayName || "")} (${shvSkeletonShifts.length} משמרות).`;
-    if (usedPrefill) note += ` <span style="color:#fde68a;">מולא מראש לפי החלוקה של ${escapeHtml(res.prefill.sourceDay)} ${escapeHtml(res.prefill.sourceDate)} - שנה רק מה שצריך.</span>`;
+    if (usedPrefill) note += ` <span style="color:var(--warn);">מולא מראש לפי החלוקה של ${escapeHtml(res.prefill.sourceDay)} ${escapeHtml(res.prefill.sourceDate)} - שנה רק מה שצריך.</span>`;
     else if (existingRows.length) note += " מוצגת החלוקה השמורה לתאריך זה.";
     listDiv.dataset.note = note;
     renderSkeletonTable();
@@ -1948,9 +2025,9 @@
     const listDiv = document.getElementById("skeletonTasksList");
     const tasksOrder = [];
     shvSkeletonShifts.forEach(sh => { if (!tasksOrder.includes(sh.taskName)) tasksOrder.push(sh.taskName); });
-    let html = `<div style="font-size:0.85rem;color:#7dd3fc;margin-bottom:10px;">${listDiv.dataset.note || ""}</div>
-      <div style="font-size:0.78rem;color:#94a3b8;margin-bottom:8px;">לחץ על התא של המחלקה כדי לשייך אליה את המשמרת. "כולן" משייך את כל המשמרות של המשימה.</div>
-      ${shvSkeletonShifts.some(x => x.flexible) ? `<div style="font-size:0.78rem;color:#fde68a;margin-bottom:8px;">⏱️ במשימות עם שעות גמישות (${escapeHtml(Array.from(new Set(shvSkeletonShifts.filter(x => x.flexible).map(x => x.taskName))).join(", "))}) קובעים את השעות של כל משמרת ומוסיפים משמרות לפי הצורך - למשל משמרת לכל מחלקה. המפקדים יוכלו לפצל אותן לפי שעות בשיבוץ.</div>` : ""}
+    let html = `<div style="font-size:0.85rem;color:var(--olive);margin-bottom:10px;">${listDiv.dataset.note || ""}</div>
+      <div style="font-size:0.78rem;color:var(--ink-muted);margin-bottom:8px;">לחץ על התא של המחלקה כדי לשייך אליה את המשמרת. "כולן" משייך את כל המשמרות של המשימה.</div>
+      ${shvSkeletonShifts.some(x => x.flexible) ? `<div style="font-size:0.78rem;color:var(--warn);margin-bottom:8px;">⏱️ במשימות עם שעות גמישות (${escapeHtml(Array.from(new Set(shvSkeletonShifts.filter(x => x.flexible).map(x => x.taskName))).join(", "))}) קובעים את השעות של כל משמרת ומוסיפים משמרות לפי הצורך - למשל משמרת לכל מחלקה. המפקדים יוכלו לפצל אותן לפי שעות בשיבוץ.</div>` : ""}
       <div style="overflow-x:auto;"><table class="skel-table"><thead><tr><th style="text-align:right;">משימה / משמרת</th>${SHAVZAK_PLATOONS.map(p => `<th>${escapeHtml(PLATOON_SHORT[p] || p)}</th>`).join("")}</tr></thead><tbody>`;
     tasksOrder.forEach(task => {
       const shifts = shvSkeletonShifts.map((sh, idx) => ({ sh, idx })).filter(x => x.sh.taskName === task);
@@ -1964,7 +2041,7 @@
                 <input type="time" class="skel-time" value="${m[1].padStart(5, "0")}" onchange="setSkelHours(${idx}, 0, this.value)">–<input type="time" class="skel-time" value="${m[2].padStart(5, "0")}" onchange="setSkelHours(${idx}, 1, this.value)">
                 ${shifts.length > 1 ? `<button type="button" class="skel-flex-del" title="מחק משמרת" onclick="delSkelShift(${idx})">🗑️</button>` : ""}</div>`; })()
           : hrs(sh.hoursLabel);
-        html += `<tr><td class="lbl">${lbl}<br><span style="color:#64748b;">${sh.reqCmdrs ? sh.reqCmdrs + " מפק' + " : ""}${sh.reqSoldiers} חי'</span></td>` +
+        html += `<tr><td class="lbl">${lbl}<br><span style="color:var(--ink-muted);">${sh.reqCmdrs ? sh.reqCmdrs + " מפק' + " : ""}${sh.reqSoldiers} חי'</span></td>` +
           SHAVZAK_PLATOONS.map(p => `<td class="skel-cell ${shvSkelPlatoons[idx] === p ? "on" : ""}" data-i="${idx}" data-p="${escapeHtml(p)}" onclick="setSkel(${idx}, this.dataset.p)">${shvSkelPlatoons[idx] === p ? "✓" : "·"}</td>`).join("") + `</tr>`;
       });
     });
@@ -2109,15 +2186,15 @@
       let actions = "";
       if (isOfficers && !shvState.isPendingMpApproval && !shvState.isOfficialApproved) {
         if (p.status === ST.SUBMITTED) {
-          actions = `<button type="button" class="btn-mini" style="border-color:#22c55e;color:#86efac;" data-fw="${escapeHtml(p.framework)}" onclick="approvePlatoon(this.dataset.fw)">✓ אשר</button>
-                     <button type="button" class="btn-mini" style="border-color:#f59e0b;color:#fcd34d;" data-fw="${escapeHtml(p.framework)}" onclick="returnPlatoon(this.dataset.fw)">↩ החזר</button>`;
+          actions = `<button type="button" class="btn-mini" style="border-color:var(--ok);color:var(--ok);" data-fw="${escapeHtml(p.framework)}" onclick="approvePlatoon(this.dataset.fw)">✓ אשר</button>
+                     <button type="button" class="btn-mini" style="border-color:var(--warn);color:var(--warn);" data-fw="${escapeHtml(p.framework)}" onclick="returnPlatoon(this.dataset.fw)">↩ החזר</button>`;
         } else if (p.status === ST.OK) {
-          actions = `<button type="button" class="btn-mini" style="border-color:#f59e0b;color:#fcd34d;" data-fw="${escapeHtml(p.framework)}" onclick="returnPlatoon(this.dataset.fw)">↩ החזר</button>`;
+          actions = `<button type="button" class="btn-mini" style="border-color:var(--warn);color:var(--warn);" data-fw="${escapeHtml(p.framework)}" onclick="returnPlatoon(this.dataset.fw)">↩ החזר</button>`;
         }
       }
-      const note = (p.status === ST.RETURNED && p.note) ? `<div style="font-size:0.75rem;color:#fca5a5;width:100%;">הערה: ${escapeHtml(p.note)}</div>` : "";
+      const note = (p.status === ST.RETURNED && p.note) ? `<div style="font-size:0.75rem;color:var(--signal);width:100%;">הערה: ${escapeHtml(p.note)}</div>` : "";
       return `<div class="pl-row">
-        <div><strong>${escapeHtml(p.framework)}</strong> <span style="color:#94a3b8;font-size:0.8rem;">(${p.filled}/${p.total})</span></div>
+        <div><strong>${escapeHtml(p.framework)}</strong> <span style="color:var(--ink-muted);font-size:0.8rem;">(${p.filled}/${p.total})</span></div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
           <span class="pl-status" style="background:${v.bg};color:${v.fg};">${v.t}</span>
           <span class="pl-actions">${actions}</span>
@@ -2128,7 +2205,7 @@
         <div class="btn-tab ${shvMode === "review" ? "active" : ""}" onclick="setShvMode('review')">📋 סקירה ואישור</div>
         <div class="btn-tab ${shvMode === "edit" ? "active" : ""}" onclick="setShvMode('edit')">✏️ עריכת שיבוץ</div>
       </div>` : "";
-    bar.innerHTML = `<div style="font-weight:bold;color:#38bdf8;margin-bottom:4px;">📍 מצב השבצ"ק - ${escapeHtml(shvState.dayName)} ${escapeHtml(shvState.targetDate)}</div>${rows}${tabs}`;
+    bar.innerHTML = `<div style="font-weight:bold;color:var(--olive);margin-bottom:4px;">📍 מצב השבצ"ק - ${escapeHtml(shvState.dayName)} ${escapeHtml(shvState.targetDate)}</div>${rows}${tabs}`;
   }
 
   // ---------- מסך סקירה (קצינים / אישור סופי) ----------
@@ -2172,11 +2249,11 @@
     }
     if (hidden.length) {
       const fws = Array.from(new Set(hidden.map(r => r.platoon)));
-      html += `<div class="review-box" style="background:#1e293b;border:1px dashed #64748b;color:#cbd5e1;">⏳ ${escapeHtml(fws.join(", "))} עדיין לא הגישו - המשמרות שלהן מסומנות באפור.</div>`;
+      html += `<div class="review-box" style="background:var(--surface);border:1px dashed var(--line-strong);color:var(--ink);">⏳ ${escapeHtml(fws.join(", "))} עדיין לא הגישו - המשמרות שלהן מסומנות באפור.</div>`;
     }
     const canvas = buildShavzakCanvas(reviewBlockForCanvas(issues));
     html += `<div class="review-img-wrap"><img src="${canvas.toDataURL("image/png")}" alt="שבצק" style="width:${Math.round(canvas.width / 2)}px;"></div>
-      <div style="font-size:0.75rem;color:#94a3b8;margin:-6px 0 10px;">תאים באדום = משמרות עם פערים. אפשר לגלול את התמונה הצידה בטלפון.</div>`;
+      <div style="font-size:0.75rem;color:var(--ink-muted);margin:-6px 0 10px;">תאים באדום = משמרות עם פערים. אפשר לגלול את התמונה הצידה בטלפון.</div>`;
     panel.innerHTML = html;
   }
 
@@ -2224,13 +2301,13 @@
       (b.isCommander - a.isCommander) || a.name.localeCompare(b.name, "he"));
 
     const poolDiv = document.getElementById("shvAvailablePool");
-    if (!pool.length) { poolDiv.innerHTML = '<div style="color:#94a3b8;font-size:0.85rem;text-align:center;padding:12px;">אין חיילים נוכחים להצגה.</div>'; return; }
+    if (!pool.length) { poolDiv.innerHTML = '<div style="color:var(--ink-muted);font-size:0.85rem;text-align:center;padding:12px;">אין חיילים נוכחים להצגה.</div>'; return; }
     poolDiv.innerHTML = pool.map(s => {
       const mine = assignMap[s.personalNumber] || [];
       const isSel = shvSelectedPn === s.personalNumber;
       return `<div class="shv-soldier-chip ${isSel ? "selected-chip" : ""} ${mine.length ? "busy" : ""}" data-pn="${escapeHtml(s.personalNumber)}" onclick="selectSoldierFromPool(this.dataset.pn)">
         <div style="min-width:0;"><div style="font-weight:bold;font-size:0.92rem;">${escapeHtml(s.name)}</div><div>${soldierBadges(s, seeAll, mine)}</div></div>
-        <span style="color:#38bdf8;font-size:0.8rem;white-space:nowrap;">${isSel ? "נבחר ✓" : "בחר"}</span>
+        <span style="color:var(--olive);font-size:0.8rem;white-space:nowrap;">${isSel ? "נבחר ✓" : "בחר"}</span>
       </div>`;
     }).join("");
   }
@@ -2256,18 +2333,18 @@
       if (slot.pn !== SHV_NONE_PN && !shvState.soldiersByPn[slot.pn]) warn = ` <span class="shv-slot-warn">⚠️ לא מדווח כנוכח</span>`;
       else if (slot.pn !== SHV_NONE_PN && conflictNames.has(slot.name)) warn = ` <span class="shv-slot-warn">🔁 חופף</span>`;
       else if (type === "cmdr" && slot.pn !== SHV_NONE_PN && !shvState.soldiersByPn[slot.pn].isCommander) warn = ` <span class="shv-slot-warn">(לא מוגדר מפקד)</span>`;
-      const display = slot.pn === SHV_NONE_PN ? `<span style="color:#94a3b8;">⊘ ${SHV_NONE}</span>` : escapeHtml(slot.name);
+      const display = slot.pn === SHV_NONE_PN ? `<span style="color:var(--ink-muted);">⊘ ${SHV_NONE}</span>` : escapeHtml(slot.name);
       const actions = (r.canEdit && !shvSwapFrom) ? `<span class="slot-actions">
           ${slot.pn !== SHV_NONE_PN ? `<button type="button" class="btn-swap" title="החלף עם משבצת אחרת" ${data} onclick="event.stopPropagation();startSwap(this)">⇄ החלף</button>` : ""}
           <button type="button" class="btn-trash" title="נקה משבצת" ${data} onclick="event.stopPropagation();clearShvSlot(this)">🗑️</button></span>` : "";
       return `<div class="shv-slot-row ${swapCls}" ${data} onclick="onSlotClick(this)">
         <span>${icon} <strong>${label}:</strong> ${display}${warn}</span>${actions}</div>`;
     }
-    if (!r.canEdit) return `<div class="shv-slot-row shv-slot-empty" style="cursor:default;"><span style="color:#64748b;">${icon} משבצת ${label} פנויה</span></div>`;
+    if (!r.canEdit) return `<div class="shv-slot-row shv-slot-empty" style="cursor:default;"><span style="color:var(--ink-muted);">${icon} משבצת ${label} פנויה</span></div>`;
     const selName = shvSelectedPn && shvState.soldiersByPn[shvSelectedPn] ? shvState.soldiersByPn[shvSelectedPn].name : "";
-    const hint = shvSwapFrom ? "(לחץ להעברה לכאן)" : selName ? `<span style="color:#86efac;">(לחץ לשיבוץ ${escapeHtml(selName)})</span>` : "(לחץ לבחירת חייל)";
+    const hint = shvSwapFrom ? "(לחץ להעברה לכאן)" : selName ? `<span style="color:var(--ok);">(לחץ לשיבוץ ${escapeHtml(selName)})</span>` : "(לחץ לבחירת חייל)";
     return `<div class="shv-slot-row shv-slot-empty ${selName && !shvSwapFrom ? "armed" : ""} ${swapCls}" ${data} onclick="onSlotClick(this)">
-      <span style="color:#94a3b8;flex:1;">${icon} משבצת ${label} פנויה ${hint}</span></div>`;
+      <span style="color:var(--ink-muted);flex:1;">${icon} משבצת ${label} פנויה ${hint}</span></div>`;
   }
 
   function platoonSelectHtml(rIdx, current, width) {
@@ -2292,26 +2369,26 @@
     document.getElementById("shvScheduleBoard").innerHTML = shvState.rows.map((r, rIdx) => {
       if (!r.canViewDetails) {
         return `<div class="shv-shift-locked">
-          <div><strong style="color:#e2e8f0;">${escapeHtml(r.taskName)}</strong> (משמרת ${r.shiftNumber}) • 🕒 ${hrs(r.hoursLabel)}</div>
-          ${canTransfer ? platoonSelectHtml(rIdx, r.platoon, 135) : `<span style="background:#334155;color:#cbd5e1;padding:4px 10px;border-radius:6px;font-weight:bold;">${escapeHtml(r.platoon)}</span>`}
+          <div><strong style="color:var(--ink);">${escapeHtml(r.taskName)}</strong> (משמרת ${r.shiftNumber}) • 🕒 ${hrs(r.hoursLabel)}</div>
+          ${canTransfer ? platoonSelectHtml(rIdx, r.platoon, 135) : `<span style="background:var(--surface-sunken);color:var(--ink);padding:4px 10px;border-radius:6px;font-weight:bold;">${escapeHtml(r.platoon)}</span>`}
         </div>`;
       }
       const iss = issueByRow[rIdx];
       const conflict = iss ? iss.conflict : new Set();
       const header = canTransfer
-        ? `<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:0.82rem;color:#cbd5e1;">🕒 ${hrs(r.hoursLabel)}</span>${platoonSelectHtml(rIdx, r.platoon, 125)}</div>`
-        : `<span style="background:#0369a1;color:#fff;padding:3px 9px;border-radius:6px;font-size:0.85rem;font-weight:bold;">${escapeHtml(r.platoon)} • 🕒 ${hrs(r.hoursLabel)}</span>`;
+        ? `<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:0.82rem;color:var(--ink);">🕒 ${hrs(r.hoursLabel)}</span>${platoonSelectHtml(rIdx, r.platoon, 125)}</div>`
+        : `<span style="background:var(--olive);color:var(--on-olive);padding:3px 9px;border-radius:6px;font-size:0.85rem;font-weight:bold;">${escapeHtml(r.platoon)} • 🕒 ${hrs(r.hoursLabel)}</span>`;
       const slots = r.cmdrSlots.map((sl, i) => slotRowHtml(r, rIdx, "cmdr", i, sl, conflict)).join("") +
                     r.soldierSlots.map((sl, i) => slotRowHtml(r, rIdx, "soldier", i, sl, conflict)).join("");
       const issHtml = iss && iss.problems.some(p => p.type !== "empty") ? `<div class="row-issues">${iss.problems.filter(p => p.type !== "empty").map(p => "• " + escapeHtml(p.text)).join("<br>")}</div>` : "";
       const flexTools = flexToolsHtml(r, rIdx);
       return `<div class="shv-shift-card ${r.dirty ? "dirty" : ""}" data-r="${rIdx}">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
-          <div><span style="font-weight:bold;font-size:1.08rem;color:#38bdf8;">${escapeHtml(r.taskName)}</span>
-          <span style="color:#cbd5e1;font-size:0.9rem;"> (משמרת ${r.shiftNumber})</span>${r.canEdit ? "" : ' <span style="font-size:0.75rem;color:#94a3b8;">🔒</span>'}</div>
+          <div><span style="font-weight:bold;font-size:1.08rem;color:var(--olive);">${escapeHtml(r.taskName)}</span>
+          <span style="color:var(--ink);font-size:0.9rem;"> (משמרת ${r.shiftNumber})</span>${r.canEdit ? "" : ' <span style="font-size:0.75rem;color:var(--ink-muted);">🔒</span>'}</div>
           ${header}
         </div>${flexTools}${issHtml}
-        ${slots || '<div style="color:#64748b;font-size:0.85rem;">אין דרישת כוח אדם למשמרת זו.</div>'}
+        ${slots || '<div style="color:var(--ink-muted);font-size:0.85rem;">אין דרישת כוח אדם למשמרת זו.</div>'}
       </div>`;
     }).join("");
   }
@@ -2369,7 +2446,7 @@
     const filled = rows.reduce((n, r) => n + r.cmdrSlots.concat(r.soldierSlots).filter(Boolean).length, 0);
     const prog = document.getElementById("shvProgress");
     prog.textContent = total ? `מולאו ${filled} מתוך ${total} משבצות` : "";
-    prog.style.color = total && filled === total ? "#86efac" : "#7dd3fc";
+    prog.style.color = total && filled === total ? "var(--ok)" : "var(--olive)";
     document.getElementById("btnNextEmpty").classList.toggle("hidden", shvMode !== "edit" || filled === total || !total);
     document.getElementById("shvDirtyNote").classList.toggle("hidden", !hasUnsavedShavzak());
 
@@ -2507,7 +2584,7 @@
         ${parts.length ? `<div class="sheet-info">${parts.join(" · ")}</div>` : ""}
       </div>`;
     }).join("");
-    document.getElementById("slotSheetList").innerHTML = html || '<div style="color:#94a3b8;text-align:center;padding:16px;">אין חיילים פנויים להצגה</div>';
+    document.getElementById("slotSheetList").innerHTML = html || '<div style="color:var(--ink-muted);text-align:center;padding:16px;">אין חיילים פנויים להצגה</div>';
   }
 
   function pickFromSheet(pn) {
@@ -2707,15 +2784,15 @@
     wpList.innerHTML = s.weaponsItems.length ? s.weaponsItems.map(it => `<div class="item-box">
         <div style="font-weight:bold;">${escapeHtml(it.toolName)} (מס': ${escapeHtml(it.serialNumber)})</div>
         <label class="return-check"><input type="checkbox" class="chk-wp-ret" data-tool="${escapeHtml(it.toolName)}" data-serial="${escapeHtml(it.serialNumber)}"> 🔴 הזדכיתי על כלי זה</label>
-      </div>`).join("") : '<div style="color:#94a3b8;font-size:0.85rem;">אין נשק או אמל"ח חתום כרגע.</div>';
+      </div>`).join("") : '<div style="color:var(--ink-muted);font-size:0.85rem;">אין נשק או אמל"ח חתום כרגע.</div>';
 
     const lgList = document.getElementById("logisticsCurrentList");
     lgList.innerHTML = s.logisticsItems.length ? s.logisticsItems.map(it => {
       const q = parseInt(it.quantityOrSerial, 10);
       const isQty = !isNaN(q) && q < 50;
       const valLabel = /^v$/i.test(it.quantityOrSerial) ? "חתום" : (isQty ? it.quantityOrSerial + " יח'" : it.quantityOrSerial);
-      return `<div class="item-box"><div style="font-weight:bold;color:#38bdf8;">${escapeHtml(it.toolName)}</div><div style="color:#cbd5e1;font-size:0.9rem;">כמות/סטטוס: ${escapeHtml(valLabel)}</div></div>`;
-    }).join("") : '<div style="color:#94a3b8;font-size:0.85rem;">אין ציוד אפסנאות חתום כרגע.</div>';
+      return `<div class="item-box"><div style="font-weight:bold;color:var(--olive);">${escapeHtml(it.toolName)}</div><div style="color:var(--ink);font-size:0.9rem;">כמות/סטטוס: ${escapeHtml(valLabel)}</div></div>`;
+    }).join("") : '<div style="color:var(--ink-muted);font-size:0.85rem;">אין ציוד אפסנאות חתום כרגע.</div>';
 
     document.getElementById("weaponsNewContainer").innerHTML = "";
     document.getElementById("logisticsNewContainer").innerHTML = "";
@@ -2731,9 +2808,9 @@
       <select class="wp-tool" onchange="onWpnTypeChange(this)" style="margin-top:6px;">${opts}</select>
       <input type="text" class="custom-name hidden" placeholder="שם נשק...">
       <label>מספר נשק / סידורי:</label><input type="text" class="wp-serial" placeholder="הקלד מספר נשק..." oninput="checkWpnKit(this)">
-      <div class="wp-sight-box hidden" style="margin-top:8px;"><label class="wp-sight-lbl" style="color:#38bdf8;"></label><input type="text" class="wp-sight-serial"></div>
+      <div class="wp-sight-box hidden" style="margin-top:8px;"><label class="wp-sight-lbl" style="color:var(--olive);"></label><input type="text" class="wp-sight-serial"></div>
       <div class="wp-kit-container">
-        <div style="font-weight:bold;color:#38bdf8;margin-bottom:6px;">📦 ציוד נשקייה נלווה:</div>
+        <div style="font-weight:bold;color:var(--olive);margin-bottom:6px;">📦 ציוד נשקייה נלווה:</div>
         <label style="font-size:0.85rem;">מחסניות:</label><select class="wp-mags">${[0,1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">${n === 0 ? "0 מחסניות" : n}</option>`).join("")}</select>
         <label class="kit-check"><input type="checkbox" class="wp-makpork"><span>מקפורק</span></label>
         <label class="kit-check"><input type="checkbox" class="wp-strap"><span>רצועה לנשק</span></label>
@@ -2867,11 +2944,11 @@
 
     container.innerHTML = `<div class="card loading-msg">טוען חיילי ${escapeHtml(fw)}...</div>`;
     const res = await apiCall({ action: "get_attendance_soldiers", filterFramework: fw });
-    if (!isOk(res)) { container.innerHTML = `<div class="card" style="text-align:center;color:#fca5a5;">${escapeHtml(res.message)}</div>`; btn.classList.add("hidden"); return; }
+    if (!isOk(res)) { container.innerHTML = `<div class="card" style="text-align:center;color:var(--signal);">${escapeHtml(res.message)}</div>`; btn.classList.add("hidden"); return; }
     const list = res.soldiers || [];
     attendanceSoldiers = list;
     if (!list.length) {
-      container.innerHTML = `<div class="card" style="text-align:center;color:#fca5a5;">לא נמצאו חיילים פעילים תחת מסגרת "${escapeHtml(fw)}".</div>`;
+      container.innerHTML = `<div class="card" style="text-align:center;color:var(--signal);">לא נמצאו חיילים פעילים תחת מסגרת "${escapeHtml(fw)}".</div>`;
       btn.classList.add("hidden");
       return;
     }
@@ -2982,7 +3059,7 @@
     if (!keepStatus) hideBox("radioStatusBox");
     document.getElementById("radioGrid").innerHTML = '<div class="loading-msg" style="grid-column:1/-1;">טוען...</div>';
     const res = await apiCall({ action: "radio_status" });
-    if (!isOk(res)) { document.getElementById("radioGrid").innerHTML = `<div style="grid-column:1/-1;color:#fca5a5;">${escapeHtml(res.message)}</div>`; return; }
+    if (!isOk(res)) { document.getElementById("radioGrid").innerHTML = `<div style="grid-column:1/-1;color:var(--signal);">${escapeHtml(res.message)}</div>`; return; }
     radioData = res;
     radioPicked = null;
     radioReturnMode = null;
@@ -2993,7 +3070,7 @@
     ["radioMissionOther", "radioNextMissionOther"].forEach(id => { const el = document.getElementById(id); el.value = ""; el.classList.add("hidden"); });
     document.querySelectorAll(".radio-photo-lbl").forEach(el => {
       el.textContent = res.photoRequired ? "(חובה - המפל\"ג ביקש)" : "(רשות)";
-      el.style.color = res.photoRequired ? "#fca5a5" : "#94a3b8";
+      el.style.color = res.photoRequired ? "var(--signal)" : "var(--ink-muted)";
     });
     fillSelect("radioNextSoldier", sortSoldiersByFw(res.soldiers).map(s => ({ value: s.key, label: `${s.name} (${s.framework})` })), "-- בחר חייל --");
     renderRadioScreen();
@@ -3003,8 +3080,8 @@
     const d = radioData;
     const mine = d.devices.filter(x => x.mine);
     document.getElementById("radioMine").innerHTML = mine.length
-      ? `<div style="font-weight:bold;color:#7dd3fc;margin-bottom:6px;">📻 רשום עליך:</div>` + mine.map(x => `<div class="radio-mine-item">
-          <div><strong style="font-size:1.1rem;">קשר ${x.device}</strong> · ${escapeHtml(missionText(x.mission, x.missionNote))}<div style="font-size:0.78rem;color:#94a3b8;">מאז ${fmtTime(x.since)} (${fmtAgo(x.since)})</div></div>
+      ? `<div style="font-weight:bold;color:var(--olive);margin-bottom:6px;">📻 רשום עליך:</div>` + mine.map(x => `<div class="radio-mine-item">
+          <div><strong style="font-size:1.1rem;">קשר ${x.device}</strong> · ${escapeHtml(missionText(x.mission, x.missionNote))}<div style="font-size:0.78rem;color:var(--ink-muted);">מאז ${fmtTime(x.since)} (${fmtAgo(x.since)})</div></div>
           <button type="button" class="btn-mini home" onclick="startRadioReturn(${x.device})">↩ החזר</button></div>`).join("")
       : "";
 
@@ -3150,10 +3227,10 @@
     const out = res.devices.filter(d => !d.atHamal).sort((a, b) => Number(a.device) - Number(b.device));
     const photoBtn = (id, title) => id ? `<button type="button" class="btn-mini" data-id="${escapeHtml(id)}" data-t="${escapeHtml(title)}" onclick="showRadioPhoto(this.dataset.id, this.dataset.t)">📷</button>` : "";
     let html = `<div class="rr-hamal"><strong>🏠 בחמ"ל: ${atHamal.length} מתוך ${res.count}</strong><br>${atHamal.length ? atHamal.map(d => d.device).join(", ") : "אין"}</div>`;
-    html += `<div style="font-weight:bold;color:#fbbf24;margin:12px 0 6px;">📍 מחוץ לחמ"ל: ${out.length}</div>`;
+    html += `<div style="font-weight:bold;color:var(--warn);margin:12px 0 6px;">📍 מחוץ לחמ"ל: ${out.length}</div>`;
     html += out.length ? `<div style="overflow-x:auto;"><table class="rr-table"><thead><tr><th>קשר</th><th>אצל</th><th>משימה</th><th>מאז</th><th></th></tr></thead><tbody>` +
-      out.map(d => `<tr><td style="font-weight:900;font-size:1.05rem;">${d.device}</td><td>${escapeHtml(d.holder.name)}<br><span style="color:#94a3b8;font-size:0.75rem;">${escapeHtml(d.holder.framework)}</span></td>
-        <td>${escapeHtml(missionText(d.mission, d.missionNote))}</td><td>${fmtTime(d.since)}<br><span style="color:${Date.now() - d.since > 12 * 3600000 ? "#fca5a5" : "#94a3b8"};font-size:0.75rem;">${fmtAgo(d.since)}</span></td>
+      out.map(d => `<tr><td style="font-weight:900;font-size:1.05rem;">${d.device}</td><td>${escapeHtml(d.holder.name)}<br><span style="color:var(--ink-muted);font-size:0.75rem;">${escapeHtml(d.holder.framework)}</span></td>
+        <td>${escapeHtml(missionText(d.mission, d.missionNote))}</td><td>${fmtTime(d.since)}<br><span style="color:${Date.now() - d.since > 12 * 3600000 ? "var(--signal)" : "var(--ink-muted)"};font-size:0.75rem;">${fmtAgo(d.since)}</span></td>
         <td>${photoBtn(d.photoId, `קשר ${d.device}`)}<button type="button" class="btn-mini" title="סמן כהוחזר לחמ&quot;ל" onclick="maflagRadioToHamal(${d.device})">🏠</button></td></tr>`).join("") +
       `</tbody></table></div>` : `<div class="item-box" style="text-align:center;">כל הקשרים בחמ"ל 👍</div>`;
 
@@ -3162,10 +3239,10 @@
         <button type="button" class="btn-action ${res.photoRequired ? "btn-danger" : "btn-secondary"}" onclick="toggleRadioPhotoRequired(${!res.photoRequired})">${res.photoRequired ? "📷 צילום חובה: פעיל (כבה)" : "📷 בקש צילום מכולם"}</button>
       </div>`;
 
-    html += `<div style="font-weight:bold;color:#38bdf8;margin:16px 0 6px;">🕒 תנועות אחרונות</div>
+    html += `<div style="font-weight:bold;color:var(--olive);margin:16px 0 6px;">🕒 תנועות אחרונות</div>
       <input type="text" placeholder="🔍 סינון לפי מספר קשר / שם..." oninput="renderRadioMoves(this.value)" style="padding:8px;">
       <div id="radioMovesList"></div>
-      <div style="font-size:0.75rem;color:#94a3b8;margin-top:6px;">היומן המלא (כולל תאריך ושעה מדויקים עד השנייה) נמצא בגיליון "תנועות_קשר".</div>`;
+      <div style="font-size:0.75rem;color:var(--ink-muted);margin-top:6px;">היומן המלא (כולל תאריך ושעה מדויקים עד השנייה) נמצא בגיליון "תנועות_קשר".</div>`;
     body.innerHTML = html;
     renderRadioMoves("");
   }
@@ -3175,10 +3252,10 @@
     const list = radioReport.moves.filter(m => !f || String(m.device) === f || [m.name, m.prev, m.next, m.by].some(x => String(x || "").includes(f)));
     const icon = a => a.indexOf("חתימה") === 0 ? "✍️" : a.indexOf("החזרה") === 0 ? "🏠" : "🔁";
     document.getElementById("radioMovesList").innerHTML = list.slice(0, 80).map(m => `<div class="rr-move">
-      <div style="display:flex;justify-content:space-between;gap:6px;"><strong>${icon(m.action)} קשר ${m.device} · ${escapeHtml(m.action)}</strong><span style="color:#94a3b8;white-space:nowrap;">${fmtTime(m.ts)}</span></div>
-      <div style="color:#cbd5e1;">${escapeHtml(m.prev)} ← ${escapeHtml(m.next)}${m.mission ? ` · ${escapeHtml(missionText(m.mission, m.missionNote))}` : ""}${m.by && m.by !== m.name ? ` · בוצע ע"י ${escapeHtml(m.by)}` : ""}
+      <div style="display:flex;justify-content:space-between;gap:6px;"><strong>${icon(m.action)} קשר ${m.device} · ${escapeHtml(m.action)}</strong><span style="color:var(--ink-muted);white-space:nowrap;">${fmtTime(m.ts)}</span></div>
+      <div style="color:var(--ink);">${escapeHtml(m.prev)} ← ${escapeHtml(m.next)}${m.mission ? ` · ${escapeHtml(missionText(m.mission, m.missionNote))}` : ""}${m.by && m.by !== m.name ? ` · בוצע ע"י ${escapeHtml(m.by)}` : ""}
       ${m.photoId ? `<button type="button" class="btn-mini" style="padding:2px 7px;" data-id="${escapeHtml(m.photoId)}" data-t="קשר ${m.device} - ${escapeHtml(m.action)} ${fmtTime(m.ts)}" onclick="showRadioPhoto(this.dataset.id, this.dataset.t)">📷</button>` : ""}</div>
-    </div>`).join("") || '<div style="color:#94a3b8;text-align:center;padding:10px;">אין תנועות</div>';
+    </div>`).join("") || '<div style="color:var(--ink-muted);text-align:center;padding:10px;">אין תנועות</div>';
   }
 
   async function showRadioPhoto(id, title) {
@@ -3257,11 +3334,11 @@
       const isQty = !isNaN(q) && q < 50;
       const qtyInp = isQty ? ` (כמות: ${escapeHtml(it.quantityOrSerial)}) | לזכות: <input type="number" class="maf-qty" data-tool="${escapeHtml(it.toolName)}" value="${escapeHtml(it.quantityOrSerial)}" min="1" max="${escapeHtml(it.quantityOrSerial)}" style="width:65px;display:inline-block;padding:4px;margin:0 4px;" onclick="event.stopPropagation()">` : "";
       return `<div class="item-box"><label class="return-check"><input type="checkbox" class="chk-maf-lg" data-tool="${escapeHtml(it.toolName)}" data-val="${escapeHtml(it.quantityOrSerial)}"> ${escapeHtml(it.toolName)}${qtyInp}</label></div>`;
-    }).join("") : '<div style="color:#94a3b8;font-size:0.85rem;margin-bottom:8px;">אין ציוד אפסנאות.</div>';
+    }).join("") : '<div style="color:var(--ink-muted);font-size:0.85rem;margin-bottom:8px;">אין ציוד אפסנאות.</div>';
 
     document.getElementById("mafWeaponsList").innerHTML = s.weaponsItems.length ? s.weaponsItems.map(it =>
       `<div class="item-box"><label class="return-check"><input type="checkbox" class="chk-maf-wp" data-tool="${escapeHtml(it.toolName)}" data-serial="${escapeHtml(it.serialNumber)}"> ${escapeHtml(it.toolName)} (מס': ${escapeHtml(it.serialNumber)})</label></div>`
-    ).join("") : '<div style="color:#94a3b8;font-size:0.85rem;margin-bottom:8px;">אין נשק חתום.</div>';
+    ).join("") : '<div style="color:var(--ink-muted);font-size:0.85rem;margin-bottom:8px;">אין נשק חתום.</div>';
     document.getElementById("mafSoldierDetails").classList.remove("hidden");
   }
 
@@ -3516,7 +3593,7 @@
 
   async function loadAdminTasks() {
     const res = await apiCall({ action: "admin_get_tasks" });
-    if (!isOk(res)) { document.getElementById("adminTasksList").innerHTML = `<div style="color:#fca5a5;">${escapeHtml(res.message)}</div>`; return; }
+    if (!isOk(res)) { document.getElementById("adminTasksList").innerHTML = `<div style="color:var(--signal);">${escapeHtml(res.message)}</div>`; return; }
     adminTasks = (res.tasks || []).map(t => Object.assign({}, t, { days: (t.days || [0,1,2,3,4,5,6]).slice() }));
     renderAdminTasks();
   }
@@ -3533,7 +3610,7 @@
     const f = document.getElementById("tasksDayFilter").value;
     const list = document.getElementById("adminTasksList");
     const visible = adminTasks.map((t, i) => ({ t, i })).filter(x => f === "ALL" || x.t.days.indexOf(parseInt(f, 10)) !== -1);
-    if (!visible.length) { list.innerHTML = '<div style="color:#94a3b8;text-align:center;padding:10px;">אין משימות ליום זה.</div>'; return; }
+    if (!visible.length) { list.innerHTML = '<div style="color:var(--ink-muted);text-align:center;padding:10px;">אין משימות ליום זה.</div>'; return; }
     list.innerHTML = visible.map(({ t, i }) => `<div class="task-edit">
       <div style="display:flex;gap:6px;align-items:center;">
         <input type="text" value="${escapeHtml(t.taskName)}" placeholder="שם המשימה" style="font-weight:bold;" oninput="adminTasks[${i}].taskName=this.value">
@@ -3546,10 +3623,10 @@
         <div><label>משמרות</label><input type="number" min="1" max="24" value="${t.numShifts}" oninput="adminTasks[${i}].numShifts=this.value"></div>
         <div><label>מפקדים</label><input type="number" min="0" value="${t.reqCmdrs}" oninput="adminTasks[${i}].reqCmdrs=this.value"></div>
         <div><label>חיילים</label><input type="number" min="0" value="${t.reqSoldiers}" oninput="adminTasks[${i}].reqSoldiers=this.value"></div>
-        <div><label>ימים: <span style="color:#c4b5fd;">${escapeHtml(daysLabel(t.days))}</span></label></div>
+        <div><label>ימים: <span style="color:var(--info);">${escapeHtml(daysLabel(t.days))}</span></label></div>
       </div>
       <div class="day-chips">${DAY_SHORT.map((d, di) => `<span class="day-chip ${t.days.indexOf(di) !== -1 ? "on" : ""}" onclick="toggleTaskDay(${i},${di})">${d}</span>`).join("")}</div>
-      <label class="checkbox-row" style="margin:8px 0 0;font-size:0.82rem;color:#fde68a;"><input type="checkbox" ${t.flexible ? "checked" : ""} onchange="adminTasks[${i}].flexible=this.checked"> ⏱️ שעות גמישות - הקצינים קובעים שעות לכל מחלקה, והמפקדים יכולים לפצל</label>
+      <label class="checkbox-row" style="margin:8px 0 0;font-size:0.82rem;color:var(--warn);"><input type="checkbox" ${t.flexible ? "checked" : ""} onchange="adminTasks[${i}].flexible=this.checked"> ⏱️ שעות גמישות - הקצינים קובעים שעות לכל מחלקה, והמפקדים יכולים לפצל</label>
     </div>`).join("");
   }
 
@@ -3678,10 +3755,10 @@
     const stops = [];
     r.ranges.forEach(x => {
       const a = ((rpDayNum(x.from) - s0) / tot) * 100, b = ((rpDayNum(x.to) - s0 + 1) / tot) * 100;
-      stops.push(`transparent ${a}%, #22c55e ${a}%, #22c55e ${b}%, transparent ${b}%`);
+      stops.push(`transparent ${a}%, var(--ok) ${a}%, var(--ok) ${b}%, transparent ${b}%`);
     });
     // כל טווח כשכבה נפרדת
-    return `<div class="rp-strip" style="background:${r.ranges.map((x, i) => `linear-gradient(to left, ${stops[i]})`).join(",")}, #334155;"></div>`;
+    return `<div class="rp-strip" style="background:${r.ranges.map((x, i) => `linear-gradient(to left, ${stops[i]})`).join(",")}, var(--surface-sunken);"></div>`;
   }
 
   function renderRp() {
@@ -3715,7 +3792,7 @@
         ${r.note ? `<div class="rp-note">💬 ${escapeHtml(r.note)}</div>` : ""}
       </div>`).join("");
     });
-    document.getElementById("rpList").innerHTML = html || '<div class="item-box" style="text-align:center;color:#94a3b8;">אין חיילים להצגה.</div>';
+    document.getElementById("rpList").innerHTML = html || '<div class="item-box" style="text-align:center;color:var(--ink-muted);">אין חיילים להצגה.</div>';
   }
 
   function openRpEdit(row) {
@@ -3935,7 +4012,7 @@
     document.getElementById("skEqCount").textContent = eq.length ? `(${done}/${eq.length} נבדקו${miss ? ` · ${miss} חסר` : ""})` : "";
     document.getElementById("skEquipment").innerHTML = eq.map((e, i) => `<div class="sk-eq ${e.status === "ok" ? "ok" : e.status === "missing" ? "missing" : ""}" id="skEq${i}">
       <div class="sk-eq-row">
-        <span class="sk-eq-name">${escapeHtml(e.item)}${e.qty ? `<br><span style="font-weight:normal;font-size:0.78rem;color:#94a3b8;">נדרש: ${e.qty}</span>` : ""}</span>
+        <span class="sk-eq-name">${escapeHtml(e.item)}${e.qty ? `<br><span style="font-weight:normal;font-size:0.78rem;color:var(--ink-muted);">נדרש: ${e.qty}</span>` : ""}</span>
         ${e.qty
           ? `<span class="sk-qty">יש בפועל: <input type="number" inputmode="numeric" min="0" max="999" value="${escapeHtml(e.count)}" placeholder="?" onchange="skSetCount(${i}, this.value)"></span>`
           : `<button type="button" class="sk-eq-btn ok ${e.status === "ok" ? "on" : ""}" onclick="skSetEq(${i},'ok')">✅ קיים</button>
@@ -4027,9 +4104,9 @@
     box.innerHTML = '<div class="loading-msg">טוען...</div>';
     const iso = document.getElementById("skListDate").value;
     const res = await apiCall({ action: "shavzakon_list", date: iso || "" });
-    if (!isOk(res)) { box.innerHTML = `<div style="color:#fca5a5;">${escapeHtml(res.message || "שגיאה")}</div>`; return; }
+    if (!isOk(res)) { box.innerHTML = `<div style="color:var(--signal);">${escapeHtml(res.message || "שגיאה")}</div>`; return; }
     skListEntries = res.entries || [];
-    if (!skListEntries.length) { box.innerHTML = '<div class="item-box" style="text-align:center;color:#94a3b8;">אין שבצקונים בתאריך הזה.</div>'; return; }
+    if (!skListEntries.length) { box.innerHTML = '<div class="item-box" style="text-align:center;color:var(--ink-muted);">אין שבצקונים בתאריך הזה.</div>'; return; }
     box.innerHTML = skListEntries.map((e, i) => `<div class="sk-card ${e.missingCount ? "has-missing" : ""}">
       <div class="sk-card-head" onclick="this.nextElementSibling.classList.toggle('hidden')">
         <div>
@@ -4056,7 +4133,7 @@
   let adminSk = [];
   async function loadAdminSkConfig() {
     const res = await apiCall({ action: "shavzakon_get_config" });
-    if (!isOk(res)) { document.getElementById("adminSkList").innerHTML = `<div style="color:#fca5a5;">${escapeHtml(res.message)}</div>`; return; }
+    if (!isOk(res)) { document.getElementById("adminSkList").innerHTML = `<div style="color:var(--signal);">${escapeHtml(res.message)}</div>`; return; }
     adminSk = (res.missions || []).map(m => ({ mission: m.mission, text: skEqToText(m.equipment) }));
     renderAdminSk();
   }
@@ -4071,7 +4148,7 @@
       </div>
       <label style="font-size:0.78rem;margin:0 0 3px;">ציוד נדרש (פריט בכל שורה. פריט עם כמות: <span class="ltr">שם | כמות</span>, למשל "מחסניות | 12"):</label>
       <textarea rows="4" style="margin-bottom:0;" oninput="adminSk[${i}].text=this.value">${escapeHtml(m.text)}</textarea>
-    </div>`).join("") || '<div style="color:#94a3b8;text-align:center;padding:10px;">אין משימות.</div>';
+    </div>`).join("") || '<div style="color:var(--ink-muted);text-align:center;padding:10px;">אין משימות.</div>';
   }
 
   function addAdminSkMission() {
