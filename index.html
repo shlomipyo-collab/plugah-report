@@ -1742,10 +1742,13 @@
         <button type="button" class="btn-action btn-wa" onclick="shareHomeSk()">📱 שליחה לווטסאפ</button></div>`;
     }
 
-    // המשימה שלי
+    // המשימה שלי - לא מוצג לפיקוד עליון, מפל"ג, חפ"ק, חמ"ל ושלומי (בד"כ לא משובצים), אלא אם יש להם משימה
     const mine = res.mine || {};
+    const noShvRoles = (currentUser.roles || []).some(r => r === "פיקוד עליון" || r === "שלומי");
+    const noShvFw = ["מפל\"ג", "חפ\"ק", "חמ\"ל"].includes(currentUser.framework);
+    const hasMission = (mine.today && mine.today.length) || (mine.tomorrow && mine.tomorrow.length);
     const missionTxt = list => list.map(m => `<div class="hm-v">${escapeHtml(m.taskName)}</div><div class="hm-h">${hrs(m.hoursLabel)} · ${escapeHtml(m.roleInTask)}</div>`).join("");
-    h += `<div class="home-mine" onclick="navTab('shavzak_view')" role="button" tabindex="0">
+    if (!(noShvRoles || noShvFw) || hasMission) h += `<div class="home-mine" onclick="navTab('shavzak_view')" role="button" tabindex="0">
       <div class="hm-row"><div class="hm-k">המשימה שלי היום</div>${(mine.today && mine.today.length) ? missionTxt(mine.today) : `<div class="hm-h">אין משימה רשומה היום</div>`}</div>
       <div class="hm-row"><div class="hm-k">מחר</div>${!mine.hasTomorrow ? `<div class="hm-h">שבצ"ק מחר טרם פורסם</div>` : (mine.tomorrow && mine.tomorrow.length) ? missionTxt(mine.tomorrow) : `<div class="hm-h">לא משובץ</div>`}</div>
     </div>`;
@@ -1763,12 +1766,13 @@
     if (res.attendance) {
       const fws = res.attendance.frameworks.filter(f => f.total > 0);
       const rep = fws.filter(f => f.reported);
+      const attLbl = res.attendance.forTomorrow ? "נוכחות מחר" : "נוכחות היום";
       const present = rep.reduce((a, f) => a + f.present, 0);
       if (fws.length === 1) {
         const f = fws[0];
-        stats.push({ cls: f.reported ? "ok" : "warn", v: f.reported ? `${f.present}/${f.total}` : "—", k: "נוכחות היום", s: f.reported ? "נוכחים מתוך המסגרת" : "טרם דווח", go: "attendance" });
+        stats.push({ cls: f.reported ? "ok" : "warn", v: f.reported ? `${f.present}/${f.total}` : "—", k: attLbl, s: f.reported ? "נוכחים מתוך המסגרת" : "טרם דווח", go: "attendance" });
       } else {
-        stats.push({ cls: rep.length === fws.length ? "ok" : "warn", v: String(present), k: "נוכחות היום", s: `${rep.length}/${fws.length} מסגרות דיווחו`, go: p.reportsCenter ? "reports" : "attendance" });
+        stats.push({ cls: rep.length === fws.length ? "ok" : "warn", v: String(present), k: attLbl, s: `${rep.length}/${fws.length} מסגרות דיווחו`, go: p.reportsCenter ? "reports" : "attendance" });
       }
     }
     if (res.radios) { // מפל"ג בלבד
@@ -1792,7 +1796,7 @@
 
     // פירוט לפי מסגרת (כשרואים יותר ממסגרת אחת)
     if (res.attendance && res.attendance.frameworks.filter(f => f.total > 0).length > 1) {
-      h += `<div class="home-sec">נוכחות לפי מסגרת</div><table class="fw-table"><thead><tr><th>מסגרת</th><th>נוכחים</th><th>לא נוכחים</th><th>סטטוס</th></tr></thead><tbody>` +
+      h += `<div class="home-sec">${res.attendance.forTomorrow ? "נוכחות למחר" : "נוכחות היום"} לפי מסגרת</div><table class="fw-table"><thead><tr><th>מסגרת</th><th>נוכחים</th><th>לא נוכחים</th><th>סטטוס</th></tr></thead><tbody>` +
         res.attendance.frameworks.filter(f => f.total > 0).map(f => `<tr><td>${escapeHtml(f.framework)}</td><td>${f.reported ? f.present : "—"}</td><td>${f.reported ? f.absent : "—"}</td><td>${f.reported ? '<span class="chip ok">דווח</span>' : '<span class="chip warn">טרם</span>'}</td></tr>`).join("") +
         `</tbody></table>`;
     }
