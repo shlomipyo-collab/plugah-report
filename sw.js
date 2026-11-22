@@ -1,7 +1,7 @@
 // Service worker מינימלי: מאפשר התקנה כאפליקציה.
 // תמיד מנסה קודם רשת (כדי שכל עדכון יגיע מיד), ושומר עותק אחרון רק לגישה בלי קליטה.
 // קריאות לשרת (script.google.com) לא עוברות כאן בכלל.
-const CACHE = "pluga-shell-v4";
+const CACHE = "pluga-shell-v5";
 self.addEventListener("install", () => self.skipWaiting());
 // עדכון: כל שינוי בקובץ הזה גורם לטלפונים להתקין את הגרסה החדשה ברענון הבא
 self.addEventListener("activate", e => e.waitUntil(
@@ -25,7 +25,7 @@ self.addEventListener("push", e => {
   try { const j = e.data ? e.data.json() : {}; d = j.data || j.notification || j; } catch (err) { d = { body: e.data ? e.data.text() : "" }; }
   const title = d.title || "מסייעת 8109";
   e.waitUntil(self.registration.showNotification(title, {
-    body: d.body || "", icon: "icons/icon-192.png", badge: "icons/badge-96.png", dir: "rtl", lang: "he",
+    body: d.body || "", icon: "icons/icon-192.png", badge: "icons/badge-96.png?v=2", dir: "rtl", lang: "he",
     tag: d.tag || undefined, renotify: Boolean(d.tag), data: { go: d.go || "" }
   }));
 });
