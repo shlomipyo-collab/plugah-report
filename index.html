@@ -128,6 +128,8 @@
     .push-card .pc-btns { display: flex; align-items: center; gap: 4px; }
     .push-card .pc-x { width: auto; margin: 0; background: none; border: none; color: var(--ink-muted); font-size: 16px; padding: 4px 6px; cursor: pointer; }
     .update-bar { position: fixed; left: 12px; right: 12px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 950; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--ink); color: var(--surface); border-radius: var(--radius-md); padding: 10px 12px; font-size: 14px; box-shadow: var(--shadow-float); max-width: 560px; margin: 0 auto; }
+    .ico { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+    .mk-ok { color: var(--ok); font-weight: 700; } .mk-bad { color: var(--signal); font-weight: 700; }
     .push-hub-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-sunken); font-size: 14px; }
     .todo-item { width: 100%; margin: 0 0 8px; display: flex; align-items: center; gap: 10px; text-align: right; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-inline-start: 4px solid var(--warn); border-radius: var(--radius-md); padding: 11px 12px; font: 500 14.5px/20px var(--font-sans); cursor: pointer; }
     .todo-item.lvl-bad { border-inline-start-color: var(--signal); background: var(--signal-soft); }
@@ -390,7 +392,7 @@
   <div id="installBar" class="hidden">
     <img src="icons/icon-192.png" alt="">
     <div class="ib-txt"><b>התקן את מסייעת 8109 כאפליקציה</b><br><span id="installHint" style="color:var(--ink-muted);">אייקון במסך הבית, נפתח במסך מלא</span></div>
-    <button id="installBtn" type="button" style="background:var(--olive);color:var(--on-olive);border:none;border-radius:8px;font-weight:bold;">📲 התקן</button>
+    <button id="installBtn" type="button" style="background:var(--olive);color:var(--on-olive);border:none;border-radius:8px;font-weight:bold;">התקן</button>
     <button class="ib-x" type="button" onclick="dismissInstall()" aria-label="סגור">✕</button>
   </div>
 
@@ -407,7 +409,7 @@
   <!-- פופאפ הודעה / אישור -->
   <div id="customModal" class="modal-overlay hidden">
     <div class="modal-box">
-      <div style="font-size:2.2rem;margin-bottom:8px;" id="modalIcon">💻</div>
+      <div style="font-size:2.2rem;margin-bottom:8px;" id="modalIcon"></div>
       <h3 style="margin:0 0 10px;color:var(--olive);" id="modalTitle">הודעת מערכת</h3>
       <p style="color:var(--ink);font-size:1rem;line-height:1.5;margin-bottom:18px;white-space:pre-line;" id="modalBody"></p>
       <div class="btn-row">
@@ -420,11 +422,11 @@
   <!-- מודאל תמונת שבצ"ק -->
   <div id="shvImageModal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width:min(1100px,96vw);max-height:92vh;overflow:auto;">
-      <h3 style="margin:0 0 10px;color:var(--olive);" id="shvImageTitle">📋 שבצ"ק פלוגתי רשמי</h3>
+      <h3 style="margin:0 0 10px;color:var(--olive);" id="shvImageTitle">שבצ"ק פלוגתי רשמי</h3>
       <img id="shvGeneratedImg" style="width:100%;border-radius:8px;border:1px solid var(--line-strong);margin-bottom:12px;" alt="שבצק">
       <div class="btn-row">
-        <button type="button" class="btn-action btn-wa" onclick="shareShavzakImage()">📱 שתף תמונה</button>
-        <button type="button" class="btn-action btn-primary" onclick="downloadShavzakImage()">⬇️ הורד תמונה</button>
+        <button type="button" class="btn-action btn-wa" onclick="shareShavzakImage()">שתף תמונה</button>
+        <button type="button" class="btn-action btn-primary" onclick="downloadShavzakImage()">הורד תמונה</button>
       </div>
       <button type="button" class="btn-action btn-danger" style="margin-top:8px;" onclick="document.getElementById('shvImageModal').classList.add('hidden')">סגור</button>
     </div>
@@ -432,7 +434,7 @@
 
   <!-- מסך 1: הזדהות -->
   <div id="screenLogin" class="card narrow-wrap">
-    <h2 style="text-align:center;">🔐 כניסה לפורטל הפלוגתי</h2>
+    <h2 style="text-align:center;">כניסה לפורטל הפלוגתי</h2>
     <label>הקש מספר אישי:</label>
     <input type="text" id="loginPn" placeholder="מספר אישי..." inputmode="numeric" autocomplete="username" onkeydown="if(event.key==='Enter')checkPersonalNumber()">
     <button type="button" id="btnCheckPn" class="btn-action btn-primary" onclick="checkPersonalNumber()">המשך</button>
@@ -443,14 +445,14 @@
       <input type="password" id="newPassInput" placeholder="הזן סיסמה חדשה..." autocomplete="new-password">
       <label>אימות סיסמה:</label>
       <input type="password" id="confirmPassInput" placeholder="הזן שוב לאימות..." autocomplete="new-password" onkeydown="if(event.key==='Enter')saveNewPassword()">
-      <button type="button" id="btnSavePass" class="btn-action btn-success" onclick="saveNewPassword()">💾 שמור סיסמה והתחבר</button>
+      <button type="button" id="btnSavePass" class="btn-action btn-success" onclick="saveNewPassword()">שמור סיסמה והתחבר</button>
     </div>
 
     <div id="verifyPasswordBox" class="hidden" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--line);">
       <div style="color:var(--ink);font-weight:bold;margin-bottom:8px;" id="welcomeReturningAuth"></div>
       <label>הזן סיסמה:</label>
       <input type="password" id="loginPassInput" placeholder="סיסמה..." autocomplete="current-password" onkeydown="if(event.key==='Enter')verifyExistingPassword()">
-      <button type="button" id="btnVerifyPass" class="btn-action btn-primary" onclick="verifyExistingPassword()">🔓 התחבר למערכת</button>
+      <button type="button" id="btnVerifyPass" class="btn-action btn-primary" onclick="verifyExistingPassword()">התחבר למערכת</button>
     </div>
 
     <div id="loginStatus" class="status-box"></div>
@@ -479,7 +481,7 @@
       <select id="pushGo"><option value="">את האפליקציה</option><option value="shavzak_view">שבצ"ק - צפיה</option><option value="radio">קשרים</option><option value="shavzakon">שבצקון משימה</option><option value="attendance">דיווח נוכחות</option><option value="signatures">טופס חתימות</option></select>
       <div class="checkbox-row"><input type="checkbox" id="pushSchedOn" onchange="document.getElementById('pushAt').classList.toggle('hidden', !this.checked)"><label for="pushSchedOn">לתזמן למועד אחר</label></div>
       <input type="datetime-local" id="pushAt" class="hidden">
-      <button type="button" class="btn-action btn-primary" onclick="sendPushAdmin(this)">🔔 שליחה</button>
+      <button type="button" class="btn-action btn-primary" onclick="sendPushAdmin(this)">שליחה</button>
     </div>
     <div class="card"><h2>מי הפעיל התראות</h2><div id="pushAdmStats"></div></div>
     <div class="card"><h2>מתוזמנות</h2><div id="pushAdmSched"></div></div>
@@ -496,7 +498,7 @@
   <!-- מסך 3: שבצק - צפיה -->
   <div id="screenShavzakView" class="narrow-wrap hidden">
     <div class="card">
-      <h2>📅 שבצק - צפיה</h2>
+      <h2>שבצק - צפיה</h2>
       <div id="soldierPushSlot"></div>
       <div id="soldierTodo"></div>
       <div id="soldierShvLoading" class="loading-msg">טוען משימות שבצ"ק...</div>
@@ -504,8 +506,8 @@
         <div id="todayMissionCard"></div>
         <div id="tomorrowMissionCard"></div>
         <div class="btn-row">
-          <button type="button" id="btnShvImgToday" class="btn-action btn-primary hidden" onclick="openShavzakImageModal('today')">🖼️ שבצ"ק מלא - היום</button>
-          <button type="button" id="btnShvImgTomorrow" class="btn-action btn-success hidden" onclick="openShavzakImageModal('tomorrow')">🖼️ שבצ"ק מלא - מחר</button>
+          <button type="button" id="btnShvImgToday" class="btn-action btn-primary hidden" onclick="openShavzakImageModal('today')">שבצ"ק מלא - היום</button>
+          <button type="button" id="btnShvImgTomorrow" class="btn-action btn-success hidden" onclick="openShavzakImageModal('tomorrow')">שבצ"ק מלא - מחר</button>
         </div>
       </div>
     </div>
@@ -514,12 +516,12 @@
   <!-- מסך 4: טופס חתימות -->
   <div id="screenSignatures" class="narrow-wrap hidden">
     <div class="card">
-      <h2>✍️ טופס חתימות</h2>
+      <h2>טופס חתימות</h2>
       <div id="gearLoading" class="loading-msg">טוען ציוד...</div>
       <div id="gearContent" class="hidden">
         <div class="btn-tab-container">
-          <div id="tabWpBtn" class="btn-tab active" onclick="switchGearSubTab('weapons')">🔫 נשקייה</div>
-          <div id="tabLgBtn" class="btn-tab" onclick="switchGearSubTab('logistics')">📦 אפסנאות</div>
+          <div id="tabWpBtn" class="btn-tab active" onclick="switchGearSubTab('weapons')">נשקייה</div>
+          <div id="tabLgBtn" class="btn-tab" onclick="switchGearSubTab('logistics')">אפסנאות</div>
         </div>
 
         <div id="weaponsSection">
@@ -539,7 +541,7 @@
           <label style="color:var(--olive);margin-top:10px;">הוספת נשק/אמל"ח לחתימה:</label>
           <div id="weaponsNewContainer"></div>
           <button type="button" class="btn-add-line" onclick="addWeaponRow()">+ הוסף נשק/אמל"ח</button>
-          <button type="button" id="btnSaveWeapons" class="btn-action btn-success" onclick="submitWeaponsAction()">💾 שמור נשקייה</button>
+          <button type="button" id="btnSaveWeapons" class="btn-action btn-success" onclick="submitWeaponsAction()">שמור נשקייה</button>
         </div>
 
         <div id="logisticsSection" class="hidden">
@@ -549,7 +551,7 @@
           <label style="color:var(--olive);">חתימה על ציוד אפסנאות נוסף:</label>
           <div id="logisticsNewContainer"></div>
           <button type="button" class="btn-add-line" onclick="addLogisticsRow()">+ הוסף פריט אפסנאות</button>
-          <button type="button" id="btnSaveLogistics" class="btn-action btn-success" onclick="submitLogisticsAction()">💾 חתום על ציוד אפסנאות</button>
+          <button type="button" id="btnSaveLogistics" class="btn-action btn-success" onclick="submitLogisticsAction()">חתום על ציוד אפסנאות</button>
         </div>
       </div>
       <div id="soldierActionStatus" class="status-box"></div>
@@ -559,7 +561,7 @@
   <!-- מסך 5: דיווח נוכחות -->
   <div id="screenAttendance" class="narrow-wrap hidden">
     <div class="card">
-      <h2>📋 דיווח נוכחות</h2>
+      <h2>דיווח נוכחות</h2>
       <label>תאריך תוקף הדוח (dd/mm/yyyy):</label>
       <div class="date-input-group">
         <input type="text" id="attReportDate" placeholder="dd/mm/yyyy">
@@ -570,25 +572,25 @@
       <label>שם המדווח:</label>
       <input type="text" id="attReporterName">
       <div id="attBulkWrap" class="att-bulk hidden">
-        <button type="button" class="btn-mini" onclick="setAllAttendance(true)">✅ סמן את כולם נוכחים</button>
+        <button type="button" class="btn-mini" onclick="setAllAttendance(true)">סמן את כולם נוכחים</button>
       </div>
       <div id="attCounter" style="font-size:0.85rem;color:var(--olive);"></div>
     </div>
     <div id="attSoldiersContainer"></div>
     <div id="attStatusBox" class="status-box"></div>
-    <button type="button" id="btnSubmitAtt" class="btn-action btn-success hidden" onclick="submitAttendanceReport()">🚀 שלח דיווח נוכחות</button>
+    <button type="button" id="btnSubmitAtt" class="btn-action btn-success hidden" onclick="submitAttendanceReport()">שלח דיווח נוכחות</button>
   </div>
 
   <!-- מסך 6: טופס זיכויים (מפל"ג) -->
   <div id="screenMaflag" class="narrow-wrap hidden">
     <div class="btn-tab-container">
-      <div id="tabMafCardBtn" class="btn-tab active" onclick="switchMafSubTab('card')">🎖️ כרטיס לוחם וזיכויים</div>
-      <div id="tabMafRepBtn" class="btn-tab" onclick="switchMafSubTab('rep')">📦 דוחות אפסנאות</div>
-      <div id="tabMafRadioBtn" class="btn-tab" onclick="switchMafSubTab('radio')">📻 דוח קשרים</div>
+      <div id="tabMafCardBtn" class="btn-tab active" onclick="switchMafSubTab('card')">כרטיס לוחם וזיכויים</div>
+      <div id="tabMafRepBtn" class="btn-tab" onclick="switchMafSubTab('rep')">דוחות אפסנאות</div>
+      <div id="tabMafRadioBtn" class="btn-tab" onclick="switchMafSubTab('radio')">דוח קשרים</div>
     </div>
 
     <div id="mafCardSection" class="card">
-      <h2>📦 טופס זיכויים - כרטיס לוחם</h2>
+      <h2>טופס זיכויים - כרטיס לוחם</h2>
       <label>חיפוש חייל (שם או מ"א):</label>
       <input type="text" placeholder="הקלד שם או מ&quot;א..." oninput="filterSelectOptions('mafSoldierSelect', this.value, onMafSoldierSelected)">
       <label>בחר לוחם:</label>
@@ -599,26 +601,26 @@
           <div style="font-weight:bold;color:var(--olive);font-size:1.1rem;" id="mafSName"></div>
           <div style="color:var(--ink);font-size:0.9rem;" id="mafSMeta"></div>
         </div>
-        <label style="color:var(--olive);">📦 ציוד אפסנאות וציוד נלווה:</label>
+        <label style="color:var(--olive);">ציוד אפסנאות וציוד נלווה:</label>
         <div id="mafLogisticsList"></div>
-        <label style="color:var(--signal);margin-top:10px;">🔫 נשק ואמצעי לחימה:</label>
+        <label style="color:var(--signal);margin-top:10px;">נשק ואמצעי לחימה:</label>
         <div id="mafWeaponsList"></div>
 
-        <button type="button" id="btnMafReturn" class="btn-action btn-danger" onclick="submitMaflagReturns()">🔴 בצע זיכוי לפריטים המסומנים</button>
-        <button type="button" class="btn-action btn-wa" style="margin-top:8px;" onclick="sendMaflagSoldierWa()">📱 שלח כרטיס מלא לוואטסאפ</button>
+        <button type="button" id="btnMafReturn" class="btn-action btn-danger" onclick="submitMaflagReturns()">בצע זיכוי לפריטים המסומנים</button>
+        <button type="button" class="btn-action btn-wa" style="margin-top:8px;" onclick="sendMaflagSoldierWa()">שלח כרטיס מלא לוואטסאפ</button>
         <div id="mafActionStatus" class="status-box"></div>
       </div>
     </div>
 
     <div id="mafRadioSection" class="card hidden">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-        <h2 style="margin:0;">📻 דוח קשרים</h2>
-        <button type="button" class="btn-mini" onclick="loadRadioReport(true)">🔄 רענן</button>
+        <h2 style="margin:0;">דוח קשרים</h2>
+        <button type="button" class="btn-mini" onclick="loadRadioReport(true)">רענן</button>
       </div>
       <div id="radioReportBody" class="loading-msg">טוען...</div>
     </div>
     <div id="mafRepSection" class="card hidden">
-      <h2>📦 דוחות ציוד ואפסנאות</h2>
+      <h2>דוחות ציוד ואפסנאות</h2>
       <label>סוג דוח:</label>
       <select id="mafRepType" onchange="onMafRepTypeChange()">
         <option value="all_company">כלל הפלוגה - דוח ציוד מפורט</option>
@@ -628,12 +630,12 @@
       </select>
       <div id="boxMafFw" class="hidden"><label>בחר מסגרת:</label><select id="mafFwSelect"></select></div>
       <div id="boxMafTool" class="hidden"><label>בחר פריט:</label><select id="mafToolSelect"></select></div>
-      <button type="button" class="btn-action btn-primary" onclick="generateMafReport()">🔍 הפק דוח ציוד</button>
+      <button type="button" class="btn-action btn-primary" onclick="generateMafReport()">הפק דוח ציוד</button>
       <div id="mafRepOut" class="hidden" style="margin-top:12px;">
         <textarea id="mafRepText" rows="10" readonly></textarea>
         <div class="btn-row">
-          <button type="button" class="btn-action btn-wa" onclick="openWaText('mafRepText')">📱 וואטסאפ</button>
-          <button type="button" class="btn-action btn-primary" onclick="copyTextArea('mafRepText')">📋 העתק</button>
+          <button type="button" class="btn-action btn-wa" onclick="openWaText('mafRepText')">וואטסאפ</button>
+          <button type="button" class="btn-action btn-primary" onclick="copyTextArea('mafRepText')">העתק</button>
         </div>
       </div>
     </div>
@@ -643,8 +645,8 @@
   <div id="screenReservePlan" class="narrow-wrap hidden">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-        <h2 style="margin:0;">🗓️ הערכות למילואים</h2>
-        <button type="button" class="btn-mini home" onclick="openRpEdit(-1)">➕ הוספת חייל</button>
+        <h2 style="margin:0;">הערכות למילואים</h2>
+        <button type="button" class="btn-mini home" onclick="openRpEdit(-1)">הוספת חייל</button>
       </div>
       <div id="rpPeriod" class="sk-hint" style="margin:6px 0 10px;"></div>
       <div id="rpLoading" class="loading-msg">טוען...</div>
@@ -652,7 +654,7 @@
         <div id="rpStats" class="rp-stats"></div>
         <div id="rpFwChips" class="rp-chips"></div>
         <div id="rpStChips" class="rp-chips"></div>
-        <input type="text" id="rpSearch" placeholder="🔍 חיפוש לפי שם..." oninput="renderRp()">
+        <input type="text" id="rpSearch" placeholder="חיפוש לפי שם..." oninput="renderRp()">
         <div id="rpList"></div>
       </div>
     </div>
@@ -672,9 +674,9 @@
       </div>
       <label>סטטוס הגעה</label>
       <div class="rp-status-btns">
-        <button type="button" class="s-ok" data-st="מגיע" onclick="setRpStatus('מגיע')">✅ מגיע</button>
-        <button type="button" class="s-part" data-st="מגיע חלקית" onclick="setRpStatus('מגיע חלקית')">🟡 מגיע חלקית</button>
-        <button type="button" class="s-no" data-st="לא מגיע" onclick="setRpStatus('לא מגיע')">❌ לא מגיע</button>
+        <button type="button" class="s-ok" data-st="מגיע" onclick="setRpStatus('מגיע')">מגיע</button>
+        <button type="button" class="s-part" data-st="מגיע חלקית" onclick="setRpStatus('מגיע חלקית')">מגיע חלקית</button>
+        <button type="button" class="s-no" data-st="לא מגיע" onclick="setRpStatus('לא מגיע')">לא מגיע</button>
       </div>
       <div id="rpRangesBox" class="hidden">
         <label>תאריכי נוכחות <span id="rpDaysCount" style="color:var(--ink-muted);font-weight:normal;"></span></label>
@@ -684,17 +686,17 @@
       <div id="rpFullNote" class="sk-hint hidden"></div>
       <label>הסבר <span id="rpNoteReq" style="color:var(--ink-muted);font-weight:normal;"></span></label>
       <textarea id="rpNote" rows="3" maxlength="500" placeholder="למשל: חתונה, לימודים, חו״ל, לידה צפויה..."></textarea>
-      <button type="button" class="btn-action btn-success" onclick="saveRp(this)">💾 שמירה</button>
-      <button type="button" id="rpDeleteBtn" class="btn-action" style="background:var(--signal);color:var(--on-signal);margin-top:6px;" onclick="deleteRp()">🗑️ מחיקת החייל מההערכות</button>
+      <button type="button" class="btn-action btn-success" onclick="saveRp(this)">שמירה</button>
+      <button type="button" id="rpDeleteBtn" class="btn-action" style="background:var(--signal);color:var(--on-signal);margin-top:6px;" onclick="deleteRp()">מחיקת החייל מההערכות</button>
     </div>
   </div>
 
   <div id="screenShavzakon" class="narrow-wrap hidden">
     <div class="card">
-      <h2>📋 שבצקון משימה</h2>
+      <h2>שבצקון משימה</h2>
       <div class="btn-tab-container">
-        <div id="tabSkFill" class="btn-tab active" onclick="switchSkTab('fill')">📝 מילוי שבצקון</div>
-        <div id="tabSkList" class="btn-tab" onclick="switchSkTab('list')">📚 שבצקונים</div>
+        <div id="tabSkFill" class="btn-tab active" onclick="switchSkTab('fill')">מילוי שבצקון</div>
+        <div id="tabSkList" class="btn-tab" onclick="switchSkTab('list')">שבצקונים</div>
       </div>
 
       <div id="skFillSection">
@@ -711,10 +713,10 @@
             <div class="sk-step">2. מפקדים</div>
             <div class="sk-hint">הראשון ברשימה = מפקד המשימה.</div>
             <div id="skCmdrs" class="sk-chips"></div>
-            <div class="sk-picker"><input type="text" id="skAddCmdr" autocomplete="off" placeholder="🔍 הקלד שם להוספת מפקד..." oninput="skSearch('cmdrs')" onfocus="skSearch('cmdrs')" onblur="skHideResults('cmdrs')"><div id="skResCmdrs" class="sk-results hidden"></div></div>
+            <div class="sk-picker"><input type="text" id="skAddCmdr" autocomplete="off" placeholder="הקלד שם להוספת מפקד..." oninput="skSearch('cmdrs')" onfocus="skSearch('cmdrs')" onblur="skHideResults('cmdrs')"><div id="skResCmdrs" class="sk-results hidden"></div></div>
             <div class="sk-step">3. לוחמים <span id="skSoldiersCount" style="color:var(--ink-muted);font-weight:normal;"></span></div>
             <div id="skSoldiers" class="sk-chips"></div>
-            <div class="sk-picker"><input type="text" id="skAddSoldier" autocomplete="off" placeholder="🔍 הקלד שם להוספת לוחם..." oninput="skSearch('soldiers')" onfocus="skSearch('soldiers')" onblur="skHideResults('soldiers')"><div id="skResSoldiers" class="sk-results hidden"></div></div>
+            <div class="sk-picker"><input type="text" id="skAddSoldier" autocomplete="off" placeholder="הקלד שם להוספת לוחם..." oninput="skSearch('soldiers')" onfocus="skSearch('soldiers')" onblur="skHideResults('soldiers')"><div id="skResSoldiers" class="sk-results hidden"></div></div>
             <div class="sk-step">4. שעות צפויות</div>
             <div class="sk-times">
               <div><label>התחלה</label><input type="time" id="skStart"></div>
@@ -724,19 +726,19 @@
             <textarea id="skGoals" rows="4" maxlength="1500" placeholder="מה המטרות, דגשים, ציר תנועה, נקודות חשובות..."></textarea>
             <div class="sk-step">6. בדיקת ציוד בכלי / במתקן <span id="skEqCount" style="color:var(--ink-muted);font-weight:normal;"></span></div>
             <div id="skEqEmpty" class="sk-hint hidden">לא הוגדר ציוד למשימה הזו.</div>
-            <button type="button" id="skAllOk" class="btn-mini" style="margin-bottom:8px;" onclick="skMarkAllOk()">✅ סמן הכול כקיים</button>
+            <button type="button" id="skAllOk" class="btn-mini" style="margin-bottom:8px;" onclick="skMarkAllOk()">סמן הכול כקיים</button>
             <div id="skEquipment"></div>
-            <button type="button" id="btnSkSubmit" class="btn-action btn-success" style="margin-top:12px;" onclick="submitShavzakon(this)">💾 שמירה ושליחה</button>
+            <button type="button" id="btnSkSubmit" class="btn-action btn-success" style="margin-top:12px;" onclick="submitShavzakon(this)">שמירה ושליחה</button>
           </div>
         </div>
         <div id="skDone" class="hidden">
-          <div class="status-box status-ok" style="display:block;">✅ השבצקון נשמר. עכשיו אפשר לשלוח לווטסאפ:</div>
+          <div class="status-box status-ok" style="display:block;">השבצקון נשמר. עכשיו אפשר לשלוח לווטסאפ:</div>
           <textarea id="skWaText" rows="12"></textarea>
           <div class="btn-row">
-            <button type="button" class="btn-action btn-wa" onclick="openWaText('skWaText')">📱 וואטסאפ</button>
-            <button type="button" class="btn-action btn-primary" onclick="copyTextArea('skWaText')">📋 העתק</button>
+            <button type="button" class="btn-action btn-wa" onclick="openWaText('skWaText')">וואטסאפ</button>
+            <button type="button" class="btn-action btn-primary" onclick="copyTextArea('skWaText')">העתק</button>
           </div>
-          <button type="button" class="btn-action btn-secondary" style="margin-top:8px;" onclick="newShavzakon()">📝 שבצקון חדש</button>
+          <button type="button" class="btn-action btn-secondary" style="margin-top:8px;" onclick="newShavzakon()">שבצקון חדש</button>
         </div>
       </div>
 
@@ -750,10 +752,10 @@
 
   <div id="screenRadio" class="narrow-wrap hidden">
     <div class="card">
-      <h2>📻 קשרים 624</h2>
+      <h2>קשרים 624</h2>
       <div id="radioMine"></div>
       <div class="btn-tab-container">
-        <div id="tabRadioSign" class="btn-tab active" onclick="switchRadioTab('sign')">✍️ חתימה על קשר</div>
+        <div id="tabRadioSign" class="btn-tab active" onclick="switchRadioTab('sign')">חתימה על קשר</div>
         <div id="tabRadioReturn" class="btn-tab" onclick="switchRadioTab('return')">↩ החזרת קשר</div>
       </div>
 
@@ -764,10 +766,10 @@
         <label>2. לאיזו משימה:</label>
         <select id="radioMission" onchange="document.getElementById('radioMissionOther').classList.toggle('hidden', this.value!=='אחר')"></select>
         <input type="text" id="radioMissionOther" class="hidden" placeholder="פרט משימה...">
-        <label>3. 📷 צילום המכשיר עם המספר <span class="radio-photo-lbl"></span></label>
+        <label>3. צילום המכשיר עם המספר <span class="radio-photo-lbl"></span></label>
         <input type="file" id="radioPhotoSign" accept="image/*" capture="environment" onchange="onRadioPhoto(this, 'sign')">
         <img id="radioPhotoSignPrev" class="radio-photo-prev hidden" alt="תצוגה מקדימה">
-        <button type="button" id="btnRadioSign" class="btn-action btn-success" onclick="submitRadioSign(false)">📻 חתום על הקשר</button>
+        <button type="button" id="btnRadioSign" class="btn-action btn-success" onclick="submitRadioSign(false)">חתום על הקשר</button>
       </div>
 
       <div id="radioReturnSection" class="hidden">
@@ -777,21 +779,21 @@
           <select id="radioReturnDevice"></select>
           <label>2. מה עושים עם המכשיר:</label>
           <div class="radio-group">
-            <label class="radio-card" id="rmHamal" onclick="setRadioReturnMode('hamal')">🏠 החזרה לחמ"ל</label>
-            <label class="radio-card" id="rmNext" onclick="setRadioReturnMode('next')">🔁 העברה לחייל הבא</label>
+            <label class="radio-card" id="rmHamal" onclick="setRadioReturnMode('hamal')">החזרה לחמ"ל</label>
+            <label class="radio-card" id="rmNext" onclick="setRadioReturnMode('next')">העברה לחייל הבא</label>
           </div>
           <div id="radioNextBox" class="hidden">
             <label>החייל הבא:</label>
-            <input type="text" placeholder="🔍 חיפוש שם..." oninput="filterSelectOptions('radioNextSoldier', this.value)">
+            <input type="text" placeholder="חיפוש שם..." oninput="filterSelectOptions('radioNextSoldier', this.value)">
             <select id="radioNextSoldier"></select>
             <label>המשימה של החייל הבא:</label>
             <select id="radioNextMission" onchange="document.getElementById('radioNextMissionOther').classList.toggle('hidden', this.value!=='אחר')"></select>
             <input type="text" id="radioNextMissionOther" class="hidden" placeholder="פרט משימה...">
           </div>
-          <label>3. 📷 צילום המכשיר <span class="radio-photo-lbl"></span></label>
+          <label>3. צילום המכשיר <span class="radio-photo-lbl"></span></label>
           <input type="file" id="radioPhotoReturn" accept="image/*" capture="environment" onchange="onRadioPhoto(this, 'return')">
           <img id="radioPhotoReturnPrev" class="radio-photo-prev hidden" alt="תצוגה מקדימה">
-          <button type="button" id="btnRadioReturn" class="btn-action btn-primary" onclick="submitRadioReturn()">✅ אשר החזרה / העברה</button>
+          <button type="button" id="btnRadioReturn" class="btn-action btn-primary" onclick="submitRadioReturn()">אשר החזרה / העברה</button>
         </div>
       </div>
       <div id="radioStatusBox" class="status-box"></div>
@@ -801,7 +803,7 @@
   <!-- תמונת קשר -->
   <div id="radioPhotoModal" class="modal-overlay hidden" onclick="if(event.target===this)this.classList.add('hidden')">
     <div class="modal-box" style="max-width:560px;">
-      <h3 style="margin:0 0 10px;color:var(--olive);" id="radioPhotoTitle">📷 תמונת מכשיר</h3>
+      <h3 style="margin:0 0 10px;color:var(--olive);" id="radioPhotoTitle">תמונת מכשיר</h3>
       <div id="radioPhotoBody" class="loading-msg">טוען תמונה...</div>
       <button type="button" class="btn-action btn-danger" style="margin-top:10px;" onclick="document.getElementById('radioPhotoModal').classList.add('hidden')">סגור</button>
     </div>
@@ -810,7 +812,7 @@
   <!-- מסך 7: ממשק דוחות -->
   <div id="screenReports" class="narrow-wrap hidden">
     <div class="card">
-      <h2>📊 ממשק דוחות</h2>
+      <h2>ממשק דוחות</h2>
       <div class="btn-tab-container">
         <div id="tabSubPres" class="btn-tab active" onclick="switchRepDomain('presence')">נוכחות</div>
         <div id="tabSubWpn" class="btn-tab" onclick="switchRepDomain('weapons')">נשקייה וצל"ם</div>
@@ -844,13 +846,13 @@
         </div>
       </div>
 
-      <button type="button" class="btn-action btn-primary" onclick="generateHighCommandReport()">🔍 הפק דוח</button>
+      <button type="button" class="btn-action btn-primary" onclick="generateHighCommandReport()">הפק דוח</button>
       <div id="hcRepErr" class="status-box status-err"></div>
       <div id="hcRepOut" class="hidden" style="margin-top:12px;">
         <textarea id="hcRepText" rows="11" readonly></textarea>
         <div class="btn-row">
-          <button type="button" class="btn-action btn-wa" onclick="openWaText('hcRepText')">📱 וואטסאפ</button>
-          <button type="button" class="btn-action btn-primary" onclick="copyTextArea('hcRepText')">📋 העתק</button>
+          <button type="button" class="btn-action btn-wa" onclick="openWaText('hcRepText')">וואטסאפ</button>
+          <button type="button" class="btn-action btn-primary" onclick="copyTextArea('hcRepText')">העתק</button>
         </div>
       </div>
     </div>
@@ -860,8 +862,8 @@
   <div id="screenShavzakBuilder" class="hidden">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-        <h2 style="margin:0;" id="shvBuilderTitle">📅 בניית שבצ"ק</h2>
-        <button type="button" id="btnToggleSkeletonMode" class="btn-mini hidden" style="border-color:var(--olive);color:var(--olive);" onclick="toggleSkeletonEditMode()">🔄 ערוך חלוקת משימות למחלקות</button>
+        <h2 style="margin:0;" id="shvBuilderTitle">בניית שבצ"ק</h2>
+        <button type="button" id="btnToggleSkeletonMode" class="btn-mini hidden" style="border-color:var(--olive);color:var(--olive);" onclick="toggleSkeletonEditMode()">ערוך חלוקת משימות למחלקות</button>
       </div>
       <label>תאריך השבצ"ק (לו"ז 06:00 עד 06:00 למחרת):</label>
       <div class="date-input-group">
@@ -880,14 +882,14 @@
     <div id="shvStage1Wrap" class="hidden">
       <div class="shv-workspace-grid">
         <div class="shv-pool-panel">
-          <h3 style="margin:0 0 6px;font-size:1.05rem;color:var(--olive);">📊 מצבת נוכחים לשבצ"ק</h3>
+          <h3 style="margin:0 0 6px;font-size:1.05rem;color:var(--olive);">מצבת נוכחים לשבצ"ק</h3>
           <div id="shvSummaryTableContainer"></div>
           <div id="shvDemandSummary" style="margin-top:12px;"></div>
         </div>
         <div class="card">
           <h2>🆕 חלוקת משימות למחלקות</h2>
           <div id="skeletonTasksList"></div>
-          <button type="button" id="btnSaveSkeleton" class="btn-action btn-success" onclick="saveOfficerSkeleton()">💾 שמור חלוקת משימות ופתח למחלקות</button>
+          <button type="button" id="btnSaveSkeleton" class="btn-action btn-success" onclick="saveOfficerSkeleton()">שמור חלוקת משימות ופתח למחלקות</button>
           <div id="skeletonStatus" class="status-box"></div>
         </div>
       </div>
@@ -903,7 +905,7 @@
         <div id="shvSwapBanner" class="swap-banner hidden"></div>
         <div class="shv-workspace-grid">
           <div class="shv-pool-panel desktop-only">
-            <h3 style="margin:0 0 6px;font-size:1.05rem;color:var(--olive);">👥 חיילים נוכחים</h3>
+            <h3 style="margin:0 0 6px;font-size:1.05rem;color:var(--olive);">חיילים נוכחים</h3>
             <div id="shvPoolFilterWrap" class="hidden">
               <select id="shvPoolFwFilter" style="padding:7px;font-size:0.85rem;margin-bottom:8px;" onchange="renderShavzakUI()">
                 <option value="ALL">כלל המחלקות והמסופחים</option>
@@ -913,7 +915,7 @@
                 <option value="מסופחים">מסופחים</option>
               </select>
             </div>
-            <input type="text" id="shvPoolSearch" placeholder="🔍 חיפוש חייל..." style="padding:8px;font-size:0.9rem;margin-bottom:8px;" oninput="renderShavzakPool()">
+            <input type="text" id="shvPoolSearch" placeholder="חיפוש חייל..." style="padding:8px;font-size:0.9rem;margin-bottom:8px;" oninput="renderShavzakPool()">
             <div style="font-size:0.8rem;color:var(--ink-muted);margin-bottom:10px;">אפשר ללחוץ על משבצת ריקה ולבחור מרשימה, או לבחור חייל כאן ואז משבצת.</div>
             <div id="shvUnreported"></div>
             <div id="shvAvailablePool"></div>
@@ -928,7 +930,7 @@
       <div id="shvActionButtons" class="card sticky-actions">
         <div class="progress-row">
           <span id="shvProgress"></span>
-          <button type="button" id="btnNextEmpty" class="btn-mini" onclick="jumpToNextEmpty()">⬇ למשבצת הריקה הבאה</button>
+          <button type="button" id="btnNextEmpty" class="btn-mini" onclick="jumpToNextEmpty()">למשבצת הריקה הבאה</button>
         </div>
         <div id="shvDirtyNote" class="hidden" style="color:var(--warn);font-size:0.85rem;font-weight:bold;margin-bottom:6px;">● יש שינויים שלא נשמרו</div>
         <div id="shvActionRow" class="btn-row"></div>
@@ -944,7 +946,7 @@
         <div id="slotSheetTitle" style="font-weight:bold;color:var(--olive);"></div>
         <button type="button" class="btn-mini" onclick="closeSlotSheet()">✕</button>
       </div>
-      <input type="text" id="slotSheetSearch" placeholder="🔍 חיפוש חייל..." oninput="renderSlotSheet()">
+      <input type="text" id="slotSheetSearch" placeholder="חיפוש חייל..." oninput="renderSlotSheet()">
       <div id="slotSheetList" class="sheet-list"></div>
       <button type="button" class="btn-action btn-secondary" onclick="sheetMarkNone()">⊘ ללא שיבוץ (אין מי שישובץ)</button>
     </div>
@@ -966,7 +968,7 @@
   <!-- מסך 9: ממשק אדמין -->
   <div id="screenAdmin" class="narrow-wrap hidden">
     <div class="card">
-      <h2>✏️ תיקון דיווח לחייל</h2>
+      <h2>תיקון דיווח לחייל</h2>
       <label>תאריך:</label><input type="date" id="uDate">
       <label>חיפוש חייל:</label><input type="text" placeholder="סנן שם..." oninput="filterSelectOptions('uSoldier', this.value, onAdmSoldierSelect)">
       <label>בחר חייל:</label><select id="uSoldier" onchange="onAdmSoldierSelect()"></select>
@@ -974,37 +976,37 @@
       <select id="uMainStatus" onchange="syncAdmSubOptions()">
         <option value="נוכח">נוכח</option>
         <option value="אינו נוכח">אינו נוכח</option>
-        <option value="לא פעיל">⛔ העבר ללא פעיל</option>
+        <option value="לא פעיל">העבר ללא פעיל</option>
       </select>
       <label>סטטוס משני:</label><select id="uSubStatus"></select>
       <label>הערה:</label><input type="text" id="uNotes">
-      <button type="button" class="btn-action btn-primary" onclick="submitAdmSingleUpdate(this)">💾 עדכן חייל</button>
+      <button type="button" class="btn-action btn-primary" onclick="submitAdmSingleUpdate(this)">עדכן חייל</button>
       <div id="uStatus" class="status-box"></div>
     </div>
 
     <div class="card">
-      <h2>➕ הוספת חייל חדש</h2>
+      <h2>הוספת חייל חדש</h2>
       <label>שם מלא: *</label><input type="text" id="aName" placeholder="ישראל ישראלי">
       <label>מספר אישי: *</label><input type="text" id="aPn" placeholder="8123456" inputmode="numeric">
       <label>מסגרת: *</label><select id="aFw"></select>
       <label>הרשאה (ניתן להפריד בפסיק):</label>
       <input type="text" id="aRole" value="חייל" placeholder="חייל / מפקד / קצין / מפל&quot;ג / פיקוד עליון / שלומי">
       <div class="checkbox-row"><input type="checkbox" id="aActive" checked><label for="aActive">פעיל בשמ"פ?</label></div>
-      <button type="button" class="btn-action btn-success" onclick="submitAdmAddSoldier(this)">🚀 שמור והוסף</button>
+      <button type="button" class="btn-action btn-success" onclick="submitAdmAddSoldier(this)">שמור והוסף</button>
       <div id="aStatus" class="status-box"></div>
     </div>
 
     <div class="card">
-      <h2>🔀 העברת חייל בין מסגרות</h2>
+      <h2>העברת חייל בין מסגרות</h2>
       <label>חיפוש חייל:</label><input type="text" placeholder="סנן..." oninput="filterSelectOptions('mSoldier', this.value)">
       <label>חייל:</label><select id="mSoldier"></select>
       <label>מסגרת יעד:</label><select id="mNewFw"></select>
-      <button type="button" class="btn-action btn-purple" onclick="submitAdmMoveSoldier(this)">🔀 העבר מסגרת</button>
+      <button type="button" class="btn-action btn-purple" onclick="submitAdmMoveSoldier(this)">העבר מסגרת</button>
       <div id="mStatus" class="status-box"></div>
     </div>
 
     <div class="card" style="border-color:var(--info);">
-      <h2>🗂️ ניהול משימות לשבצ"ק</h2>
+      <h2>ניהול משימות לשבצ"ק</h2>
       <div style="font-size:0.82rem;color:var(--ink-muted);margin-bottom:10px;line-height:1.5;">
         לכל משימה מסמנים באילו ימים היא פעילה. כך בונים שבצ"ק מותאם לשישי ולשבת: למשל "שמירה" עם 3 משמרות בימי חול, ו"שמירה" עם 4 משמרות רק בשישי-שבת (אפשר לשכפל משימה ולשנות).
       </div>
@@ -1019,12 +1021,12 @@
         <button type="button" class="btn-add-line" style="margin:0;" onclick="addAdminTask(false)">+ משימה חדשה</button>
         <button type="button" class="btn-add-line" style="margin:0;" onclick="addAdminTask(true)">+ יזומה</button>
       </div>
-      <button type="button" class="btn-action btn-success" style="margin-top:10px;" onclick="saveAdminTasks(this)">💾 שמור משימות</button>
+      <button type="button" class="btn-action btn-success" style="margin-top:10px;" onclick="saveAdminTasks(this)">שמור משימות</button>
       <div id="tasksStatus" class="status-box"></div>
     </div>
 
     <div class="card" style="border-color:var(--olive);">
-      <h2>🧰 שבצקון - משימות וציוד</h2>
+      <h2>שבצקון - משימות וציוד</h2>
       <div style="font-size:0.82rem;color:var(--ink-muted);margin-bottom:10px;line-height:1.5;">
         המשימות שמופיעות בשבצקון, ולכל משימה רשימת הציוד שהמפקד בודק בכלי או במתקן (פריט בכל שורה).
         לפריט שצריך לספור, כותבים אחרי השם קו ישר וכמות - למשל <b>מחסניות | 12</b> - והמפקד ירשום כמה יש בפועל.
@@ -1032,35 +1034,35 @@
       </div>
       <div id="adminSkList"><div class="loading-msg">טוען...</div></div>
       <button type="button" class="btn-add-line" onclick="addAdminSkMission()">+ משימה חדשה</button>
-      <button type="button" class="btn-action btn-success" style="margin-top:10px;" onclick="saveAdminSkConfig(this)">💾 שמור משימות וציוד</button>
+      <button type="button" class="btn-action btn-success" style="margin-top:10px;" onclick="saveAdminSkConfig(this)">שמור משימות וציוד</button>
       <div id="skCfgStatus" class="status-box"></div>
     </div>
 
     <div class="card">
-      <h2>🔑 איפוס סיסמה</h2>
+      <h2>איפוס סיסמה</h2>
       <label>חיפוש חייל:</label><input type="text" placeholder="סנן..." oninput="filterSelectOptions('pSoldier', this.value)">
       <label>חייל:</label><select id="pSoldier"></select>
-      <button type="button" class="btn-action btn-warning" onclick="submitAdmResetPassword(this)">🔑 אפס סיסמה</button>
+      <button type="button" class="btn-action btn-warning" onclick="submitAdmResetPassword(this)">אפס סיסמה</button>
       <div id="pStatus" class="status-box"></div>
     </div>
 
     <div class="card" style="border-color:var(--olive);">
-      <h2>🔍 בדיקת פערים (עבור ירוק בעיניים)</h2>
+      <h2>בדיקת פערים (עבור ירוק בעיניים)</h2>
       <label>הדבק רשימת מספרים אישיים:</label>
       <textarea id="pastedPnInput" rows="4" placeholder="הדבק כאן מ&quot;א מאקסל או וואטסאפ..."></textarea>
-      <button type="button" class="btn-action btn-primary" onclick="runPnCrossCheck()">⚡ בצע הצלבה</button>
+      <button type="button" class="btn-action btn-primary" onclick="runPnCrossCheck()">בצע הצלבה</button>
       <div id="crossCheckOut" class="hidden" style="margin-top:12px;">
         <textarea id="crossCheckText" rows="9" readonly></textarea>
         <div class="btn-row">
-          <button type="button" class="btn-action btn-wa" onclick="openWaText('crossCheckText')">📱 וואטסאפ</button>
-          <button type="button" class="btn-action btn-primary" onclick="copyTextArea('crossCheckText')">📋 העתק</button>
+          <button type="button" class="btn-action btn-wa" onclick="openWaText('crossCheckText')">וואטסאפ</button>
+          <button type="button" class="btn-action btn-primary" onclick="copyTextArea('crossCheckText')">העתק</button>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h2>🔄 סנכרון מבנה מטריצות</h2>
-      <button type="button" class="btn-action btn-warning" onclick="submitAdmSync(this)">🔄 סנכרן מטריצות עכשיו</button>
+      <h2>סנכרון מבנה מטריצות</h2>
+      <button type="button" class="btn-action btn-warning" onclick="submitAdmSync(this)">סנכרן מטריצות עכשיו</button>
       <div id="syncStatus" class="status-box"></div>
     </div>
   </div>
@@ -1216,7 +1218,8 @@
 
   // פופאפ: onOk / onCancel. אם cancelText מועבר - מוצג כפתור ביטול
   function openCustomModal(icon, title, body, btnText, onOk, cancelText, onCancel) {
-    document.getElementById("modalIcon").textContent = icon;
+    document.getElementById("modalIcon").textContent = "";
+    document.getElementById("modalIcon").classList.add("hidden");
     document.getElementById("modalTitle").textContent = title;
     document.getElementById("modalBody").textContent = body;
     const ok = document.getElementById("modalOkBtn");
@@ -1229,7 +1232,7 @@
     document.getElementById("customModal").classList.remove("hidden");
   }
   function closeCustomModal() { document.getElementById("customModal").classList.add("hidden"); }
-  function confirmModal(title, body, okText, onOk) { openCustomModal("⚠️", title, body, okText || "המשך", onOk, "ביטול"); }
+  function confirmModal(title, body, okText, onOk) { openCustomModal("", title, body, okText || "המשך", onOk, "ביטול"); }
 
   // ==========================================
   // תקשורת עם השרת
@@ -1554,7 +1557,7 @@
       if (!isOk(res)) throw new Error(res.message || "שגיאה");
       lsSet("pushToken", tok);
       lsSet("pushRegFor", currentUser.personalNumber + "|" + new Date().toDateString());
-      if (loud) toast("🔔 ההתראות הופעלו", "ok");
+      if (loud) toast("ההתראות הופעלו", "ok");
       return true;
     } catch (e) {
       console.log("push register failed", e);
@@ -1580,9 +1583,9 @@
     const st = pushSupport();
     const dismissed = Number(lsGet("pushPromptDismissedAt") || 0);
     if (Date.now() - dismissed < 3 * 24 * 3600 * 1000) return "";
-    if (st === "default") return `<div class="push-card"><div class="pc-ic">🔔</div><div class="pc-txt"><b>קבל התראות לטלפון</b><br><span>תזכורות למשימה, להחזרת קשר ופרסום השבצ"ק</span></div>
+    if (st === "default") return `<div class="push-card"><div class="pc-txt"><b>קבל התראות לטלפון</b><br><span>תזכורות למשימה, להחזרת קשר ופרסום השבצ"ק</span></div>
       <div class="pc-btns"><button type="button" class="btn-mini home" onclick="enablePush(this)">הפעל</button><button type="button" class="pc-x" onclick="dismissPushPrompt()" aria-label="לא עכשיו">✕</button></div></div>`;
-    if (st === "ios_install") return `<div class="push-card"><div class="pc-ic">📲</div><div class="pc-txt"><b>רוצה התראות באייפון?</b><br><span>צריך קודם להתקין: שיתוף ⬆️ ← "הוסף למסך הבית", ולפתוח מהאייקון</span></div>
+    if (st === "ios_install") return `<div class="push-card"><div class="pc-txt"><b>רוצה התראות באייפון?</b><br><span>צריך קודם להתקין: שיתוף ⬆️ ← "הוסף למסך הבית", ולפתוח מהאייקון</span></div>
       <div class="pc-btns"><button type="button" class="pc-x" onclick="dismissPushPrompt()" aria-label="סגור">✕</button></div></div>`;
     return "";
   }
@@ -1591,7 +1594,7 @@
   }
   function pushHubRowHtml() {
     const st = pushSupport();
-    const label = st === "granted" ? "🔔 התראות פעילות במכשיר הזה" : st === "denied" ? "🔕 ההתראות חסומות (אפשר לשנות בהגדרות הטלפון)" : st === "ios_install" ? "📲 להתראות באייפון - התקן את האפליקציה למסך הבית" : st === "none" ? "המכשיר הזה לא תומך בהתראות" : "🔕 התראות כבויות";
+    const label = st === "granted" ? "התראות פעילות במכשיר הזה" : st === "denied" ? "ההתראות חסומות (אפשר לשנות בהגדרות הטלפון)" : st === "ios_install" ? "להתראות באייפון - התקן את האפליקציה למסך הבית" : st === "none" ? "המכשיר הזה לא תומך בהתראות" : "התראות כבויות";
     return `<div class="push-hub-row"><span>${label}</span>${st === "default" ? `<button type="button" class="btn-mini home" onclick="enablePush(this)">הפעל</button>` : ""}</div>`;
   }
 
@@ -1770,7 +1773,7 @@
     await apiSWR({ action: "home_status" }, (res) => {
       if (currentScreen !== "home") return;
       if (!isOk(res)) {
-        box.innerHTML = `<div class="item-box" style="text-align:center;">⚠️ ${escapeHtml(res.message || "שגיאה בטעינת מסך הבית")}<br><button type="button" class="home-refresh" style="margin-top:8px;" onclick="openHome()">נסה שוב</button></div>`;
+        box.innerHTML = `<div class="item-box" style="text-align:center;">${escapeHtml(res.message || "שגיאה בטעינת מסך הבית")}<br><button type="button" class="home-refresh" style="margin-top:8px;" onclick="openHome()">נסה שוב</button></div>`;
         return;
       }
       renderHome(res);
@@ -1804,7 +1807,7 @@
         <div class="hs-line"><b>לוחמים (${e.soldiers.length}):</b> ${escapeHtml(e.soldiers.join(", ") || "-")}</div>
         <div class="hs-line"><b>ציוד:</b> <span class="chip ${e.missingCount ? "bad" : "ok"}">${escapeHtml(e.equipStatus)}</span></div>
         <div class="hs-goals">${escapeHtml(e.goals)}</div>
-        <button type="button" class="btn-action btn-wa" onclick="shareHomeSk()">📱 שליחה לווטסאפ</button></div>`;
+        <button type="button" class="btn-action btn-wa" onclick="shareHomeSk()">שליחה לווטסאפ</button></div>`;
     }
 
     // המשימה שלי - לא מוצג לפיקוד עליון, מפל"ג, חפ"ק, חמ"ל ושלומי (בד"כ לא משובצים), אלא אם יש להם משימה
@@ -1926,21 +1929,21 @@
     grid.innerHTML = "";
     const perms = currentUser.permissions || {};
     const tiles = [
-      { show: Boolean(perms.reservePlan || perms.adminPanel), wide: true, icon: "🗓️", title: "הערכות למילואים",
-        desc: (perms.attendanceAllCompany || perms.adminPanel) ? "מי מגיע, באילו תאריכים ולמה - כל הפלוגה" : `מי מגיע, באילו תאריכים ולמה - ${currentUser.framework}`, key: "reserve" },
-      { show: true, icon: "📅", title: "שבצק - צפיה", desc: "משימות היום ומחר ותמונת שבצ\"ק", key: "shavzak_view" },
-      { show: true, icon: "✍️", title: "טופס חתימות", desc: "נשקייה ואפסנאות אישית", key: "signatures" },
-      { show: true, icon: "📻", title: "קשרים", desc: "חתימה והחזרה של מכשיר קשר", key: "radio" },
-      { show: Boolean(perms.shavzakon || perms.adminPanel), icon: "📋", title: "שבצקון משימה", desc: "תדריך ובדיקת ציוד לפני עלייה למשימה", key: "shavzakon" },
-      { show: Boolean(perms.attendanceReport), icon: "📋", title: "דיווח נוכחות", desc: perms.attendanceAllCompany ? "כלל הפלוגה" : (perms.allowedAttendanceFrameworks || []).join(", "), key: "attendance" },
-      { show: Boolean(perms.maflagReturns), icon: "📦", title: "טופס זיכויים", desc: "זיכוי ציוד ודוחות מפל\"ג", key: "maflag" },
-      { show: Boolean(perms.maflagReturns || perms.adminPanel), icon: "📻", title: "דוח קשרים", desc: "איפה כל מכשירי הקשר ותנועות אחרונות", key: "radio_report" },
-      { show: Boolean(perms.reportsCenter), icon: "📊", title: "ממשק דוחות", desc: "דוחות נוכחות ונשקייה לפיקוד", key: "reports" },
-      { show: Boolean(perms.shavzakPlatoon && !perms.shavzakOfficers), icon: "🪖", title: "בניית שבצק", desc: `שיבוץ חיילי ${currentUser.framework}`, key: "shavzak_platoon" },
-      { show: Boolean(perms.shavzakOfficers), icon: "⭐", title: "שבצק - קצינים", desc: "חלוקת משימות למחלקות ושיבוץ", key: "shavzak_officers" },
-      { show: Boolean(perms.shavzakFinalApproval), icon: "🎖️", title: "שבצק - אישור סופי", desc: "בקרה ואישור מ\"פ לשבצ\"ק", key: "shavzak_final" },
-      { show: Boolean(perms.adminPanel), icon: "🛠️", title: "ממשק אדמין", desc: "ניהול חיילים, העברות והצלבות", key: "admin" },
-      { show: Boolean(perms.adminPanel), icon: "🔔", title: "התראות", desc: "שליחה ידנית, תזמון ויומן", key: "push_admin" }
+      { show: Boolean(perms.reservePlan || perms.adminPanel), wide: true, icon: "", title: "הערכות למילואים",
+        desc: (perms.attendanceAllCompany || perms.adminPanel) ? "כל הפלוגה" : currentUser.framework, key: "reserve" },
+      { show: true, icon: "", title: "שבצ\"ק", desc: "היום ומחר", key: "shavzak_view" },
+      { show: true, icon: "", title: "חתימות", desc: "נשקייה ואפסנאות", key: "signatures" },
+      { show: true, icon: "", title: "קשרים", desc: "חתימה והחזרה", key: "radio" },
+      { show: Boolean(perms.shavzakon || perms.adminPanel), icon: "", title: "שבצקון", desc: "תדריך למשימה", key: "shavzakon" },
+      { show: Boolean(perms.attendanceReport), icon: "", title: "נוכחות", desc: perms.attendanceAllCompany ? "כל הפלוגה" : (perms.allowedAttendanceFrameworks || []).join(", "), key: "attendance" },
+      { show: Boolean(perms.maflagReturns), icon: "", title: "זיכויים", desc: "ציוד ודוחות", key: "maflag" },
+      { show: Boolean(perms.maflagReturns || perms.adminPanel), icon: "", title: "דוח קשרים", desc: "מיקום ותנועות", key: "radio_report" },
+      { show: Boolean(perms.reportsCenter), icon: "", title: "דוחות", desc: "נוכחות ונשקייה", key: "reports" },
+      { show: Boolean(perms.shavzakPlatoon && !perms.shavzakOfficers), icon: "", title: "בניית שבצ\"ק", desc: currentUser.framework, key: "shavzak_platoon" },
+      { show: Boolean(perms.shavzakOfficers), icon: "", title: "שבצ\"ק קצינים", desc: "חלוקה ושיבוץ", key: "shavzak_officers" },
+      { show: Boolean(perms.shavzakFinalApproval), icon: "", title: "אישור שבצ\"ק", desc: "אישור ופרסום", key: "shavzak_final" },
+      { show: Boolean(perms.adminPanel), icon: "", title: "ניהול", desc: "חיילים ומשימות", key: "admin" },
+      { show: Boolean(perms.adminPanel), icon: "", title: "התראות", desc: "שליחה ויומן", key: "push_admin" }
     ];
     tiles.filter(t => t.show).forEach(t => {
       const card = document.createElement("div");
@@ -2016,13 +2019,13 @@
       shvForceSkeletonEdit = false;
       if (screenKey === "shavzak_final") {
         shvViewMode = "final_approval";
-        document.getElementById("shvBuilderTitle").textContent = "🎖️ שבצק - אישור סופי";
+        document.getElementById("shvBuilderTitle").textContent = "שבצק - אישור סופי";
       } else if (screenKey === "shavzak_officers") {
         shvViewMode = "officers";
-        document.getElementById("shvBuilderTitle").textContent = "⭐ שבצק - קצינים";
+        document.getElementById("shvBuilderTitle").textContent = "שבצק - קצינים";
       } else {
         shvViewMode = "platoon";
-        document.getElementById("shvBuilderTitle").textContent = `🪖 בניית שבצ"ק - ${currentUser.framework}`;
+        document.getElementById("shvBuilderTitle").textContent = `בניית שבצ"ק - ${currentUser.framework}`;
       }
       document.getElementById("screenShavzakBuilder").classList.remove("hidden");
       initShavzakBuilderScreen();
@@ -2058,7 +2061,7 @@
 
   function renderSoldierShavzak(res) {
     if (!isOk(res)) {
-      document.getElementById("soldierShvLoading").textContent = "⚠️ " + (res.message || "שגיאה בטעינה");
+      document.getElementById("soldierShvLoading").textContent = "" + (res.message || "שגיאה בטעינה");
       return;
     }
     document.getElementById("soldierShvLoading").classList.add("hidden");
@@ -2068,12 +2071,12 @@
       <div class="shv-mission-hero" ${green ? 'style="border-color:var(--ok);background:linear-gradient(135deg,var(--ok-soft),var(--surface-sunken));"' : ""}>
         <div class="shv-hero-day" ${green ? 'style="color:var(--ok);"' : ""}>${day} (${escapeHtml(date)})</div>
         <div class="shv-hero-task">${escapeHtml(m.taskName)}</div>
-        <div class="shv-hero-hours">🕒 ${hrs(m.hoursLabel)} (${escapeHtml(m.roleInTask)})</div>
+        <div class="shv-hero-hours">${hrs(m.hoursLabel)} (${escapeHtml(m.roleInTask)})</div>
       </div>`;
 
     const todayDiv = document.getElementById("todayMissionCard");
     if (res.todayMissions && res.todayMissions.length) {
-      todayDiv.innerHTML = res.todayMissions.map(m => hero(m, "📌 המשימה שלך היום", res.todayDate, false)).join("");
+      todayDiv.innerHTML = res.todayMissions.map(m => hero(m, "המשימה שלך היום", res.todayDate, false)).join("");
     } else {
       todayDiv.innerHTML = `<div class="item-box" style="text-align:center;color:var(--ink-muted);">אין משימה רשומה עבורך להיום (${escapeHtml(res.todayDate)}).</div>`;
     }
@@ -2081,7 +2084,7 @@
     const tmrDiv = document.getElementById("tomorrowMissionCard");
     if (res.hasTomorrowShavzak) {
       tmrDiv.innerHTML = (res.tomorrowMissions && res.tomorrowMissions.length)
-        ? res.tomorrowMissions.map(m => hero(m, "⏭️ המשימה שלך למחר", res.tomorrowDate, true)).join("")
+        ? res.tomorrowMissions.map(m => hero(m, "המשימה שלך למחר", res.tomorrowDate, true)).join("")
         : `<div class="item-box" style="text-align:center;color:var(--ink-muted);">פורסם שבצ"ק למחר (${escapeHtml(res.tomorrowDate)}) - אינך משובץ למשימה.</div>`;
     } else {
       tmrDiv.innerHTML = `<div class="item-box" style="text-align:center;color:var(--ink-muted);font-size:0.85rem;">שבצ"ק למחר טרם פורסם.</div>`;
@@ -2293,7 +2296,7 @@
   function openShavzakImageModal(which) {
     const block = soldierShvBlocks[which];
     if (!block) return;
-    document.getElementById("shvImageTitle").textContent = `📋 שבצ"ק ${which === "tomorrow" ? "מחר" : "היום"} - ${block.dayName} ${block.date}`;
+    document.getElementById("shvImageTitle").textContent = `שבצ"ק ${which === "tomorrow" ? "מחר" : "היום"} - ${block.dayName} ${block.date}`;
     const canvas = buildShavzakCanvas(block);
     shvGeneratedDataUrl = canvas.toDataURL("image/png");
     document.getElementById("shvGeneratedImg").src = shvGeneratedDataUrl;
@@ -2326,13 +2329,13 @@
     OK: "אושר ע\"י קצינים", RETURNED: "הוחזר לתיקון", PENDING: "ממתין לאישור מ\"פ", PUBLISHED: "מאושר ופורסם"
   };
   const ST_VIEW = {
-    [ST.OPEN]: { t: "⏳ טרם התחילה", bg: "var(--surface-sunken)", fg: "var(--ink-muted)" },
-    [ST.DRAFT]: { t: "✏️ בשיבוץ", bg: "var(--warn-soft)", fg: "var(--warn)" },
-    [ST.SUBMITTED]: { t: "📨 הוגש לקצינים", bg: "var(--info-soft)", fg: "var(--info)" },
-    [ST.OK]: { t: "✅ אושר", bg: "var(--ok-soft)", fg: "var(--ok)" },
+    [ST.OPEN]: { t: "טרם התחילה", bg: "var(--surface-sunken)", fg: "var(--ink-muted)" },
+    [ST.DRAFT]: { t: "בשיבוץ", bg: "var(--warn-soft)", fg: "var(--warn)" },
+    [ST.SUBMITTED]: { t: "הוגש לקצינים", bg: "var(--info-soft)", fg: "var(--info)" },
+    [ST.OK]: { t: "אושר", bg: "var(--ok-soft)", fg: "var(--ok)" },
     [ST.RETURNED]: { t: "↩ הוחזר לתיקון", bg: "var(--signal-soft)", fg: "var(--signal)" },
-    [ST.PENDING]: { t: "📤 אצל מ\"פ", bg: "var(--olive-soft)", fg: "var(--olive)" },
-    [ST.PUBLISHED]: { t: "🎖️ פורסם", bg: "var(--ok-soft)", fg: "var(--ok)" }
+    [ST.PENDING]: { t: "אצל מ\"פ", bg: "var(--olive-soft)", fg: "var(--olive)" },
+    [ST.PUBLISHED]: { t: "פורסם", bg: "var(--ok-soft)", fg: "var(--ok)" }
   };
   const PLATOON_SHORT = { "מחלקה 1": "מ'1", "מחלקה 2": "מ'2", "מחלקה 3": "מ'3", "מסופחים": "מסופ'" };
 
@@ -2431,7 +2434,7 @@
       return;
     }
 
-    if (isOfficerOrTop) { toggleBtn.classList.remove("hidden"); toggleBtn.textContent = "🔄 ערוך חלוקת משימות למחלקות"; }
+    if (isOfficerOrTop) { toggleBtn.classList.remove("hidden"); toggleBtn.textContent = "ערוך חלוקת משימות למחלקות"; }
 
     const soldiersByPn = {};
     (res.availableSoldiers || []).forEach(s => { soldiersByPn[s.personalNumber] = s; });
@@ -2465,13 +2468,13 @@
         box.classList.remove("hidden");
         box.innerHTML = `<strong>↩ הקצינים החזירו את השיבוץ לתיקון:</strong><br>${escapeHtml(mine.note || "")}<br><span style="opacity:.85;font-size:0.85rem;">תקן ולחץ "שמירה והעברה לאישור".</span>`;
       } else if (mine && mine.status === ST.SUBMITTED) {
-        setBanner("shvStageStatusBanner", "📨 השיבוץ הוגש לקצינים. אפשר עדיין לתקן ולשמור עד שהקצינים יאשרו.");
+        setBanner("shvStageStatusBanner", "השיבוץ הוגש לקצינים. אפשר עדיין לתקן ולשמור עד שהקצינים יאשרו.");
       } else if (mine && mine.status === ST.OK) {
-        setBanner("shvStageStatusBanner", "✅ הקצינים אישרו את השיבוץ של המחלקה. השיבוץ נעול.");
+        setBanner("shvStageStatusBanner", "הקצינים אישרו את השיבוץ של המחלקה. השיבוץ נעול.");
       } else if (res.isOfficialApproved) {
-        setBanner("shvStageStatusBanner", "🎖️ השבצ\"ק אושר ופורסם.");
+        setBanner("shvStageStatusBanner", "השבצ\"ק אושר ופורסם.");
       } else if (res.isPendingMpApproval) {
-        setBanner("shvStageStatusBanner", "📤 השבצ\"ק הועבר לאישור סופי - נעול לעריכה.");
+        setBanner("shvStageStatusBanner", "השבצ\"ק הועבר לאישור סופי - נעול לעריכה.");
       }
     }
 
@@ -2510,7 +2513,7 @@
     shvSkeletonShifts.forEach((sh, idx) => { demand[shvSkelPlatoons[idx]] += sh.reqCmdrs + sh.reqSoldiers; });
     const avail = {};
     shvStage1Summary.forEach(x => { avail[x.framework] = x; });
-    document.getElementById("shvDemandSummary").innerHTML = `<div style="font-size:0.85rem;color:var(--olive);font-weight:bold;margin-bottom:4px;">📐 משבצות שהוקצו מול נוכחים:</div>
+    document.getElementById("shvDemandSummary").innerHTML = `<div style="font-size:0.85rem;color:var(--olive);font-weight:bold;margin-bottom:4px;">משבצות שהוקצו מול נוכחים:</div>
       <table class="summary-table"><thead><tr><th>מסגרת</th><th>משבצות</th><th>נוכחים</th></tr></thead><tbody>` +
       SHAVZAK_PLATOONS.map(p => {
         const have = avail[p] ? avail[p].totalCount : 0;
@@ -2548,7 +2551,7 @@
     const usedPrefill = !existingRows.length && res.prefill;
     shvSkelPlatoons = shvSkeletonShifts.map(sh => sh.presetPlatoon || existingMap[sh.shiftKey] || (!existingRows.length && prefillMap[sh.shiftKey]) || "מחלקה 1");
 
-    let note = `📆 תבנית משימות ל${escapeHtml(res.dayName || "")} (${shvSkeletonShifts.length} משמרות).`;
+    let note = `תבנית משימות ל${escapeHtml(res.dayName || "")} (${shvSkeletonShifts.length} משמרות).`;
     if (usedPrefill) note += ` <span style="color:var(--warn);">מולא מראש לפי החלוקה של ${escapeHtml(res.prefill.sourceDay)} ${escapeHtml(res.prefill.sourceDate)} - שנה רק מה שצריך.</span>`;
     else if (existingRows.length) note += " מוצגת החלוקה השמורה לתאריך זה.";
     listDiv.dataset.note = note;
@@ -2561,7 +2564,7 @@
     shvSkeletonShifts.forEach(sh => { if (!tasksOrder.includes(sh.taskName)) tasksOrder.push(sh.taskName); });
     let html = `<div style="font-size:0.85rem;color:var(--olive);margin-bottom:10px;">${listDiv.dataset.note || ""}</div>
       <div style="font-size:0.78rem;color:var(--ink-muted);margin-bottom:8px;">לחץ על התא של המחלקה כדי לשייך אליה את המשמרת. "כולן" משייך את כל המשמרות של המשימה.</div>
-      ${shvSkeletonShifts.some(x => x.flexible) ? `<div style="font-size:0.78rem;color:var(--warn);margin-bottom:8px;">⏱️ במשימות עם שעות גמישות (${escapeHtml(Array.from(new Set(shvSkeletonShifts.filter(x => x.flexible).map(x => x.taskName))).join(", "))}) קובעים את השעות של כל משמרת ומוסיפים משמרות לפי הצורך - למשל משמרת לכל מחלקה. המפקדים יוכלו לפצל אותן לפי שעות בשיבוץ.</div>` : ""}
+      ${shvSkeletonShifts.some(x => x.flexible) ? `<div style="font-size:0.78rem;color:var(--warn);margin-bottom:8px;">במשימות עם שעות גמישות (${escapeHtml(Array.from(new Set(shvSkeletonShifts.filter(x => x.flexible).map(x => x.taskName))).join(", "))}) קובעים את השעות של כל משמרת ומוסיפים משמרות לפי הצורך - למשל משמרת לכל מחלקה. המפקדים יוכלו לפצל אותן לפי שעות בשיבוץ.</div>` : ""}
       <div style="overflow-x:auto;"><table class="skel-table"><thead><tr><th style="text-align:right;">משימה / משמרת</th>${SHAVZAK_PLATOONS.map(p => `<th>${escapeHtml(PLATOON_SHORT[p] || p)}</th>`).join("")}</tr></thead><tbody>`;
     tasksOrder.forEach(task => {
       const shifts = shvSkeletonShifts.map((sh, idx) => ({ sh, idx })).filter(x => x.sh.taskName === task);
@@ -2573,7 +2576,7 @@
           ? (() => { const m = String(sh.hoursLabel).match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/) || ["", "06:00", "06:00"];
               return `<div style="display:flex;align-items:center;gap:2px;flex-wrap:wrap;direction:ltr;justify-content:flex-end;">
                 <input type="time" class="skel-time" value="${m[1].padStart(5, "0")}" onchange="setSkelHours(${idx}, 0, this.value)">–<input type="time" class="skel-time" value="${m[2].padStart(5, "0")}" onchange="setSkelHours(${idx}, 1, this.value)">
-                ${shifts.length > 1 ? `<button type="button" class="skel-flex-del" title="מחק משמרת" onclick="delSkelShift(${idx})">🗑️</button>` : ""}</div>`; })()
+                ${shifts.length > 1 ? `<button type="button" class="skel-flex-del" title="מחק משמרת" onclick="delSkelShift(${idx})"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>` : ""}</div>`; })()
           : hrs(sh.hoursLabel);
         html += `<tr><td class="lbl">${lbl}<br><span style="color:var(--ink-muted);">${sh.reqCmdrs ? sh.reqCmdrs + " מפק' + " : ""}${sh.reqSoldiers} חי'</span></td>` +
           SHAVZAK_PLATOONS.map(p => `<td class="skel-cell ${shvSkelPlatoons[idx] === p ? "on" : ""}" data-i="${idx}" data-p="${escapeHtml(p)}" onclick="setSkel(${idx}, this.dataset.p)">${shvSkelPlatoons[idx] === p ? "✓" : "·"}</td>`).join("") + `</tr>`;
@@ -2736,10 +2739,10 @@
       </div>`;
     }).join("");
     const tabs = canToggle ? `<div class="mode-tabs">
-        <div class="btn-tab ${shvMode === "review" ? "active" : ""}" onclick="setShvMode('review')">📋 סקירה ואישור</div>
-        <div class="btn-tab ${shvMode === "edit" ? "active" : ""}" onclick="setShvMode('edit')">✏️ עריכת שיבוץ</div>
+        <div class="btn-tab ${shvMode === "review" ? "active" : ""}" onclick="setShvMode('review')">סקירה ואישור</div>
+        <div class="btn-tab ${shvMode === "edit" ? "active" : ""}" onclick="setShvMode('edit')">עריכת שיבוץ</div>
       </div>` : "";
-    bar.innerHTML = `<div style="font-weight:bold;color:var(--olive);margin-bottom:4px;">📍 מצב השבצ"ק - ${escapeHtml(shvState.dayName)} ${escapeHtml(shvState.targetDate)}</div>${rows}${tabs}`;
+    bar.innerHTML = `<div style="font-weight:bold;color:var(--olive);margin-bottom:4px;">מצב השבצ"ק - ${escapeHtml(shvState.dayName)} ${escapeHtml(shvState.targetDate)}</div>${rows}${tabs}`;
   }
 
   // ---------- מסך סקירה (קצינים / אישור סופי) ----------
@@ -2750,7 +2753,7 @@
       date: shvState.targetDate, dayName: shvState.dayName,
       title: `שבצ"ק פלוגתי - מסייעת 8109 | ${shvState.dayName} ${shvState.targetDate}`,
       rows: shvState.rows.map((r, rIdx) => {
-        if (!r.canViewDetails) return { taskName: r.taskName, hoursLabel: r.hoursLabel, platoon: r.platoon, cmdrs: "", soldiers: "", placeholder: "⏳ טרם הוגש" };
+        if (!r.canViewDetails) return { taskName: r.taskName, hoursLabel: r.hoursLabel, platoon: r.platoon, cmdrs: "", soldiers: "", placeholder: "טרם הוגש" };
         const real = arr => arr.filter(slotIsReal).map(x => x.name).join(", ");
         const iss = issueByRow[rIdx];
         const missing = r.cmdrSlots.concat(r.soldierSlots).filter(x => !x || x.pn === SHV_NONE_PN).length;
@@ -2765,13 +2768,13 @@
     const issues = computeIssues();
     const counts = {};
     issues.forEach(i => i.problems.forEach(p => { counts[p.type] = (counts[p.type] || 0) + 1; }));
-    const LBL = { empty: "🔴 משמרות עם משבצות ריקות", none: "⊘ \"ללא שיבוץ\"", cmdr: "⭐ חסר מפקד", overlap: "🔁 כפל שיבוץ בשעות חופפות", absent: "❓ משובץ שלא דווח כנוכח" };
+    const LBL = { empty: "משמרות עם משבצות ריקות", none: "⊘ \"ללא שיבוץ\"", cmdr: "חסר מפקד", overlap: "כפל שיבוץ בשעות חופפות", absent: "משובץ שלא דווח כנוכח" };
     const hidden = shvState.rows.filter(r => !r.canViewDetails);
     let html = "";
     if (!issues.length) {
-      html += `<div class="review-box ok"><strong>✅ אין פערים</strong> - כל המשבצות מלאות, אין כפל שיבוץ ואין חוסר במפקדים.</div>`;
+      html += `<div class="review-box ok"><strong>אין פערים</strong> - כל המשבצות מלאות, אין כפל שיבוץ ואין חוסר במפקדים.</div>`;
     } else {
-      html += `<div class="review-box bad"><div style="font-weight:bold;font-size:1.05rem;margin-bottom:6px;">⚠️ נמצאו פערים ב-${issues.length} משמרות</div>` +
+      html += `<div class="review-box bad"><div style="font-weight:bold;font-size:1.05rem;margin-bottom:6px;">נמצאו פערים ב-${issues.length} משמרות</div>` +
         `<div style="margin-bottom:8px;">${Object.keys(counts).map(k => `${LBL[k]}: <strong>${counts[k]}</strong>`).join(" &nbsp;·&nbsp; ")}</div>`;
       const byPlatoon = {};
       issues.forEach(i => { (byPlatoon[i.platoon] = byPlatoon[i.platoon] || []).push(i); });
@@ -2783,7 +2786,7 @@
     }
     if (hidden.length) {
       const fws = Array.from(new Set(hidden.map(r => r.platoon)));
-      html += `<div class="review-box" style="background:var(--surface);border:1px dashed var(--line-strong);color:var(--ink);">⏳ ${escapeHtml(fws.join(", "))} עדיין לא הגישו - המשמרות שלהן מסומנות באפור.</div>`;
+      html += `<div class="review-box" style="background:var(--surface);border:1px dashed var(--line-strong);color:var(--ink);">${escapeHtml(fws.join(", "))} עדיין לא הגישו - המשמרות שלהן מסומנות באפור.</div>`;
     }
     const canvas = buildShavzakCanvas(reviewBlockForCanvas(issues));
     html += `<div class="review-img-wrap"><img src="${canvas.toDataURL("image/png")}" alt="שבצק" style="width:${Math.round(canvas.width / 2)}px;"></div>
@@ -2811,7 +2814,7 @@
     const fwFilter = document.getElementById("shvPoolFwFilter").value;
     const unrep = (shvState.unreported || []).filter(u => seeAll ? (fwFilter === "ALL" || u.framework === fwFilter) : u.framework === shvState.userFramework);
     const html = unrep.length
-      ? `<div class="unreported-box">⚠️ <strong>${unrep.length} חיילים לא דווחו לתאריך ${escapeHtml(shvState.targetDate)}</strong> ולכן לא מופיעים לשיבוץ:<br>${unrep.map(u => escapeHtml(u.name) + (seeAll ? ` (${escapeHtml(u.framework)})` : "")).join(", ")}<br><span style="opacity:.85;">דווח עליהם במסך "דיווח נוכחות" לתאריך הזה ולחץ "טען".</span></div>`
+      ? `<div class="unreported-box"><strong>${unrep.length} חיילים לא דווחו לתאריך ${escapeHtml(shvState.targetDate)}</strong> ולכן לא מופיעים לשיבוץ:<br>${unrep.map(u => escapeHtml(u.name) + (seeAll ? ` (${escapeHtml(u.framework)})` : "")).join(", ")}<br><span style="opacity:.85;">דווח עליהם במסך "דיווח נוכחות" לתאריך הזה ולחץ "טען".</span></div>`
       : "";
     document.getElementById("shvUnreported").innerHTML = html;
     document.getElementById("shvUnreportedMobile").innerHTML = html;
@@ -2852,33 +2855,32 @@
     if (s.subStatus && s.subStatus.includes("מגיע היום")) b += `<span class="chip-badge badge-arrive">מגיע היום</span> `;
     if (s.subStatus && s.subStatus.includes("יוצא היום")) b += `<span class="chip-badge badge-leave">יוצא היום</span> `;
     if (showFw) b += `<span class="chip-badge badge-fw">${escapeHtml(s.framework)}</span> `;
-    if (mine && mine.length) b += `<span class="chip-badge badge-busy">📌 ${mine.length === 1 ? "משובץ" : mine.length + " משימות"}</span>`;
+    if (mine && mine.length) b += `<span class="chip-badge badge-busy">${mine.length === 1 ? "משובץ" : mine.length + " משימות"}</span>`;
     return b;
   }
 
   function slotRowHtml(r, rIdx, type, sIdx, slot, conflictNames) {
-    const icon = type === "cmdr" ? "⭐" : "🪖";
     const label = type === "cmdr" ? "מפקד" : "לוחם";
     const isSrc = shvSwapFrom && shvSwapFrom.rIdx === rIdx && shvSwapFrom.type === type && shvSwapFrom.sIdx === sIdx;
     const swapCls = shvSwapFrom && r.canEdit ? (isSrc ? "swap-source" : "swap-target") : "";
     const data = `data-r="${rIdx}" data-t="${type}" data-s="${sIdx}"`;
     if (slot) {
       let warn = "";
-      if (slot.pn !== SHV_NONE_PN && !shvState.soldiersByPn[slot.pn]) warn = ` <span class="shv-slot-warn">⚠️ לא מדווח כנוכח</span>`;
-      else if (slot.pn !== SHV_NONE_PN && conflictNames.has(slot.name)) warn = ` <span class="shv-slot-warn">🔁 חופף</span>`;
+      if (slot.pn !== SHV_NONE_PN && !shvState.soldiersByPn[slot.pn]) warn = ` <span class="shv-slot-warn">לא מדווח כנוכח</span>`;
+      else if (slot.pn !== SHV_NONE_PN && conflictNames.has(slot.name)) warn = ` <span class="shv-slot-warn">חופף</span>`;
       else if (type === "cmdr" && slot.pn !== SHV_NONE_PN && !shvState.soldiersByPn[slot.pn].isCommander) warn = ` <span class="shv-slot-warn">(לא מוגדר מפקד)</span>`;
       const display = slot.pn === SHV_NONE_PN ? `<span style="color:var(--ink-muted);">⊘ ${SHV_NONE}</span>` : escapeHtml(slot.name);
       const actions = (r.canEdit && !shvSwapFrom) ? `<span class="slot-actions">
           ${slot.pn !== SHV_NONE_PN ? `<button type="button" class="btn-swap" title="החלף עם משבצת אחרת" ${data} onclick="event.stopPropagation();startSwap(this)">⇄ החלף</button>` : ""}
-          <button type="button" class="btn-trash" title="נקה משבצת" ${data} onclick="event.stopPropagation();clearShvSlot(this)">🗑️</button></span>` : "";
+          <button type="button" class="btn-trash" title="נקה משבצת" ${data} onclick="event.stopPropagation();clearShvSlot(this)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button></span>` : "";
       return `<div class="shv-slot-row ${swapCls}" ${data} onclick="onSlotClick(this)">
-        <span>${icon} <strong>${label}:</strong> ${display}${warn}</span>${actions}</div>`;
+        <span><strong>${label}:</strong> ${display}${warn}</span>${actions}</div>`;
     }
-    if (!r.canEdit) return `<div class="shv-slot-row shv-slot-empty" style="cursor:default;"><span style="color:var(--ink-muted);">${icon} משבצת ${label} פנויה</span></div>`;
+    if (!r.canEdit) return `<div class="shv-slot-row shv-slot-empty" style="cursor:default;"><span style="color:var(--ink-muted);">משבצת ${label} פנויה</span></div>`;
     const selName = shvSelectedPn && shvState.soldiersByPn[shvSelectedPn] ? shvState.soldiersByPn[shvSelectedPn].name : "";
     const hint = shvSwapFrom ? "(לחץ להעברה לכאן)" : selName ? `<span style="color:var(--ok);">(לחץ לשיבוץ ${escapeHtml(selName)})</span>` : "(לחץ לבחירת חייל)";
     return `<div class="shv-slot-row shv-slot-empty ${selName && !shvSwapFrom ? "armed" : ""} ${swapCls}" ${data} onclick="onSlotClick(this)">
-      <span style="color:var(--ink-muted);flex:1;">${icon} משבצת ${label} פנויה ${hint}</span></div>`;
+      <span style="color:var(--ink-muted);flex:1;">משבצת ${label} פנויה ${hint}</span></div>`;
   }
 
   function platoonSelectHtml(rIdx, current, width) {
@@ -2903,15 +2905,15 @@
     document.getElementById("shvScheduleBoard").innerHTML = shvState.rows.map((r, rIdx) => {
       if (!r.canViewDetails) {
         return `<div class="shv-shift-locked">
-          <div><strong style="color:var(--ink);">${escapeHtml(r.taskName)}</strong> (משמרת ${r.shiftNumber}) • 🕒 ${hrs(r.hoursLabel)}</div>
+          <div><strong style="color:var(--ink);">${escapeHtml(r.taskName)}</strong> (משמרת ${r.shiftNumber}) • ${hrs(r.hoursLabel)}</div>
           ${canTransfer ? platoonSelectHtml(rIdx, r.platoon, 135) : `<span style="background:var(--surface-sunken);color:var(--ink);padding:4px 10px;border-radius:6px;font-weight:bold;">${escapeHtml(r.platoon)}</span>`}
         </div>`;
       }
       const iss = issueByRow[rIdx];
       const conflict = iss ? iss.conflict : new Set();
       const header = canTransfer
-        ? `<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:0.82rem;color:var(--ink);">🕒 ${hrs(r.hoursLabel)}</span>${platoonSelectHtml(rIdx, r.platoon, 125)}</div>`
-        : `<span style="background:var(--olive);color:var(--on-olive);padding:3px 9px;border-radius:6px;font-size:0.85rem;font-weight:bold;">${escapeHtml(r.platoon)} • 🕒 ${hrs(r.hoursLabel)}</span>`;
+        ? `<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:0.82rem;color:var(--ink);">${hrs(r.hoursLabel)}</span>${platoonSelectHtml(rIdx, r.platoon, 125)}</div>`
+        : `<span style="background:var(--olive);color:var(--on-olive);padding:3px 9px;border-radius:6px;font-size:0.85rem;font-weight:bold;">${escapeHtml(r.platoon)} • ${hrs(r.hoursLabel)}</span>`;
       const slots = r.cmdrSlots.map((sl, i) => slotRowHtml(r, rIdx, "cmdr", i, sl, conflict)).join("") +
                     r.soldierSlots.map((sl, i) => slotRowHtml(r, rIdx, "soldier", i, sl, conflict)).join("");
       const issHtml = iss && iss.problems.some(p => p.type !== "empty") ? `<div class="row-issues">${iss.problems.filter(p => p.type !== "empty").map(p => "• " + escapeHtml(p.text)).join("<br>")}</div>` : "";
@@ -2919,7 +2921,7 @@
       return `<div class="shv-shift-card ${r.dirty ? "dirty" : ""}" data-r="${rIdx}">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
           <div><span style="font-weight:bold;font-size:1.08rem;color:var(--olive);">${escapeHtml(r.taskName)}</span>
-          <span style="color:var(--ink);font-size:0.9rem;"> (משמרת ${r.shiftNumber})</span>${r.canEdit ? "" : ' <span style="font-size:0.75rem;color:var(--ink-muted);">🔒</span>'}</div>
+          <span style="color:var(--ink);font-size:0.9rem;"> (משמרת ${r.shiftNumber})</span>${r.canEdit ? "" : ' <span style="font-size:0.75rem;color:var(--ink-muted);"></span>'}</div>
           ${header}
         </div>${flexTools}${issHtml}
         ${slots || '<div style="color:var(--ink-muted);font-size:0.85rem;">אין דרישת כוח אדם למשמרת זו.</div>'}
@@ -2937,11 +2939,11 @@
     if (shvSplitOpen === rIdx) {
       const mid = r.range ? Math.round((r.range.s + r.range.e) / 2 / 30) * 30 : 720;
       const v = `${String(Math.floor(mid / 60) % 24).padStart(2, "0")}:${String(mid % 60).padStart(2, "0")}`;
-      return `<div class="flex-tools"><span style="font-size:0.85rem;">✂️ לפצל בשעה:</span><input type="time" id="shvSplitAt" value="${v}">
+      return `<div class="flex-tools"><span style="font-size:0.85rem;">לפצל בשעה:</span><input type="time" id="shvSplitAt" value="${v}">
         <button type="button" class="btn-mini home" onclick="doSplitShvShift(${rIdx})">פצל</button><button type="button" class="btn-mini" onclick="shvSplitOpen=-1;renderShavzakBoard()">ביטול</button></div>`;
     }
     const canMerge = shvPrevAdjacent(r) !== -1;
-    return `<div class="flex-tools"><button type="button" class="btn-mini" onclick="openSplitShvShift(${rIdx})">✂️ פיצול לפי שעות</button>${canMerge ? `<button type="button" class="btn-mini" onclick="mergeShvShift(${rIdx})">🔗 איחוד עם המשמרת הקודמת</button>` : ""}</div>`;
+    return `<div class="flex-tools"><button type="button" class="btn-mini" onclick="openSplitShvShift(${rIdx})">פיצול לפי שעות</button>${canMerge ? `<button type="button" class="btn-mini" onclick="mergeShvShift(${rIdx})">איחוד עם המשמרת הקודמת</button>` : ""}</div>`;
   }
   function openSplitShvShift(rIdx) {
     if (hasUnsavedShavzak()) { toast("יש שינויים שלא נשמרו - שמור טיוטה לפני פיצול", "err"); return; }
@@ -2991,22 +2993,22 @@
     const anyEditable = rows.length > 0;
 
     if (vm === "platoon") {
-      btns.push(`<button type="button" class="btn-action btn-primary" ${myCanEdit ? "" : "disabled"} onclick="savePlatoonShavzak(false)">💾 שמירה (טיוטה)</button>`);
-      btns.push(`<button type="button" class="btn-action btn-success" ${myCanEdit && myAllFilled ? "" : "disabled"} title="${myAllFilled ? "" : "יש למלא את כל המשבצות (או לסמן 'ללא שיבוץ')"}" onclick="attemptSubmitPlatoonApproval()">✅ שמירה והעברה לאישור</button>`);
+      btns.push(`<button type="button" class="btn-action btn-primary" ${myCanEdit ? "" : "disabled"} onclick="savePlatoonShavzak(false)">שמירה (טיוטה)</button>`);
+      btns.push(`<button type="button" class="btn-action btn-success" ${myCanEdit && myAllFilled ? "" : "disabled"} title="${myAllFilled ? "" : "יש למלא את כל המשבצות (או לסמן 'ללא שיבוץ')"}" onclick="attemptSubmitPlatoonApproval()">שמירה והעברה לאישור</button>`);
     } else if (vm === "officers") {
-      if (hasUnsavedShavzak() || (shvMode === "edit" && anyEditable)) btns.push(`<button type="button" class="btn-action btn-primary" onclick="savePlatoonShavzak(false)">💾 שמירה</button>`);
+      if (hasUnsavedShavzak() || (shvMode === "edit" && anyEditable)) btns.push(`<button type="button" class="btn-action btn-primary" onclick="savePlatoonShavzak(false)">שמירה</button>`);
       const mine = shvState.platoonStatuses.find(p => p.framework === currentUser.framework);
       if (mine && [ST.OPEN, ST.DRAFT, ST.RETURNED].includes(mine.status) && shvMode === "edit") {
-        btns.push(`<button type="button" class="btn-action btn-success" ${myAllFilled ? "" : "disabled"} onclick="attemptSubmitPlatoonApproval()">✅ הגש את ${escapeHtml(currentUser.framework)}</button>`);
+        btns.push(`<button type="button" class="btn-action btn-success" ${myAllFilled ? "" : "disabled"} onclick="attemptSubmitPlatoonApproval()">הגש את ${escapeHtml(currentUser.framework)}</button>`);
       }
       if (!shvState.isPendingMpApproval && !shvState.isOfficialApproved) {
         const ready = shvState.allPlatoonsApproved;
-        btns.push(`<button type="button" class="btn-action btn-warning" ${ready ? "" : "disabled"} title="${ready ? "" : "יש לאשר קודם את כל המחלקות"}" onclick="forwardToMpApproval()">📤 העבר לאישור סופי${ready ? "" : " (ממתין לאישור כל המחלקות)"}</button>`);
+        btns.push(`<button type="button" class="btn-action btn-warning" ${ready ? "" : "disabled"} title="${ready ? "" : "יש לאשר קודם את כל המחלקות"}" onclick="forwardToMpApproval()">העבר לאישור סופי${ready ? "" : " (ממתין לאישור כל המחלקות)"}</button>`);
       }
     } else {
-      if (hasUnsavedShavzak() || shvMode === "edit") btns.push(`<button type="button" class="btn-action btn-primary" onclick="savePlatoonShavzak(false)">💾 שמור תיקונים</button>`);
-      btns.push(`<button type="button" class="btn-action btn-success" onclick="publishOfficialShavzak()">🎖️ ${shvState.isOfficialApproved ? "פרסם שוב" : "אשר ופרסם"}</button>`);
-      if (shvState.isOfficialApproved || shvJustPublished) btns.push(`<button type="button" class="btn-action btn-wa" onclick="shareBuilderImage()">📱 שתף לקבוצה</button>`);
+      if (hasUnsavedShavzak() || shvMode === "edit") btns.push(`<button type="button" class="btn-action btn-primary" onclick="savePlatoonShavzak(false)">שמור תיקונים</button>`);
+      btns.push(`<button type="button" class="btn-action btn-success" onclick="publishOfficialShavzak()">${shvState.isOfficialApproved ? "פרסם שוב" : "אשר ופרסם"}</button>`);
+      if (shvState.isOfficialApproved || shvJustPublished) btns.push(`<button type="button" class="btn-action btn-wa" onclick="shareBuilderImage()">שתף לקבוצה</button>`);
     }
     document.getElementById("shvActionRow").innerHTML = btns.join("");
   }
@@ -3016,7 +3018,7 @@
       const r = shvState.rows[parseInt(x.dataset.r, 10)];
       return r && r.canEdit && (shvState.viewMode !== "platoon" || r.isMyPlatoon);
     });
-    if (!el) { toast("אין משבצות ריקות 👍", "ok"); return; }
+    if (!el) { toast("אין משבצות ריקות", "ok"); return; }
     el.scrollIntoView({ behavior: "smooth", block: "center" });
     el.classList.add("flash");
     setTimeout(() => el.classList.remove("flash"), 2600);
@@ -3071,7 +3073,7 @@
   function openSlotSheet(ref) {
     sheetTarget = ref;
     const row = shvState.rows[ref.rIdx];
-    document.getElementById("slotSheetTitle").innerHTML = `${ref.type === "cmdr" ? "⭐ מפקד" : "🪖 לוחם"} ל${escapeHtml(row.taskName)} ${hrs(row.hoursLabel)}`;
+    document.getElementById("slotSheetTitle").innerHTML = `${ref.type === "cmdr" ? "מפקד" : "לוחם"} ל${escapeHtml(row.taskName)} ${hrs(row.hoursLabel)}`;
     document.getElementById("slotSheetSearch").value = "";
     document.getElementById("slotSheet").classList.remove("hidden");
     renderSlotSheet();
@@ -3110,9 +3112,9 @@
       const sep = seeAll && group !== lastGroup ? `<div class="sheet-sep">${escapeHtml(group)}</div>` : "";
       lastGroup = group;
       const parts = [];
-      if (i.overlap) parts.push(`⚠️ חופף ל${escapeHtml(i.overlap.taskName)}`);
-      else if (i.mine.length) parts.push(`📌 ${i.mine.length === 1 ? "משימה אחת" : i.mine.length + " משימות"} היום (${Math.round(i.hours)} ש')`);
-      if (i.y && i.y.night) parts.push("🌙 לילה אתמול");
+      if (i.overlap) parts.push(`חופף ל${escapeHtml(i.overlap.taskName)}`);
+      else if (i.mine.length) parts.push(`${i.mine.length === 1 ? "משימה אחת" : i.mine.length + " משימות"} היום (${Math.round(i.hours)} ש')`);
+      if (i.y && i.y.night) parts.push("לילה אתמול");
       return `${sep}<div class="sheet-item ${i.overlap ? "warn" : ""}" data-pn="${escapeHtml(s.personalNumber)}" onclick="pickFromSheet(this.dataset.pn)">
         <div style="display:flex;justify-content:space-between;gap:6px;"><strong>${escapeHtml(s.name)}</strong><span>${soldierBadges(s, seeAll && s.framework !== row.platoon, null)}</span></div>
         ${parts.length ? `<div class="sheet-info">${parts.join(" · ")}</div>` : ""}
@@ -3263,13 +3265,13 @@
     const body = issues.length
       ? `שים לב - יש פערים בשבצ"ק:\n${Object.keys(counts).map(k => `• ${LBL[k]}: ${counts[k]}`).join("\n")}\n\nלפרסם לכל הפלוגה בכל זאת?`
       : `אין פערים. לפרסם את השבצ"ק ל${shvState.dayName} ${shvState.targetDate} לכל הפלוגה?`;
-    openCustomModal(issues.length ? "⚠️" : "🎖️", "אישור ופרסום", body, issues.length ? "פרסם בכל זאת" : "פרסם", async () => {
+    openCustomModal(issues.length ? "" : "", "אישור ופרסום", body, issues.length ? "פרסם בכל זאת" : "פרסם", async () => {
       const saved = await savePlatoonShavzak(false, true);
       if (!saved) return;
       showBox("shvSaveStatus", "מפרסם שבצ\"ק רשמי...", true);
       const res = await apiCall({ action: "shavzak_approve_official", targetDate: shvState.targetDate });
       showBox("shvSaveStatus", res.message, isOk(res));
-      if (isOk(res)) { shvJustPublished = true; await loadShavzakWorkspace(); toast("פורסם! אפשר לשתף לקבוצה 📱", "ok"); }
+      if (isOk(res)) { shvJustPublished = true; await loadShavzakWorkspace(); toast("פורסם! אפשר לשתף לקבוצה", "ok"); }
     }, "ביטול");
   }
 
@@ -3304,7 +3306,7 @@
     const loading = document.getElementById("gearLoading");
     if (!isOk(res) || !res.soldierData || !res.soldierData.found) {
       loading.classList.remove("hidden");
-      loading.textContent = "⚠️ " + ((res.soldierData && res.soldierData.message) || res.message || "שגיאה בטעינת הציוד");
+      loading.textContent = "" + ((res.soldierData && res.soldierData.message) || res.message || "שגיאה בטעינת הציוד");
       return;
     }
     if (res.weaponsTools) wpToolsList = res.weaponsTools;
@@ -3322,7 +3324,7 @@
     const wpList = document.getElementById("weaponsCurrentList");
     wpList.innerHTML = s.weaponsItems.length ? s.weaponsItems.map(it => `<div class="item-box">
         <div style="font-weight:bold;">${escapeHtml(it.toolName)} (מס': ${escapeHtml(it.serialNumber)})</div>
-        <label class="return-check"><input type="checkbox" class="chk-wp-ret" data-tool="${escapeHtml(it.toolName)}" data-serial="${escapeHtml(it.serialNumber)}"> 🔴 הזדכיתי על כלי זה</label>
+        <label class="return-check"><input type="checkbox" class="chk-wp-ret" data-tool="${escapeHtml(it.toolName)}" data-serial="${escapeHtml(it.serialNumber)}"> הזדכיתי על כלי זה</label>
       </div>`).join("") : '<div style="color:var(--ink-muted);font-size:0.85rem;">אין נשק או אמל"ח חתום כרגע.</div>';
 
     const lgList = document.getElementById("logisticsCurrentList");
@@ -3349,7 +3351,7 @@
       <label>מספר נשק / סידורי:</label><input type="text" class="wp-serial" placeholder="הקלד מספר נשק..." oninput="checkWpnKit(this)">
       <div class="wp-sight-box hidden" style="margin-top:8px;"><label class="wp-sight-lbl" style="color:var(--olive);"></label><input type="text" class="wp-sight-serial"></div>
       <div class="wp-kit-container">
-        <div style="font-weight:bold;color:var(--olive);margin-bottom:6px;">📦 ציוד נשקייה נלווה:</div>
+        <div style="font-weight:bold;color:var(--olive);margin-bottom:6px;">ציוד נשקייה נלווה:</div>
         <label style="font-size:0.85rem;">מחסניות:</label><select class="wp-mags">${[0,1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">${n === 0 ? "0 מחסניות" : n}</option>`).join("")}</select>
         <label class="kit-check"><input type="checkbox" class="wp-makpork"><span>מקפורק</span></label>
         <label class="kit-check"><input type="checkbox" class="wp-strap"><span>רצועה לנשק</span></label>
@@ -3625,7 +3627,7 @@
     const d = radioData;
     const mine = d.devices.filter(x => x.mine);
     document.getElementById("radioMine").innerHTML = mine.length
-      ? `<div style="font-weight:bold;color:var(--olive);margin-bottom:6px;">📻 רשום עליך:</div>` + mine.map(x => `<div class="radio-mine-item">
+      ? `<div style="font-weight:bold;color:var(--olive);margin-bottom:6px;">רשום עליך:</div>` + mine.map(x => `<div class="radio-mine-item">
           <div><strong style="font-size:1.1rem;">קשר ${x.device}</strong> · ${escapeHtml(missionText(x.mission, x.missionNote))}<div style="font-size:0.78rem;color:var(--ink-muted);">מאז ${fmtTime(x.since)} (${fmtAgo(x.since)})</div></div>
           <button type="button" class="btn-mini home" onclick="startRadioReturn(${x.device})">↩ החזר</button></div>`).join("")
       : "";
@@ -3640,9 +3642,9 @@
     if (radioPicked) {
       const x = d.devices[radioPicked - 1];
       info.classList.remove("hidden");
-      info.innerHTML = x.atHamal ? `✅ קשר ${x.device} נמצא בחמ"ל - פנוי.`
+      info.innerHTML = x.atHamal ? `קשר ${x.device} נמצא בחמ"ל - פנוי.`
         : x.mine ? `ℹ️ קשר ${x.device} כבר רשום עליך.`
-        : `⚠️ קשר ${x.device} רשום על <strong>${escapeHtml(x.holder.name)}</strong> (${escapeHtml(x.holder.framework)}) - ${escapeHtml(missionText(x.mission, x.missionNote))}, מאז ${fmtTime(x.since)}.`;
+        : `קשר ${x.device} רשום על <strong>${escapeHtml(x.holder.name)}</strong> (${escapeHtml(x.holder.framework)}) - ${escapeHtml(missionText(x.mission, x.missionNote))}, מאז ${fmtTime(x.since)}.`;
     } else info.classList.add("hidden");
 
     // החזרה
@@ -3726,7 +3728,7 @@
     setBtnBusy(btn, false);
     if (res.status === "conflict") {
       const h = res.holder;
-      openCustomModal("⚠️", `קשר ${res.device} רשום על מישהו אחר`,
+      openCustomModal("", `קשר ${res.device} רשום על מישהו אחר`,
         `המכשיר רשום כרגע על ${h.name} (${h.framework})\nמשימה: ${h.mission || "-"}\nמאז: ${fmtTime(h.since)}\n\nאם המכשיר נמצא אצלך עכשיו - לחץ "מאשר בכל זאת" והוא יועבר אליך אוטומטית.`,
         "מאשר בכל זאת", () => submitRadioSign(true),
         "ביטול", () => { radioPicked = null; document.getElementById("radioMission").value = ""; resetRadioPhoto("sign"); renderRadioScreen(); toast("בוטל - אפשר להתחיל מחדש"); });
@@ -3769,27 +3771,27 @@
 
   function renderRadioReport(res) {
     const body = document.getElementById("radioReportBody");
-    if (!isOk(res)) { body.className = "loading-msg"; body.textContent = "⚠️ " + res.message; return; }
+    if (!isOk(res)) { body.className = "loading-msg"; body.textContent = "" + res.message; return; }
     radioReport = res;
     body.className = "";
     const atHamal = res.devices.filter(d => d.atHamal);
     const out = res.devices.filter(d => !d.atHamal).sort((a, b) => Number(a.device) - Number(b.device));
-    const photoBtn = (id, title) => id ? `<button type="button" class="btn-mini" data-id="${escapeHtml(id)}" data-t="${escapeHtml(title)}" onclick="showRadioPhoto(this.dataset.id, this.dataset.t)">📷</button>` : "";
-    let html = `<div class="rr-hamal"><strong>🏠 בחמ"ל: ${atHamal.length} מתוך ${res.count}</strong><br>${atHamal.length ? atHamal.map(d => d.device).join(", ") : "אין"}</div>`;
-    html += `<div style="font-weight:bold;color:var(--warn);margin:12px 0 6px;">📍 מחוץ לחמ"ל: ${out.length}</div>`;
+    const photoBtn = (id, title) => id ? `<button type="button" class="btn-mini" data-id="${escapeHtml(id)}" data-t="${escapeHtml(title)}" onclick="showRadioPhoto(this.dataset.id, this.dataset.t)" aria-label="תמונה"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>` : "";
+    let html = `<div class="rr-hamal"><strong>בחמ"ל: ${atHamal.length} מתוך ${res.count}</strong><br>${atHamal.length ? atHamal.map(d => d.device).join(", ") : "אין"}</div>`;
+    html += `<div style="font-weight:bold;color:var(--warn);margin:12px 0 6px;">מחוץ לחמ"ל: ${out.length}</div>`;
     html += out.length ? `<div style="overflow-x:auto;"><table class="rr-table"><thead><tr><th>קשר</th><th>אצל</th><th>משימה</th><th>מאז</th><th></th></tr></thead><tbody>` +
       out.map(d => `<tr><td style="font-weight:900;font-size:1.05rem;">${d.device}</td><td>${escapeHtml(d.holder.name)}<br><span style="color:var(--ink-muted);font-size:0.75rem;">${escapeHtml(d.holder.framework)}</span></td>
         <td>${escapeHtml(missionText(d.mission, d.missionNote))}</td><td>${fmtTime(d.since)}<br><span style="color:${Date.now() - d.since > 12 * 3600000 ? "var(--signal)" : "var(--ink-muted)"};font-size:0.75rem;">${fmtAgo(d.since)}</span></td>
-        <td>${photoBtn(d.photoId, `קשר ${d.device}`)}<button type="button" class="btn-mini" title="סמן כהוחזר לחמ&quot;ל" onclick="maflagRadioToHamal(${d.device})">🏠</button></td></tr>`).join("") +
-      `</tbody></table></div>` : `<div class="item-box" style="text-align:center;">כל הקשרים בחמ"ל 👍</div>`;
+        <td>${photoBtn(d.photoId, `קשר ${d.device}`)}<button type="button" class="btn-mini" title="סמן כהוחזר לחמ&quot;ל" onclick="maflagRadioToHamal(${d.device})">לחמ"ל</button></td></tr>`).join("") +
+      `</tbody></table></div>` : `<div class="item-box" style="text-align:center;">כל הקשרים בחמ"ל</div>`;
 
     html += `<div class="btn-row" style="margin-top:10px;">
-        <button type="button" class="btn-action btn-wa" onclick="shareRadioReport()">📱 שלח דוח לוואטסאפ</button>
-        <button type="button" class="btn-action ${res.photoRequired ? "btn-danger" : "btn-secondary"}" onclick="toggleRadioPhotoRequired(${!res.photoRequired})">${res.photoRequired ? "📷 צילום חובה: פעיל (כבה)" : "📷 בקש צילום מכולם"}</button>
+        <button type="button" class="btn-action btn-wa" onclick="shareRadioReport()">שלח דוח לוואטסאפ</button>
+        <button type="button" class="btn-action ${res.photoRequired ? "btn-danger" : "btn-secondary"}" onclick="toggleRadioPhotoRequired(${!res.photoRequired})">${res.photoRequired ? "צילום חובה: פעיל (כבה)" : "בקש צילום מכולם"}</button>
       </div>`;
 
-    html += `<div style="font-weight:bold;color:var(--olive);margin:16px 0 6px;">🕒 תנועות אחרונות</div>
-      <input type="text" placeholder="🔍 סינון לפי מספר קשר / שם..." oninput="renderRadioMoves(this.value)" style="padding:8px;">
+    html += `<div style="font-weight:bold;color:var(--olive);margin:16px 0 6px;">תנועות אחרונות</div>
+      <input type="text" placeholder="סינון לפי מספר קשר / שם..." oninput="renderRadioMoves(this.value)" style="padding:8px;">
       <div id="radioMovesList"></div>
       <div style="font-size:0.75rem;color:var(--ink-muted);margin-top:6px;">היומן המלא (כולל תאריך ושעה מדויקים עד השנייה) נמצא בגיליון "תנועות_קשר".</div>`;
     body.innerHTML = html;
@@ -3799,21 +3801,20 @@
   function renderRadioMoves(filter) {
     const f = cleanHebrewText(filter);
     const list = radioReport.moves.filter(m => !f || String(m.device) === f || [m.name, m.prev, m.next, m.by].some(x => String(x || "").includes(f)));
-    const icon = a => a.indexOf("חתימה") === 0 ? "✍️" : a.indexOf("החזרה") === 0 ? "🏠" : "🔁";
     document.getElementById("radioMovesList").innerHTML = list.slice(0, 80).map(m => `<div class="rr-move">
-      <div style="display:flex;justify-content:space-between;gap:6px;"><strong>${icon(m.action)} קשר ${m.device} · ${escapeHtml(m.action)}</strong><span style="color:var(--ink-muted);white-space:nowrap;">${fmtTime(m.ts)}</span></div>
+      <div style="display:flex;justify-content:space-between;gap:6px;"><strong>קשר ${m.device} · ${escapeHtml(m.action)}</strong><span style="color:var(--ink-muted);white-space:nowrap;">${fmtTime(m.ts)}</span></div>
       <div style="color:var(--ink);">${escapeHtml(m.prev)} ← ${escapeHtml(m.next)}${m.mission ? ` · ${escapeHtml(missionText(m.mission, m.missionNote))}` : ""}${m.by && m.by !== m.name ? ` · בוצע ע"י ${escapeHtml(m.by)}` : ""}
-      ${m.photoId ? `<button type="button" class="btn-mini" style="padding:2px 7px;" data-id="${escapeHtml(m.photoId)}" data-t="קשר ${m.device} - ${escapeHtml(m.action)} ${fmtTime(m.ts)}" onclick="showRadioPhoto(this.dataset.id, this.dataset.t)">📷</button>` : ""}</div>
+      ${m.photoId ? `<button type="button" class="btn-mini" style="padding:2px 7px;" data-id="${escapeHtml(m.photoId)}" data-t="קשר ${m.device} - ${escapeHtml(m.action)} ${fmtTime(m.ts)}" onclick="showRadioPhoto(this.dataset.id, this.dataset.t)" aria-label="תמונה"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>` : ""}</div>
     </div>`).join("") || '<div style="color:var(--ink-muted);text-align:center;padding:10px;">אין תנועות</div>';
   }
 
   async function showRadioPhoto(id, title) {
-    document.getElementById("radioPhotoTitle").textContent = "📷 " + title;
+    document.getElementById("radioPhotoTitle").textContent = "" + title;
     const body = document.getElementById("radioPhotoBody");
     body.className = "loading-msg"; body.textContent = "טוען תמונה...";
     document.getElementById("radioPhotoModal").classList.remove("hidden");
     const res = await apiCall({ action: "radio_photo", photoId: id });
-    if (!isOk(res)) { body.textContent = "⚠️ " + res.message; return; }
+    if (!isOk(res)) { body.textContent = "" + res.message; return; }
     body.className = "";
     body.innerHTML = `<img src="${res.dataUrl}" style="max-width:100%;border-radius:8px;" alt="תמונת מכשיר">`;
   }
@@ -3916,7 +3917,7 @@
         if (!isOk(r2)) errors.push("אפסנאות: " + r2.message);
       }
       setBtnBusy(btn, false);
-      if (errors.length) showBox("mafActionStatus", "⚠️ חלק מהזיכויים נכשלו:\n" + errors.join("\n"), false);
+      if (errors.length) showBox("mafActionStatus", "חלק מהזיכויים נכשלו:\n" + errors.join("\n"), false);
       else showBox("mafActionStatus", "הזיכוי בוצע בהצלחה!", true);
       invalidateSharedDB();
       await onMafSoldierSelected(true);
@@ -4164,7 +4165,7 @@
       <div style="display:flex;gap:6px;align-items:center;">
         <input type="text" value="${escapeHtml(t.taskName)}" placeholder="שם המשימה" style="font-weight:bold;" oninput="adminTasks[${i}].taskName=this.value">
         <button type="button" class="btn-mini" title="שכפל" style="margin-bottom:8px;" onclick="duplicateAdminTask(${i})">⧉</button>
-        <button type="button" class="btn-trash" title="מחק" style="margin-bottom:8px;" onclick="deleteAdminTask(${i})">🗑️</button>
+        <button type="button" class="btn-trash" title="מחק" style="margin-bottom:8px;" onclick="deleteAdminTask(${i})"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
       </div>
       <div class="grid3">
         <div><label>התחלה</label><input type="time" value="${escapeHtml(t.startStr)}" onchange="adminTasks[${i}].startStr=this.value"></div>
@@ -4175,7 +4176,7 @@
         <div><label>ימים: <span style="color:var(--info);">${escapeHtml(daysLabel(t.days))}</span></label></div>
       </div>
       <div class="day-chips">${DAY_SHORT.map((d, di) => `<span class="day-chip ${t.days.indexOf(di) !== -1 ? "on" : ""}" onclick="toggleTaskDay(${i},${di})">${d}</span>`).join("")}</div>
-      <label class="checkbox-row" style="margin:8px 0 0;font-size:0.82rem;color:var(--warn);"><input type="checkbox" ${t.flexible ? "checked" : ""} onchange="adminTasks[${i}].flexible=this.checked"> ⏱️ שעות גמישות - הקצינים קובעים שעות לכל מחלקה, והמפקדים יכולים לפצל</label>
+      <label class="checkbox-row" style="margin:8px 0 0;font-size:0.82rem;color:var(--warn);"><input type="checkbox" ${t.flexible ? "checked" : ""} onchange="adminTasks[${i}].flexible=this.checked"> שעות גמישות - הקצינים קובעים שעות לכל מחלקה, והמפקדים יכולים לפצל</label>
     </div>`).join("");
   }
 
@@ -4295,7 +4296,7 @@
 
   function applyReservePlan(res) {
     if (currentScreen !== "reserve") return;
-    if (!isOk(res)) { document.getElementById("rpLoading").textContent = "⚠️ " + (res.message || "שגיאה בטעינה"); return; }
+    if (!isOk(res)) { document.getElementById("rpLoading").textContent = "" + (res.message || "שגיאה בטעינה"); return; }
     rpData = res;
     if (res.scope !== "ALL") rpFw = res.scope; // קצין רואה רק את המסגרת שלו
     document.getElementById("rpLoading").classList.add("hidden");
@@ -4330,7 +4331,7 @@
     document.getElementById("rpFwChips").classList.toggle("hidden", rpData.scope !== "ALL");
     document.getElementById("rpFwChips").innerHTML = [["ALL", "כל הפלוגה", rows.length]].concat(fws.map(f => [f, f, rows.filter(r => r.framework === f).length]))
       .map(([k, label, n]) => `<span class="rp-chip ${rpFw === k ? "on" : ""}" data-k="${escapeHtml(k)}" onclick="rpFw=this.dataset.k;renderRp()">${escapeHtml(label)} (${n})</span>`).join("");
-    document.getElementById("rpStChips").innerHTML = [["ALL", "כל הסטטוסים"], ["מגיע", "✅ מגיע"], ["מגיע חלקית", "🟡 חלקית"], ["לא מגיע", "❌ לא מגיע"]]
+    document.getElementById("rpStChips").innerHTML = [["ALL", "הכל"], ["מגיע", "מגיע"], ["מגיע חלקית", "חלקית"], ["לא מגיע", "לא מגיע"]]
       .map(([k, label]) => `<span class="rp-chip ${rpSt === k ? "on" : ""}" data-k="${k}" onclick="rpSt=this.dataset.k;renderRp()">${label}</span>`).join("");
     const shown = inFw.filter(r => (rpSt === "ALL" || r.status === rpSt) && (!q || r.name.includes(q)));
     const groups = rpFw === "ALL" ? fws : [rpFw];
@@ -4339,12 +4340,12 @@
       const g = shown.filter(r => r.framework === f);
       if (!g.length) return;
       const all = rows.filter(r => r.framework === f);
-      html += `<div class="rp-fw-head"><span>${escapeHtml(f)}</span><small>✅ ${all.filter(r => r.status === "מגיע").length} · 🟡 ${all.filter(r => r.status === "מגיע חלקית").length} · ❌ ${all.filter(r => r.status === "לא מגיע").length}</small></div>`;
+      html += `<div class="rp-fw-head"><span>${escapeHtml(f)}</span><small>מגיעים ${all.filter(r => r.status === "מגיע").length} · חלקית ${all.filter(r => r.status === "מגיע חלקית").length} · לא ${all.filter(r => r.status === "לא מגיע").length}</small></div>`;
       html += g.map(r => `<div class="rp-card ${RP_CLS[r.status] || ""}" onclick="openRpEdit(${r.row})">
         <div class="rp-card-top"><b>${escapeHtml(r.name)}</b><span class="rp-badge ${RP_CLS[r.status] || ""}">${escapeHtml(r.status || "?")} · ${r.days}/${rpData.period.days}</span></div>
         ${rpStrip(r)}
         ${r.status === "מגיע חלקית" ? `<div class="rp-dates">${r.ranges.map(x => x.from === x.to ? rpShort(x.from) : `${rpShort(x.from)}–${rpShort(x.to)}`).join(" , ")}</div>` : ""}
-        ${r.note ? `<div class="rp-note">💬 ${escapeHtml(r.note)}</div>` : ""}
+        ${r.note ? `<div class="rp-note">${escapeHtml(r.note)}</div>` : ""}
       </div>`).join("");
     });
     document.getElementById("rpList").innerHTML = html || '<div class="item-box" style="text-align:center;color:var(--ink-muted);">אין חיילים להצגה.</div>';
@@ -4354,7 +4355,7 @@
     const r = row === -1 ? null : rpData.rows.find(x => x.row === row);
     rpEdit = r ? { row: r.row, origName: r.name, status: r.status, ranges: r.ranges.map(x => ({ from: rpIsoFromEur(x.from), to: rpIsoFromEur(x.to) })) }
                : { row: null, origName: "", status: "", ranges: [] };
-    document.getElementById("rpEditTitle").textContent = r ? `✏️ ${r.name}` : "➕ הוספת חייל להערכות";
+    document.getElementById("rpEditTitle").textContent = r ? `${r.name}` : "הוספת חייל להערכות";
     document.getElementById("rpName").value = r ? r.name : "";
     document.getElementById("rpPn").value = r ? r.pn : "";
     document.getElementById("rpFw").innerHTML = rpData.frameworks.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join("");
@@ -4391,7 +4392,7 @@
       <input type="date" min="${min}" max="${max}" value="${x.from}" onchange="rpEdit.ranges[${i}].from=this.value;updateRpDays()">
       <span>עד</span>
       <input type="date" min="${min}" max="${max}" value="${x.to}" onchange="rpEdit.ranges[${i}].to=this.value;updateRpDays()">
-      <button type="button" class="skel-flex-del" title="מחק טווח" onclick="rpEdit.ranges.splice(${i},1);renderRpEdit()">🗑️</button></div>`).join("");
+      <button type="button" class="skel-flex-del" title="מחק טווח" onclick="rpEdit.ranges.splice(${i},1);renderRpEdit()"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button></div>`).join("");
     updateRpDays();
   }
   function updateRpDays() { document.getElementById("rpDaysCount").textContent = `(${rpRangeDays()} מתוך ${rpData.period.days} ימים)`; }
@@ -4457,11 +4458,11 @@
   }
 
   function applyShavzakonInit(res) {
-    if (!isOk(res)) { document.getElementById("skLoading").textContent = "⚠️ " + (res.message || "שגיאה בטעינה"); return; }
+    if (!isOk(res)) { document.getElementById("skLoading").textContent = "" + (res.message || "שגיאה בטעינה"); return; }
     skData = res;
     document.getElementById("skLoading").classList.add("hidden");
     document.getElementById("skForm").classList.remove("hidden");
-    document.getElementById("skDayInfo").textContent = `יום ${res.dayName} ${res.date}` + (res.published ? "" : " · אין עדיין שבצ\"ק מפורסם להיום, ממלאים ידנית");
+    document.getElementById("skDayInfo").textContent = `${res.dayName} ${res.date}` + (res.published ? "" : " · אין עדיין שבצ\"ק מפורסם להיום, ממלאים ידנית");
     skState = null;
     document.getElementById("skDetails").classList.add("hidden");
     renderSkMissions();
@@ -4476,7 +4477,7 @@
     const sug = (skData && skData.suggestions) || {};
     document.getElementById("skMissions").innerHTML = (skData.missions || []).map((m, i) => {
       const shifts = sug[m.mission] || [];
-      const sub = shifts.some(x => x.mine) ? "📌 אתה משובץ" : (shifts.length ? `${shifts.length} משמרות בשבצ"ק` : "מילוי ידני");
+      const sub = shifts.some(x => x.mine) ? "אתה משובץ" : (shifts.length ? `${shifts.length} משמרות בשבצ"ק` : "מילוי ידני");
       return `<div class="sk-mission ${skState && skState.mission === m.mission ? "on" : ""}" onclick="pickSkMission(${i})">${escapeHtml(m.mission)}<small>${sub}</small></div>`;
     }).join("");
   }
@@ -4524,12 +4525,12 @@
     const box = document.getElementById("skShiftBox");
     box.classList.toggle("hidden", skState.shifts.length < 2);
     document.getElementById("skShifts").innerHTML = skState.shifts.map((x, k) =>
-      `<span class="day-chip ${k === idx ? "on" : ""}" onclick="applySkShift(${k})">${escapeHtml(x.hoursLabel)}${x.mine ? " 📌" : ""}</span>`).join("");
+      `<span class="day-chip ${k === idx ? "on" : ""}" onclick="applySkShift(${k})">${escapeHtml(x.hoursLabel)}${x.mine ? "" : ""}</span>`).join("");
     renderSkPeople();
   }
 
   function renderSkPeople() {
-    const chip = (list, key, i, lead) => `<span class="sk-chip ${lead ? "lead" : ""}">${lead ? "⭐ " : ""}${escapeHtml(list[i])}<button type="button" title="הסר" onclick="skRemovePerson('${key}',${i})">✕</button></span>`;
+    const chip = (list, key, i, lead) => `<span class="sk-chip ${lead ? "lead" : ""}">${lead ? "" : ""}${escapeHtml(list[i])}<button type="button" title="הסר" onclick="skRemovePerson('${key}',${i})">✕</button></span>`;
     document.getElementById("skCmdrs").innerHTML = skState.cmdrs.map((n, i) => chip(skState.cmdrs, "cmdrs", i, i === 0)).join("") ||
       '<span class="sk-hint" style="margin:0;">אין מפקד - הוסף למטה</span>';
     document.getElementById("skSoldiers").innerHTML = skState.soldiers.map((n, i) => chip(skState.soldiers, "soldiers", i, false)).join("") ||
@@ -4579,8 +4580,8 @@
         <span class="sk-eq-name">${escapeHtml(e.item)}${e.qty ? `<br><span style="font-weight:normal;font-size:0.78rem;color:var(--ink-muted);">נדרש: ${e.qty}</span>` : ""}</span>
         ${e.qty
           ? `<span class="sk-qty">יש בפועל: <input type="number" inputmode="numeric" min="0" max="999" value="${escapeHtml(e.count)}" placeholder="?" onchange="skSetCount(${i}, this.value)"></span>`
-          : `<button type="button" class="sk-eq-btn ok ${e.status === "ok" ? "on" : ""}" onclick="skSetEq(${i},'ok')">✅ קיים</button>
-        <button type="button" class="sk-eq-btn miss ${e.status === "missing" ? "on" : ""}" onclick="skSetEq(${i},'missing')">❌ חסר</button>`}
+          : `<button type="button" class="sk-eq-btn ok ${e.status === "ok" ? "on" : ""}" onclick="skSetEq(${i},'ok')">קיים</button>
+        <button type="button" class="sk-eq-btn miss ${e.status === "missing" ? "on" : ""}" onclick="skSetEq(${i},'missing')">חסר</button>`}
       </div>
       ${e.status === "missing" ? `<input type="text" maxlength="200" placeholder="הערה (לא חובה): מה חסר / תקול..." value="${escapeHtml(e.note)}" oninput="skState.equipment[${i}].note=this.value">` : ""}
     </div>`).join("");
@@ -4680,16 +4681,16 @@
       <div class="sk-card-head" onclick="this.nextElementSibling.classList.toggle('hidden')">
         <div>
           <div class="sk-card-title">${escapeHtml(e.mission)} · ${escapeHtml(e.hours)}</div>
-          <div class="sk-card-sub">⭐ ${escapeHtml(e.cmdrs[0] || "-")} · 🪖 ${e.soldiers.length} לוחמים · ✍️ ${escapeHtml(e.by)} ${escapeHtml(skFmtTs(e.ts))}</div>
+          <div class="sk-card-sub">${escapeHtml(e.cmdrs[0] || "-")} · ${e.soldiers.length} לוחמים · ${escapeHtml(e.by)} ${escapeHtml(skFmtTs(e.ts))}</div>
         </div>
-        <span class="sk-eq-badge ${e.missingCount ? "bad" : "ok"}">${e.checks.length ? (e.missingCount ? `❌ חסר ${e.missingCount}` : "✅ ציוד תקין") : "ללא ציוד"}</span>
+        <span class="sk-eq-badge ${e.missingCount ? "bad" : "ok"}">${e.checks.length ? (e.missingCount ? `חסר ${e.missingCount}` : "ציוד תקין") : "ללא ציוד"}</span>
       </div>
       <div class="sk-card-body hidden">
         ${e.cmdrs.length > 1 ? `<div><b>מפקדים נוספים:</b> ${escapeHtml(e.cmdrs.slice(1).join(", "))}</div>` : ""}
         <div><b>לוחמים:</b> ${escapeHtml(e.soldiers.join(", ") || "-")}</div>
         <div style="margin-top:6px;"><b>מטרות:</b><div style="white-space:pre-wrap;">${escapeHtml(e.goals)}</div></div>
-        ${e.checks.length ? `<div style="margin-top:6px;"><b>ציוד:</b> ${e.checks.map(c => `${c.ok ? "✅" : "❌"} ${escapeHtml(c.item)}${c.qty ? ` ${c.count}/${c.qty}` : ""}${c.note ? ` (${escapeHtml(c.note)})` : ""}`).join(" · ")}</div>` : ""}
-        <button type="button" class="btn-action btn-wa" style="margin-top:10px;" onclick="shareSkEntry(${i})">📱 שליחה לווטסאפ</button>
+        ${e.checks.length ? `<div style="margin-top:6px;"><b>ציוד:</b> ${e.checks.map(c => `<span class="${c.ok ? "mk-ok" : "mk-bad"}">${c.ok ? "✓" : "✗"}</span> ${escapeHtml(c.item)}${c.qty ? ` ${c.count}/${c.qty}` : ""}${c.note ? ` (${escapeHtml(c.note)})` : ""}`).join(" · ")}</div>` : ""}
+        <button type="button" class="btn-action btn-wa" style="margin-top:10px;" onclick="shareSkEntry(${i})">שליחה לווטסאפ</button>
       </div>
     </div>`).join("");
   }
@@ -4713,7 +4714,7 @@
     document.getElementById("adminSkList").innerHTML = adminSk.map((m, i) => `<div class="task-edit">
       <div style="display:flex;gap:6px;align-items:center;">
         <input type="text" value="${escapeHtml(m.mission)}" placeholder="שם המשימה" style="font-weight:bold;" oninput="adminSk[${i}].mission=this.value">
-        <button type="button" class="btn-trash" title="מחק" style="margin-bottom:8px;" onclick="deleteAdminSkMission(${i})">🗑️</button>
+        <button type="button" class="btn-trash" title="מחק" style="margin-bottom:8px;" onclick="deleteAdminSkMission(${i})"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
       </div>
       <label style="font-size:0.78rem;margin:0 0 3px;">ציוד נדרש (פריט בכל שורה. פריט עם כמות: <span class="ltr">שם | כמות</span>, למשל "מחסניות | 12"):</label>
       <textarea rows="4" style="margin-bottom:0;" oninput="adminSk[${i}].text=this.value">${escapeHtml(m.text)}</textarea>
