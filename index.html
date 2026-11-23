@@ -2792,7 +2792,8 @@
       const v = ST_VIEW[p.status] || ST_VIEW[ST.DRAFT];
       let actions = "";
       if (isOfficers && !shvState.isPendingMpApproval && !shvState.isOfficialApproved) {
-        const force = (currentUser.permissions || {}).shavzakFinalApproval && [ST.OPEN, ST.DRAFT, ST.RETURNED].includes(p.status);
+        // פיקוד עליון/שלומי - כל מחלקה; קצינים - גם מסופחים (אין להם מפקד שמגיש)
+        const force = ((currentUser.permissions || {}).shavzakFinalApproval || p.framework === "מסופחים") && [ST.OPEN, ST.DRAFT, ST.RETURNED].includes(p.status);
         if (p.status === ST.SUBMITTED || force) {
           actions = `<button type="button" class="btn-mini" style="border-color:var(--ok);color:var(--ok);" data-fw="${escapeHtml(p.framework)}" onclick="approvePlatoon(this.dataset.fw)">✓ אשר</button>
                      <button type="button" class="btn-mini" style="border-color:var(--warn);color:var(--warn);" data-fw="${escapeHtml(p.framework)}" onclick="returnPlatoon(this.dataset.fw)">↩ החזר</button>`;
