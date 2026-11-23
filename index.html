@@ -613,7 +613,7 @@
     <div id="mafRadioSection" class="card hidden">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
         <h2 style="margin:0;">📻 דוח קשרים</h2>
-        <button type="button" class="btn-mini" onclick="loadRadioReport()">🔄 רענן</button>
+        <button type="button" class="btn-mini" onclick="loadRadioReport(true)">🔄 רענן</button>
       </div>
       <div id="radioReportBody" class="loading-msg">טוען...</div>
     </div>
@@ -1300,6 +1300,10 @@
     opts = opts || {};
     const c = opts.fresh ? null : swrGet(payload);
     if (c && render) render(c.res, true);
+    if (c && !opts.fresh && Object.keys(payload).length === 1 && bootFresh[payload.action] && Date.now() - bootFresh[payload.action] < 20000) {
+      delete bootFresh[payload.action]; // הנתונים הגיעו הרגע עם ההתחברות - אין צורך לפנות שוב
+      return c.res;
+    }
     const k = swrKey(payload);
     const req = swrInflight[k] || (swrInflight[k] = apiCall(payload).finally(() => { delete swrInflight[k]; }));
     const res = await req;
@@ -1309,6 +1313,13 @@
       if (changed && render) render(res, false);
     } else if (!c && render) render(res, false);
     return res;
+  }
+  // נתוני פתיחה שהגיעו יחד עם ההתחברות
+  let bootFresh = {};
+  function seedBoot(boot) {
+    bootFresh = {};
+    if (!boot) return;
+    Object.keys(boot).forEach(action => { if (isOk(boot[action])) { swrSet({ action }, boot[action]); bootFresh[action] = Date.now(); } });
   }
   // אחרי כניסה: טוענים ברקע את המסכים הנפוצים כדי שייפתחו מיד
   function prefetchCommon() {
@@ -1429,6 +1440,7 @@
     currentUser = res.user;
     if (res.token) {
       authToken = res.token;
+      seedBoot(res.boot);
       completeAuthentication(currentUser);
     } else if (!currentUser.hasPassword) {
       document.getElementById("welcomeNewAuth").innerText = `שלום ${currentUser.name}, זו כניסתך הראשונה. אנא הגדר סיסמה:`;
@@ -1452,6 +1464,7 @@
     setBtnBusy(btn, false);
     if (isOk(res) && res.token) {
       authToken = res.token; currentUser = res.user;
+      seedBoot(res.boot);
       completeAuthentication(currentUser);
     } else showBox("loginStatus", res.message || "שגיאה בשמירת הסיסמה", false);
   }
@@ -1465,6 +1478,7 @@
     setBtnBusy(btn, false);
     if (isOk(res) && res.authenticated && res.token) {
       authToken = res.token; currentUser = res.user;
+      seedBoot(res.boot);
       completeAuthentication(currentUser);
     } else showBox("loginStatus", res.message || "סיסמה שגויה", false);
   }
@@ -3282,7 +3296,12 @@
     const loading = document.getElementById("gearLoading");
     if (!soldierGearData) { loading.classList.remove("hidden"); loading.textContent = "טוען ציוד..."; document.getElementById("gearContent").classList.add("hidden"); }
     if (!keepStatus) hideBox("soldierActionStatus");
-    const res = await apiCall({ action: "get_soldier_gear", skipTools: wpToolsList.length > 0 });
+    if (swrGet({ action: "get_soldier_gear" }) && !keepStatus) { loading.classList.add("hidden"); document.getElementById("gearContent").classList.remove("hidden"); }
+    await apiSWR({ action: "get_soldier_gear" }, applySoldierGear, { fresh: Boolean(keepStatus) });
+  }
+
+  function applySoldierGear(res) {
+    const loading = document.getElementById("gearLoading");
     if (!isOk(res) || !res.soldierData || !res.soldierData.found) {
       loading.classList.remove("hidden");
       loading.textContent = "⚠️ " + ((res.soldierData && res.soldierData.message) || res.message || "שגיאה בטעינת הציוד");
@@ -3742,11 +3761,15 @@
   // --- דוח קשרים למפל"ג ---
   let radioReport = null;
 
-  async function loadRadioReport() {
+  async function loadRadioReport(fresh) {
     const body = document.getElementById("radioReportBody");
-    body.className = "loading-msg"; body.textContent = "טוען דוח קשרים...";
-    const res = await apiCall({ action: "radio_report" });
-    if (!isOk(res)) { body.textContent = "⚠️ " + res.message; return; }
+    if (fresh || !swrGet({ action: "radio_report" })) { body.className = "loading-msg"; body.textContent = "טוען דוח קשרים..."; }
+    await apiSWR({ action: "radio_report" }, renderRadioReport, { fresh: Boolean(fresh) });
+  }
+
+  function renderRadioReport(res) {
+    const body = document.getElementById("radioReportBody");
+    if (!isOk(res)) { body.className = "loading-msg"; body.textContent = "⚠️ " + res.message; return; }
     radioReport = res;
     body.className = "";
     const atHamal = res.devices.filter(d => d.atHamal);
@@ -3800,14 +3823,14 @@
     confirmModal("החזרה לחמ\"ל", `לסמן שקשר ${device} (רשום על ${d.holder.name}) הוחזר לחמ"ל?\nהפעולה תירשם ביומן בשמך.`, "סמן כהוחזר", async () => {
       const res = await apiCall({ action: "radio_return", device, mode: "hamal" });
       toast(res.message, isOk(res) ? "ok" : "err");
-      if (isOk(res)) loadRadioReport();
+      if (isOk(res)) loadRadioReport(true);
     });
   }
 
   async function toggleRadioPhotoRequired(on) {
     const res = await apiCall({ action: "radio_set_photo_required", required: on });
     toast(res.message, isOk(res) ? "ok" : "err");
-    if (isOk(res)) loadRadioReport();
+    if (isOk(res)) loadRadioReport(true);
   }
 
   function shareRadioReport() {
@@ -4262,10 +4285,16 @@
   function rpIsoFromEur(eur) { const m = String(eur).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m ? `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}` : ""; }
   function rpShort(eur) { return String(eur).slice(0, 5); }
 
-  async function loadReservePlan() {
-    document.getElementById("rpLoading").classList.remove("hidden");
-    document.getElementById("rpBody").classList.add("hidden");
-    const res = await apiCall({ action: "reserve_plan_get" });
+  async function loadReservePlan(fresh) {
+    if (fresh || !swrGet({ action: "reserve_plan_get" })) {
+      document.getElementById("rpLoading").classList.remove("hidden");
+      document.getElementById("rpBody").classList.add("hidden");
+    }
+    await apiSWR({ action: "reserve_plan_get" }, applyReservePlan, { fresh: Boolean(fresh) });
+  }
+
+  function applyReservePlan(res) {
+    if (currentScreen !== "reserve") return;
     if (!isOk(res)) { document.getElementById("rpLoading").textContent = "⚠️ " + (res.message || "שגיאה בטעינה"); return; }
     rpData = res;
     if (res.scope !== "ALL") rpFw = res.scope; // קצין רואה רק את המסגרת שלו
@@ -4381,7 +4410,7 @@
     if (!isOk(res)) { toast(res.message || "שגיאה בשמירה", "err"); return; }
     toast(res.message, "ok");
     closeRpEdit();
-    await loadReservePlan();
+    await loadReservePlan(true);
   }
 
   function deleteRp() {
@@ -4391,7 +4420,7 @@
       if (!isOk(res)) { toast(res.message || "שגיאה", "err"); return; }
       toast(res.message, "ok");
       closeRpEdit();
-      await loadReservePlan();
+      await loadReservePlan(true);
     });
   }
 
@@ -4414,11 +4443,20 @@
   }
 
   async function loadShavzakonScreen() {
-    document.getElementById("skLoading").classList.remove("hidden");
-    document.getElementById("skLoading").textContent = "טוען...";
-    document.getElementById("skForm").classList.add("hidden");
     document.getElementById("skDone").classList.add("hidden");
-    const res = await apiCall({ action: "shavzakon_init" });
+    skState = null;
+    if (!swrGet({ action: "shavzakon_init" })) {
+      document.getElementById("skLoading").classList.remove("hidden");
+      document.getElementById("skLoading").textContent = "טוען...";
+      document.getElementById("skForm").classList.add("hidden");
+    }
+    await apiSWR({ action: "shavzakon_init" }, (res, fromCache) => {
+      if (currentScreen !== "shavzakon" || (!fromCache && skState)) return; // לא מאפסים טופס שכבר התחילו למלא
+      applyShavzakonInit(res);
+    });
+  }
+
+  function applyShavzakonInit(res) {
     if (!isOk(res)) { document.getElementById("skLoading").textContent = "⚠️ " + (res.message || "שגיאה בטעינה"); return; }
     skData = res;
     document.getElementById("skLoading").classList.add("hidden");
@@ -4627,9 +4665,14 @@
   let skListEntries = [];
   async function loadShavzakonList() {
     const box = document.getElementById("skList");
-    box.innerHTML = '<div class="loading-msg">טוען...</div>';
     const iso = document.getElementById("skListDate").value;
-    const res = await apiCall({ action: "shavzakon_list", date: iso || "" });
+    const payload = { action: "shavzakon_list", date: iso || "" };
+    if (!swrGet(payload)) box.innerHTML = '<div class="loading-msg">טוען...</div>';
+    await apiSWR(payload, renderShavzakonList);
+  }
+
+  function renderShavzakonList(res) {
+    const box = document.getElementById("skList");
     if (!isOk(res)) { box.innerHTML = `<div style="color:var(--signal);">${escapeHtml(res.message || "שגיאה")}</div>`; return; }
     skListEntries = res.entries || [];
     if (!skListEntries.length) { box.innerHTML = '<div class="item-box" style="text-align:center;color:var(--ink-muted);">אין שבצקונים בתאריך הזה.</div>'; return; }
