@@ -209,6 +209,20 @@
     .pl-status { font-size: 0.82rem; padding: 3px 8px; border-radius: 6px; font-weight: bold; white-space: nowrap; }
     .pl-actions { display: flex; gap: 6px; }
     .mode-tabs { display: flex; gap: 6px; margin-top: 10px; }
+    .shv-date-line { color: var(--ink-muted); font-size: 0.85rem; }
+    .shv-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 12px; }
+    .shv-step { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; font-size: 0.78rem; line-height: 1.2; cursor: pointer; text-align: center; }
+    .shv-step b { display: inline-flex; width: 22px; height: 22px; border-radius: 50%; align-items: center; justify-content: center; background: var(--surface-sunken); color: var(--ink-muted); font-size: 0.8rem; }
+    .shv-step.now { border-color: var(--olive); }
+    .shv-step.now b { background: var(--olive); color: var(--on-olive); }
+    .shv-step.done b { background: var(--olive-soft, var(--surface-sunken)); color: var(--olive); }
+    .shv-step.active { background: var(--olive); color: var(--on-olive); border-color: var(--olive); }
+    .shv-step.active b { background: var(--on-olive); color: var(--olive); }
+    .shv-step:disabled { opacity: 0.45; cursor: default; }
+    .shv-gate { text-align: center; padding: 28px 18px; }
+    .shv-gate .g-t { font-size: 1.15rem; font-weight: 700; color: var(--olive); }
+    .shv-gate .g-s { color: var(--ink-muted); font-size: 0.9rem; margin-top: 6px; }
+    .shv-gate .btn-action { max-width: 220px; margin: 16px auto 0; }
     .mode-tabs .btn-tab { padding: 8px 6px; }
     .review-box { border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
     .review-box.ok { background: var(--ok-soft); border: 1px solid var(--ok); color: var(--ok); }
@@ -861,12 +875,13 @@
   <!-- מסך 8: בנייה ואישור שבצ"ק -->
   <div id="screenShavzakBuilder" class="hidden">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">
         <h2 style="margin:0;" id="shvBuilderTitle">בניית שבצ"ק</h2>
-        <button type="button" id="btnToggleSkeletonMode" class="btn-mini hidden" style="border-color:var(--olive);color:var(--olive);" onclick="toggleSkeletonEditMode()">ערוך חלוקת משימות למחלקות</button>
+        <span id="shvDateLine" class="shv-date-line"></span>
+        <button type="button" id="btnToggleSkeletonMode" class="hidden" onclick="toggleSkeletonEditMode()"></button>
       </div>
-      <label>תאריך השבצ"ק (לו"ז 06:00 עד 06:00 למחרת):</label>
-      <div class="date-input-group">
+      <div id="shvSteps" class="shv-steps"></div>
+      <div class="date-input-group hidden">
         <input type="text" id="shvTargetDate" placeholder="dd/mm/yyyy">
         <label class="date-pick-btn" title="בחר תאריך"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M7 13h2M11 13h2M15 13h2M7 17h2M11 17h2"/></svg><input type="date" id="shvDatePicker" onclick="openNativePicker(this)"></label>
         <button type="button" class="btn-mini" style="background:var(--olive);color:var(--on-olive);border:none;padding:0 14px;" onclick="confirmLeaveShavzak(() => loadShavzakWorkspace())">טען</button>
@@ -874,6 +889,7 @@
     </div>
 
     <div id="shvLoading" class="loading-msg hidden">טוען שבצ"ק...</div>
+    <div id="shvGate" class="card shv-gate hidden"></div>
     <div id="shvBlockingMessage" class="warning-banner hidden"></div>
     <div id="shvStageStatusBanner" class="info-banner hidden"></div>
     <div id="shvReturnedBanner" class="warning-banner hidden" style="text-align:right;"></div>
@@ -887,7 +903,7 @@
           <div id="shvDemandSummary" style="margin-top:12px;"></div>
         </div>
         <div class="card">
-          <h2>🆕 חלוקת משימות למחלקות</h2>
+          <h2>חלוקת משימות למחלקות</h2>
           <div id="skeletonTasksList"></div>
           <button type="button" id="btnSaveSkeleton" class="btn-action btn-success" onclick="saveOfficerSkeleton()">שמור חלוקת משימות ופתח למחלקות</button>
           <div id="skeletonStatus" class="status-box"></div>
@@ -1141,6 +1157,10 @@
   let shvSkeletonShifts = [];
   let shvViewMode = "platoon";
   let shvForceSkeletonEdit = false;
+  let shvTabPinned = null;   // לשונית שהמשתמש בחר ידנית (1-4); null = לפי השלב הנוכחי
+  let shvTabShown = null;
+  let shvStage = null;
+  let shvLastStage = null;
   let mobileWarningShown = false;
 
   // ==========================================
@@ -1612,11 +1632,17 @@
     const p = (currentUser && currentUser.permissions) || {};
     const map = { home: !isPlainSoldier(), shavzak_view: true, radio: true, signatures: true, shavzakon: p.shavzakon || p.adminPanel,
       attendance: p.attendanceReport || p.adminPanel, reserve: p.reservePlan || p.adminPanel,
-      shavzak_platoon: p.shavzakPlatoon && !p.shavzakOfficers, shavzak_officers: p.shavzakOfficers, shavzak_final: p.shavzakFinalApproval };
+      shavzak_build: canBuildShavzak() };
     return Boolean(map[key]);
+  }
+  const OLD_SHV_KEYS = ["shavzak_platoon", "shavzak_officers", "shavzak_final"];
+  function canBuildShavzak() {
+    const p = (currentUser && currentUser.permissions) || {};
+    return Boolean(p.shavzakBuild || p.shavzakPlatoon || p.shavzakOfficers || p.shavzakFinalApproval);
   }
   function resolveGo(key) {
     if (!currentUser || !key) return null;
+    if (OLD_SHV_KEYS.includes(key)) key = "shavzak_build";
     if (canOpenScreen(key)) return key;
     if (key.indexOf("shavzak_") === 0) { const t = tabsForUser().find(x => x.key.indexOf("shavzak_") === 0 && x.key !== homeKey()); return t ? t.key : "shavzak_view"; }
     if (key === "home") return homeKey();
@@ -1715,7 +1741,7 @@
   // חייל פשוט = אין לו אף הרשאה מעבר לצפייה, חתימות וקשרים
   function isPlainSoldier() {
     const p = (currentUser && currentUser.permissions) || {};
-    return !(p.shavzakon || p.attendanceReport || p.shavzakPlatoon || p.shavzakOfficers || p.shavzakFinalApproval ||
+    return !(p.shavzakon || p.attendanceReport || p.shavzakBuild || p.shavzakPlatoon || p.shavzakOfficers || p.shavzakFinalApproval ||
       p.maflagReturns || p.reportsCenter || p.adminPanel || p.reservePlan);
   }
   function homeKey() { return isPlainSoldier() ? "shavzak_view" : "home"; }
@@ -1727,7 +1753,7 @@
     if (plain) {
       tabs.push({ key: "signatures", label: "חתימות", icon: HUB_ICONS.signatures });
     } else {
-      const shvKey = p.shavzakFinalApproval ? "shavzak_final" : p.shavzakOfficers ? "shavzak_officers" : p.shavzakPlatoon ? "shavzak_platoon" : "shavzak_view";
+      const shvKey = canBuildShavzak() ? "shavzak_build" : "shavzak_view";
       tabs.push({ key: shvKey, label: "שבצ\"ק", icon: HUB_ICONS.shavzak_view });
     }
     tabs.push({ key: "radio", label: "קשרים", icon: HUB_ICONS.radio });
@@ -1754,6 +1780,7 @@
   }
 
   function navTab(key) {
+    if (OLD_SHV_KEYS.includes(key)) key = "shavzak_build";
     confirmLeaveShavzak(() => {
       if (key === "hub") openMainHub();
       else if (key === "home") openHome();
@@ -1847,7 +1874,7 @@
       const r = res.radios;
       stats.push({ cls: r.overdue.length ? "bad" : "", v: String(r.out), k: "קשרים בחוץ", s: r.overdue.length ? `${r.overdue.length} מעל 12 שעות` : `מתוך ${r.total}`, go: "radio_report" });
     }
-    let shvGo = p.shavzakFinalApproval ? "shavzak_final" : p.shavzakOfficers ? "shavzak_officers" : "shavzak_platoon";
+    let shvGo = "shavzak_build";
     if (res.shavzak) {
       const sv = res.shavzak, pl = sv.platoons;
       const PUB = "מאושר ופורסם";
@@ -1890,6 +1917,7 @@
       maflag: svg('<path d="M21 8l-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path>'),
       radio_report: svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path>'),
       reports: svg('<path d="M4 4h11l5 5v11H4z"></path><path d="M15 4v5h5M8 13h8M8 17h5"></path>'),
+      shavzak_build: svg('<rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><path d="M17.5 14v7M14 17.5h7"></path>'),
       shavzak_platoon: svg('<rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><path d="M17.5 14v7M14 17.5h7"></path>'),
       shavzak_officers: svg('<path d="M12 3l2.7 5.5 6 .9-4.4 4.2 1 6-5.3-2.8-5.3 2.8 1-6L3.3 9.4l6-.9z"></path>'),
       shavzak_final: svg('<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"></path><path d="M8.5 12l2.5 2.5 4.5-4.5"></path>'),
@@ -1939,9 +1967,7 @@
       { show: Boolean(perms.maflagReturns), icon: "", title: "זיכויים", desc: "ציוד ודוחות", key: "maflag" },
       { show: Boolean(perms.maflagReturns || perms.adminPanel), icon: "", title: "דוח קשרים", desc: "מיקום ותנועות", key: "radio_report" },
       { show: Boolean(perms.reportsCenter), icon: "", title: "דוחות", desc: "נוכחות ונשקייה", key: "reports" },
-      { show: Boolean(perms.shavzakPlatoon && !perms.shavzakOfficers), icon: "", title: "בניית שבצ\"ק", desc: currentUser.framework, key: "shavzak_platoon" },
-      { show: Boolean(perms.shavzakOfficers), icon: "", title: "שבצ\"ק קצינים", desc: "חלוקה ושיבוץ", key: "shavzak_officers" },
-      { show: Boolean(perms.shavzakFinalApproval), icon: "", title: "אישור שבצ\"ק", desc: "אישור ופרסום", key: "shavzak_final" },
+      { show: canBuildShavzak(), icon: "", title: "בניית שבצ\"ק", desc: "חלוקה, שיבוץ ואישור", key: "shavzak_build" },
       { show: Boolean(perms.adminPanel), icon: "", title: "ניהול", desc: "חיילים ומשימות", key: "admin" },
       { show: Boolean(perms.adminPanel), icon: "", title: "התראות", desc: "שליחה ויומן", key: "push_admin" }
     ];
@@ -1979,6 +2005,7 @@
   }
 
   async function openScreen(screenKey) {
+    if (OLD_SHV_KEYS.includes(screenKey)) screenKey = "shavzak_build";
     hideAllScreens();
     { const ib = document.getElementById("installBar"); if (ib) ib.classList.add("hidden"); } // הצעת ההתקנה רק בדף הראשי
     currentScreen = screenKey;
@@ -2015,18 +2042,10 @@
     } else if (screenKey === "reports") {
       document.getElementById("screenReports").classList.remove("hidden");
       await loadHighCommandWorkspace();
-    } else if (screenKey === "shavzak_platoon" || screenKey === "shavzak_officers" || screenKey === "shavzak_final") {
+    } else if (screenKey === "shavzak_build") {
       shvForceSkeletonEdit = false;
-      if (screenKey === "shavzak_final") {
-        shvViewMode = "final_approval";
-        document.getElementById("shvBuilderTitle").textContent = "שבצק - אישור סופי";
-      } else if (screenKey === "shavzak_officers") {
-        shvViewMode = "officers";
-        document.getElementById("shvBuilderTitle").textContent = "שבצק - קצינים";
-      } else {
-        shvViewMode = "platoon";
-        document.getElementById("shvBuilderTitle").textContent = `בניית שבצ"ק - ${currentUser.framework}`;
-      }
+      shvTabPinned = null;
+      document.getElementById("shvBuilderTitle").textContent = "בניית שבצ\"ק";
       document.getElementById("screenShavzakBuilder").classList.remove("hidden");
       initShavzakBuilderScreen();
     } else if (screenKey === "push_admin") {
@@ -2359,20 +2378,73 @@
   });
 
   function initShavzakBuilderScreen() {
-    const tmr = new Date(); tmr.setDate(tmr.getDate() + 1);
-    document.getElementById("shvTargetDate").value = dateToEur(tmr);
-    const picker = document.getElementById("shvDatePicker");
-    picker.value = dateToIso(tmr);
-    picker.onchange = function () {
-      if (!this.value) return;
-      const v = this.value;
-      confirmLeaveShavzak(() => {
-        document.getElementById("shvTargetDate").value = isoToEur(v);
-        shvForceSkeletonEdit = false;
-        loadShavzakWorkspace();
-      });
-    };
+    document.getElementById("shvTargetDate").value = ""; // השרת קובע: עד 06:00 היום, אחר כך מחר
     loadShavzakWorkspace();
+  }
+
+  // ---------- 4 שלבי הבנייה ----------
+  const SHV_STEPS = [
+    { n: 1, t: "חלוקה למחלקות" },
+    { n: 2, t: "שיבוץ חיילים" },
+    { n: 3, t: "אישור קצינים" },
+    { n: 4, t: "אישור מ\"פ" }
+  ];
+  function shvTabAllowed(t) {
+    const p = currentUser.permissions || {};
+    if (t === 1 || t === 3) return Boolean(p.shavzakOfficers);
+    if (t === 2) return canBuildShavzak();
+    return Boolean(p.shavzakFinalApproval);
+  }
+  function shvTabReachable(t, stage) {
+    if (stage == null) return false;
+    if (t === 1) return stage >= 1 && stage <= 3;
+    if (t === 2) return stage >= 2;
+    if (t === 3) return stage >= 3;
+    return stage >= 4;
+  }
+  function shvModeForTab(t) {
+    if (t === 4) return "final_approval";
+    return currentUser.permissions.shavzakOfficers ? "officers" : "platoon";
+  }
+  function shvAutoTab(stage) {
+    const t = { 1: 1, 2: 2, 3: 3, 4: 4 }[stage];
+    return t && shvTabAllowed(t) ? t : null;
+  }
+  function renderShvSteps() {
+    document.getElementById("shvSteps").innerHTML = SHV_STEPS.map(st => {
+      const ok = shvTabAllowed(st.n) && shvTabReachable(st.n, shvStage);
+      const cls = [st.n === shvTabShown ? "active" : "", st.n === shvStage ? "now" : "", shvStage > st.n ? "done" : ""].join(" ");
+      return `<button type="button" class="shv-step ${cls}" ${ok ? "" : "disabled"} onclick="pickShvTab(${st.n})"><b>${st.n}</b><span>${st.t}</span></button>`;
+    }).join("");
+  }
+  function pickShvTab(t) {
+    confirmLeaveShavzak(() => { shvTabPinned = t; loadShavzakWorkspace(); });
+  }
+  function shvShort(eur) { const m = String(eur || "").match(/^(\d{2})\/(\d{2})\/\d{2}(\d{2})$/); return m ? `${m[1]}/${m[2]}/${m[3]}` : eur; }
+  function showShvGate(res) {
+    const gate = document.getElementById("shvGate");
+    const p = currentUser.permissions || {};
+    let t = "", sub = "", btn = "";
+    const stage = res.stage;
+    if (stage === 0) {
+      t = "ממתין לסיום דיווח כ\"א";
+      const m = res.missingAttendanceFrameworks || [];
+      if (m.length) sub = `טרם דיווחו: ${m.join(", ")}`;
+    } else if (stage === 1) {
+      t = "ממתין לחלוקה למחלקות";
+    } else if (stage === 3) {
+      t = "ממתין לאישור קצינים";
+      const mine = (res.platoonStatuses || []).find(x => x.framework === currentUser.framework);
+      if (mine && mine.status === ST.SUBMITTED) btn = `<button type="button" class="btn-action btn-secondary" onclick="pickShvTab(2)">עריכה</button>`;
+    } else if (stage === 4) {
+      t = "ממתין לאישור מ\"פ/סמ\"פ";
+      if (p.shavzakOfficers) btn = `<button type="button" class="btn-action btn-secondary" onclick="pickShvTab(2)">עריכה</button>`;
+    } else if (stage === 5) {
+      t = `שבצ"ק לתאריך ${shvShort(res.targetDate)} מוכן`;
+      sub = "לבניית שבצ\"ק נוסף, יש לסיים דיווח כ\"א";
+    }
+    gate.innerHTML = `<div class="g-t">${escapeHtml(t)}</div>${sub ? `<div class="g-s">${escapeHtml(sub)}</div>` : ""}${btn}`;
+    gate.classList.remove("hidden");
   }
 
   function toggleSkeletonEditMode() {
@@ -2380,7 +2452,7 @@
   }
 
   function hideShvPanels() {
-    ["shvBlockingMessage", "shvStageStatusBanner", "shvReturnedBanner", "shvStage1Wrap", "shvStage2Wrap", "btnToggleSkeletonMode"]
+    ["shvBlockingMessage", "shvStageStatusBanner", "shvReturnedBanner", "shvStage1Wrap", "shvStage2Wrap", "btnToggleSkeletonMode", "shvGate"]
       .forEach(id => document.getElementById(id).classList.add("hidden"));
   }
 
@@ -2390,8 +2462,11 @@
     el.textContent = text;
   }
 
-  async function loadShavzakWorkspace() {
+  async function loadShavzakWorkspace(_retry) {
     const targetDate = document.getElementById("shvTargetDate").value.trim();
+    // איזה מסך לבקש מהשרת: לפי הלשונית שנבחרה, או לפי השלב האחרון שראינו
+    const guess = shvTabPinned || shvAutoTab(shvLastStage) || 2;
+    shvViewMode = shvModeForTab(guess);
     const toggleBtn = document.getElementById("btnToggleSkeletonMode");
     const loading = document.getElementById("shvLoading");
 
@@ -2405,23 +2480,21 @@
 
     if (!isOk(res)) { setBanner("shvBlockingMessage", res.message || "שגיאה בטעינת השבצ\"ק"); return; }
     const missing = res.missingAttendanceFrameworks || [];
-    const isOfficerOrTop = shvViewMode === "officers" || shvViewMode === "final_approval";
+    document.getElementById("shvTargetDate").value = res.targetDate;
+    document.getElementById("shvDateLine").textContent = `${res.dayName || ""} ${shvShort(res.targetDate)}`.trim();
+    shvStage = shvLastStage = res.stage;
 
-    if (shvViewMode === "platoon" && !res.hasSkeleton) {
-      setBanner("shvBlockingMessage", `טרם חולקו משימות למחלקות לתאריך ${res.targetDate}. נא לבקש מהקצינים לחלק משימות.`);
-      return;
-    }
-    if (missing.length > 0 && !res.hasSkeleton) {
-      setBanner("shvBlockingMessage", missing.length === 1
-        ? `${missing[0]} עדיין לא דיווחה נוכחות לתאריך ${res.targetDate}`
-        : `${missing.slice(0, -1).join(", ")} ו-${missing[missing.length - 1]} עדיין לא דיווחו נוכחות לתאריך ${res.targetDate}`);
-      return;
-    }
+    let tab = shvTabPinned;
+    if (tab && !(shvTabAllowed(tab) && shvTabReachable(tab, res.stage))) tab = shvTabPinned = null;
+    if (!tab) tab = shvAutoTab(res.stage);
+    shvTabShown = tab;
+    renderShvSteps();
+    if (!tab) { showShvGate(res); return; }
+    if (shvModeForTab(tab) !== shvViewMode && !_retry) return loadShavzakWorkspace(true);
 
-    // שלב א
-    if (isOfficerOrTop && (!res.hasSkeleton || shvForceSkeletonEdit)) {
+    // לשונית 1: חלוקה למחלקות
+    if (tab === 1) {
       document.getElementById("shvStage1Wrap").classList.remove("hidden");
-      if (res.hasSkeleton) { toggleBtn.classList.remove("hidden"); toggleBtn.textContent = "↩️ חזרה ללוח השיבוץ"; }
       const unrep = res.unreportedSoldiers || [];
       if (missing.length || unrep.length) {
         const byFw = {};
@@ -2433,8 +2506,6 @@
       await renderStage1TasksList(res.rows || []);
       return;
     }
-
-    if (isOfficerOrTop) { toggleBtn.classList.remove("hidden"); toggleBtn.textContent = "ערוך חלוקת משימות למחלקות"; }
 
     const soldiersByPn = {};
     (res.availableSoldiers || []).forEach(s => { soldiersByPn[s.personalNumber] = s; });
@@ -2478,13 +2549,8 @@
       }
     }
 
-    // מסך ברירת מחדל: קצינים ומ"פ מתחילים בסקירה, מפקדי מחלקות בעריכה
-    if (shvViewMode === "final_approval") shvMode = "review";
-    else if (shvViewMode === "officers") {
-      const othersArrived = shvState.platoonStatuses.some(p => p.framework !== currentUser.framework &&
-        [ST.SUBMITTED, ST.OK, ST.RETURNED, ST.PENDING, ST.PUBLISHED].includes(p.status));
-      shvMode = othersArrived ? "review" : "edit";
-    } else shvMode = "edit";
+    // לשונית 2 = עריכת שיבוץ, לשוניות 3-4 = סקירה ואישור (אפשר לעבור לעריכה מתוכן)
+    shvMode = tab === 2 ? "edit" : "review";
 
     document.getElementById("shvStage2Wrap").classList.remove("hidden");
     renderShavzakUI();
@@ -2642,7 +2708,7 @@
     const res = await apiCall({ action: "shavzak_init_skeleton", targetDate, assignments });
     setBtnBusy(btn, false);
     showBox("skeletonStatus", res.message, isOk(res));
-    if (isOk(res)) { shvForceSkeletonEdit = false; setTimeout(loadShavzakWorkspace, 600); }
+    if (isOk(res)) { shvForceSkeletonEdit = false; shvTabPinned = null; setTimeout(() => loadShavzakWorkspace(), 600); }
   }
 
   // ---------- כלים לשיבוץ ----------
@@ -2717,7 +2783,7 @@
   function renderPlatoonBar() {
     const bar = document.getElementById("shvPlatoonBar");
     const isOfficers = shvState.viewMode === "officers";
-    const canToggle = shvState.viewMode !== "platoon";
+    const canToggle = shvTabShown === 3 || shvTabShown === 4;
     const rows = shvState.platoonStatuses.map(p => {
       const v = ST_VIEW[p.status] || ST_VIEW[ST.DRAFT];
       let actions = "";
@@ -3216,7 +3282,7 @@
     showBox("shvSaveStatus", res.message, isOk(res));
     if (!isOk(res)) return false;
     shvState.rows.forEach(r => { r.dirty = false; });
-    if (submitForApproval) setTimeout(loadShavzakWorkspace, 700);
+    if (submitForApproval) setTimeout(() => loadShavzakWorkspace(), 700);
     else renderShavzakUI();
     return true;
   }
@@ -3253,7 +3319,7 @@
     showBox("shvSaveStatus", "מעביר לאישור סופי...", true);
     const res = await apiCall({ action: "shavzak_forward_to_mp", targetDate: shvState.targetDate });
     showBox("shvSaveStatus", res.message, isOk(res));
-    if (isOk(res)) await loadShavzakWorkspace();
+    if (isOk(res)) { shvTabPinned = null; await loadShavzakWorkspace(); toast(res.message, "ok"); }
   }
 
   // ---------- אישור סופי ופרסום ----------
@@ -3271,7 +3337,7 @@
       showBox("shvSaveStatus", "מפרסם שבצ\"ק רשמי...", true);
       const res = await apiCall({ action: "shavzak_approve_official", targetDate: shvState.targetDate });
       showBox("shvSaveStatus", res.message, isOk(res));
-      if (isOk(res)) { shvJustPublished = true; await loadShavzakWorkspace(); toast("פורסם! אפשר לשתף לקבוצה", "ok"); }
+      if (isOk(res)) { shvJustPublished = true; shvTabPinned = 4; await loadShavzakWorkspace(); toast("פורסם! אפשר לשתף לקבוצה", "ok"); }
     }, "ביטול");
   }
 
