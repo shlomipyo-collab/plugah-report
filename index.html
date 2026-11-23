@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#f5f4ef">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <script>
     // מצב בהיר/כהה: לפי בחירה ידנית, אחרת לפי הגדרת המכשיר
     (function () { try { var t = localStorage.getItem("theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {} })();
@@ -31,9 +31,6 @@
     .m-num, .num { font-variant-numeric: tabular-nums; }
     :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
     /* סמן כנף - רק לפני כותרות אזור */
-    .m-wing { display: inline-flex; gap: 3px; flex: none; }
-    .m-wing i { display: block; width: 7px; height: 18px; background: var(--olive); transform: skewX(-24deg); }
-    .m-wing i + i { background: var(--sand); width: 5px; }
     * { box-sizing: border-box; }
     body { font-family: var(--font-sans); font-size: 16px; line-height: 1.5; background: var(--bg); color: var(--ink); margin: 0 auto; padding: var(--space-4); max-width: 980px; -webkit-font-smoothing: antialiased; }
     .narrow-wrap { max-width: 560px; margin: 0 auto; }
@@ -130,6 +127,7 @@
     .push-card .pc-txt span { color: var(--ink-muted); font-size: 12.5px; }
     .push-card .pc-btns { display: flex; align-items: center; gap: 4px; }
     .push-card .pc-x { width: auto; margin: 0; background: none; border: none; color: var(--ink-muted); font-size: 16px; padding: 4px 6px; cursor: pointer; }
+    .update-bar { position: fixed; left: 12px; right: 12px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 950; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--ink); color: var(--surface); border-radius: var(--radius-md); padding: 10px 12px; font-size: 14px; box-shadow: var(--shadow-float); max-width: 560px; margin: 0 auto; }
     .push-hub-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-sunken); font-size: 14px; }
     .todo-item { width: 100%; margin: 0 0 8px; display: flex; align-items: center; gap: 10px; text-align: right; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-inline-start: 4px solid var(--warn); border-radius: var(--radius-md); padding: 11px 12px; font: 500 14.5px/20px var(--font-sans); cursor: pointer; }
     .todo-item.lvl-bad { border-inline-start-color: var(--signal); background: var(--signal-soft); }
@@ -283,7 +281,6 @@
     .badge-leave { background: var(--warn); color: var(--warn); }
     .badge-busy { background: var(--warn-soft); color: var(--warn); }
     .badge-fw { background: var(--surface-sunken); color: var(--ink); }
-    .chip-hours { font-size: 0.72rem; color: var(--warn); margin-top: 3px; }
     .shv-shift-card { background: var(--surface-sunken); border: 1px solid var(--olive); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
     .shv-shift-card.dirty { border-color: var(--warn); }
     .shv-shift-locked { background: var(--surface-sunken); border: 1px dashed var(--line); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: var(--ink-muted); gap: 8px; flex-wrap: wrap; }
@@ -340,9 +337,6 @@
     .sk-res:active, .sk-res:hover { background: var(--olive-soft); }
     .sk-res small { color: var(--ink-muted); }
     .sk-res-empty { padding: 10px 12px; color: var(--ink-muted); font-size: 0.85rem; }
-    .sk-add { display: flex; gap: 6px; }
-    .sk-add input { margin-bottom: 0; }
-    .sk-add button { width: auto; flex: none; margin: 0; padding: 0 14px; }
     .sk-times { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .sk-times input { min-width: 0; width: 100%; padding: 11px; margin-bottom: 8px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-sunken); color: var(--ink); font-size: 1rem; font-family: inherit; }
     .sk-eq { background: var(--surface-sunken); border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; margin-bottom: 7px; }
@@ -366,7 +360,6 @@
     .sk-eq-badge.ok { background: var(--ok-soft); color: var(--ok); }
     .sk-eq-badge.bad { background: var(--signal-soft); color: var(--signal); }
     .btn-trash { background: var(--signal-soft); color: var(--signal); border: 1px solid var(--signal); border-radius: 6px; padding: 5px 9px; cursor: pointer; font-size: 0.9rem; }
-    .btn-unassigned { background: var(--surface-sunken); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 0.78rem; white-space: nowrap; }
     .warning-banner { background: var(--signal-soft); border: 1px solid var(--signal); color: var(--signal); padding: 14px; border-radius: 10px; margin-bottom: 14px; font-size: 0.95rem; text-align: center; }
     .info-banner { background: var(--ok-soft); border: 1px solid var(--ok); color: var(--ok); padding: 14px; border-radius: 10px; margin-bottom: 14px; font-size: 0.95rem; text-align: center; }
     .summary-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 8px; }
@@ -407,7 +400,6 @@
       <div class="profile-info-sub" id="barUserPermissions"></div>
     </div>
     <div class="top-bar-actions">
-      <button type="button" id="btnBackToHub" class="btn-mini home hidden" onclick="goHome()">🏠 תפריט ראשי</button>
       <button type="button" class="btn-mini danger" onclick="logoutUser()">יציאה</button>
     </div>
   </div>
@@ -1278,6 +1270,56 @@
 
   function isOk(res) { return res && res.status === "success"; }
 
+  // ==========================================
+  // מטמון מסכים: מציגים מיד את הנתונים האחרונים, ומרעננים ברקע
+  // ==========================================
+  const SWR_PERSIST = ["home_status", "get_soldier_shavzak", "radio_status"]; // נשמרים גם בין כניסות
+  const SWR_MAX_AGE = 3 * 24 * 3600 * 1000;
+  const swrMem = {};
+  function swrKey(p) { return (currentUser ? currentUser.personalNumber : "") + "|" + JSON.stringify(p); }
+  function swrGet(p) {
+    const k = swrKey(p);
+    if (swrMem[k]) return swrMem[k];
+    if (SWR_PERSIST.includes(p.action)) {
+      try { const v = JSON.parse(localStorage.getItem("swr:" + k) || "null"); if (v && Date.now() - v.at < SWR_MAX_AGE) return (swrMem[k] = v); } catch (e) {}
+    }
+    return null;
+  }
+  function swrSet(p, res) {
+    const k = swrKey(p), v = { at: Date.now(), res };
+    swrMem[k] = v;
+    if (SWR_PERSIST.includes(p.action)) { try { localStorage.setItem("swr:" + k, JSON.stringify(v)); } catch (e) {} }
+  }
+  function swrClear() {
+    Object.keys(swrMem).forEach(k => delete swrMem[k]);
+    try { Object.keys(localStorage).filter(k => k.indexOf("swr:") === 0).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+  }
+  // render(res, fromCache) נקרא עד פעמיים: מהמטמון (אם יש) ואחרי הרענון אם משהו השתנה
+  const swrInflight = {};
+  async function apiSWR(payload, render, opts) {
+    opts = opts || {};
+    const c = opts.fresh ? null : swrGet(payload);
+    if (c && render) render(c.res, true);
+    const k = swrKey(payload);
+    const req = swrInflight[k] || (swrInflight[k] = apiCall(payload).finally(() => { delete swrInflight[k]; }));
+    const res = await req;
+    if (isOk(res)) {
+      const changed = !c || JSON.stringify(c.res) !== JSON.stringify(res);
+      swrSet(payload, res);
+      if (changed && render) render(res, false);
+    } else if (!c && render) render(res, false);
+    return res;
+  }
+  // אחרי כניסה: טוענים ברקע את המסכים הנפוצים כדי שייפתחו מיד
+  function prefetchCommon() {
+    setTimeout(() => {
+      if (!currentUser) return;
+      apiSWR({ action: "radio_status" });
+      if (isPlainSoldier()) apiSWR({ action: "home_status" });
+      else apiSWR({ action: "get_soldier_shavzak" });
+    }, 1200);
+  }
+
   // "חימום" השרת ברגע שהדף נטען - כך ההתחברות עצמה מהירה יותר
   function warmUpServer() { try { fetch(SCRIPT_URL + "?action=ping").catch(() => {}); } catch (e) {} }
 
@@ -1438,12 +1480,12 @@
     // חייל פשוט נכנס ישר למשימה שלו. כל השאר - למסך הבית (תמונת מצב + דורש טיפול)
     document.body.classList.add("has-tabbar");
     document.getElementById("tabBar").classList.remove("hidden");
-    homeCache = null;
     if (pendingGo && resolveGo(pendingGo)) { const g = resolveGo(pendingGo); pendingGo = null; navTab(g); }
     else if (isPlainSoldier()) openScreen("shavzak_view");
     else openHome();
     pendingGo = null;
     refreshPushAfterLogin();
+    prefetchCommon();
   }
 
   function hideAllScreens() {
@@ -1564,7 +1606,19 @@
     return null;
   }
   function goFromPush(key) { const k = resolveGo(key); if (k) navTab(k); }
-  if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", ev => { if (ev.data && ev.data.type === "go") goFromPush(ev.data.go); });
+  if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", ev => {
+    if (ev.data && ev.data.type === "go") goFromPush(ev.data.go);
+    if (ev.data && ev.data.type === "app-updated") showUpdateBar();
+  });
+  if ("serviceWorker" in navigator) navigator.serviceWorker.ready.then(() => { if (navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage({ type: "ready" }); }).catch(() => {});
+  function showUpdateBar() {
+    if (document.getElementById("updateBar")) return;
+    const b = document.createElement("div");
+    b.id = "updateBar";
+    b.className = "update-bar";
+    b.innerHTML = `<span>גרסה חדשה של האפליקציה מוכנה</span><button type="button" class="btn-mini home" onclick="confirmLeaveShavzak(() => location.reload())">רענון</button>`;
+    document.body.appendChild(b);
+  }
 
   // ---------- מסך ניהול התראות (שלומי) ----------
   let pushAdm = { info: null, type: "all", fws: [], roles: [], people: [] };
@@ -1631,7 +1685,6 @@
   // ==========================================
   // סרגל ניווט תחתון + מסך בית
   // ==========================================
-  let homeCache = null;
   let homeActiveSk = null;
   function shareHomeSk() { if (homeActiveSk) window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(skWaMessage(homeActiveSk)), "_blank"); }
   const TAB_ICONS = (() => {
@@ -1695,21 +1748,19 @@
     hideAllScreens();
     currentScreen = "home";
     shvState = null;
-    document.getElementById("btnBackToHub").classList.add("hidden");
     document.getElementById("screenHome").classList.remove("hidden");
     renderTabBar();
     window.scrollTo(0, 0);
     const box = document.getElementById("homeBody");
-    if (homeCache) renderHome(homeCache);
-    else box.innerHTML = `<div class="loading-msg">טוען תמונת מצב...</div>`;
-    const res = await apiCall({ action: "home_status" });
-    if (currentScreen !== "home") return;
-    if (!isOk(res)) {
-      if (!homeCache) box.innerHTML = `<div class="item-box" style="text-align:center;">⚠️ ${escapeHtml(res.message || "שגיאה בטעינת מסך הבית")}<br><button type="button" class="home-refresh" style="margin-top:8px;" onclick="openHome()">נסה שוב</button></div>`;
-      return;
-    }
-    homeCache = res;
-    renderHome(res);
+    if (!swrGet({ action: "home_status" })) box.innerHTML = `<div class="loading-msg">טוען תמונת מצב...</div>`;
+    await apiSWR({ action: "home_status" }, (res) => {
+      if (currentScreen !== "home") return;
+      if (!isOk(res)) {
+        box.innerHTML = `<div class="item-box" style="text-align:center;">⚠️ ${escapeHtml(res.message || "שגיאה בטעינת מסך הבית")}<br><button type="button" class="home-refresh" style="margin-top:8px;" onclick="openHome()">נסה שוב</button></div>`;
+        return;
+      }
+      renderHome(res);
+    });
   }
 
   function homeDayName(eur) {
@@ -1857,7 +1908,6 @@
     hideAllScreens();
     currentScreen = "hub";
     shvState = null;
-    document.getElementById("btnBackToHub").classList.add("hidden");
     const grid = document.getElementById("hubTilesGrid");
     grid.innerHTML = "";
     const perms = currentUser.permissions || {};
@@ -1904,7 +1954,7 @@
     document.getElementById("verifyPasswordBox").classList.add("hidden");
     hideBox("loginStatus");
     hideAllScreens();
-    homeCache = null;
+    swrClear();
     document.body.classList.remove("has-tabbar");
     document.getElementById("tabBar").classList.add("hidden");
     currentScreen = "login";
@@ -1915,7 +1965,6 @@
     hideAllScreens();
     { const ib = document.getElementById("installBar"); if (ib) ib.classList.add("hidden"); } // הצעת ההתקנה רק בדף הראשי
     currentScreen = screenKey;
-    document.getElementById("btnBackToHub").classList.add("hidden"); // הניווט עבר לסרגל התחתון
     renderTabBar();
     window.scrollTo(0, 0);
 
@@ -1980,16 +2029,20 @@
     const todoBox = document.getElementById("soldierTodo");
     todoBox.innerHTML = "";
     if (isPlainSoldier()) { // תזכורות אישיות (למשל החזרת קשר אחרי משימה)
-      apiCall({ action: "home_status" }).then(h => {
+      apiSWR({ action: "home_status" }, h => {
         if (!isOk(h) || currentScreen !== "shavzak_view") return;
         todoBox.innerHTML = (h.todo || []).map(t => `<button type="button" class="todo-item lvl-${escapeHtml(t.level)}" onclick="navTab('${escapeHtml(t.action)}')"><span class="ti-txt">${escapeHtml(t.text)}</span><span class="ti-go" aria-hidden="true">‹</span></button>`).join("");
       });
     }
-    document.getElementById("soldierShvLoading").classList.remove("hidden");
-    document.getElementById("soldierShvLoading").textContent = "טוען משימות שבצ\"ק...";
-    document.getElementById("soldierShvContent").classList.add("hidden");
+    if (!swrGet({ action: "get_soldier_shavzak" })) {
+      document.getElementById("soldierShvLoading").classList.remove("hidden");
+      document.getElementById("soldierShvLoading").textContent = "טוען משימות שבצ\"ק...";
+      document.getElementById("soldierShvContent").classList.add("hidden");
+    }
+    await apiSWR({ action: "get_soldier_shavzak" }, res => { if (currentScreen === "shavzak_view") renderSoldierShavzak(res); });
+  }
 
-    const res = await apiCall({ action: "get_soldier_shavzak" });
+  function renderSoldierShavzak(res) {
     if (!isOk(res)) {
       document.getElementById("soldierShvLoading").textContent = "⚠️ " + (res.message || "שגיאה בטעינה");
       return;
@@ -2039,19 +2092,6 @@
   }
 
   // שבירת טקסט לשורות לפי רוחב
-  function wrapWords(ctx, text, maxW) {
-    const words = String(text).split(/\s+/).filter(Boolean);
-    const lines = [];
-    let cur = "";
-    words.forEach(w => {
-      const test = cur ? cur + " " + w : w;
-      if (ctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = w; }
-      else cur = test;
-    });
-    if (cur) lines.push(cur);
-    return lines.length ? lines : [""];
-  }
-
   // סמל הפלוגה לפינת תמונת השבצ"ק (קובץ מקומי, כדי שאפשר יהיה לשמור את התמונה)
   const SHV_LOGO = new Image();
   SHV_LOGO.src = "icons/icon-192.png";
@@ -3537,17 +3577,23 @@
 
   async function loadRadioScreen(keepStatus) {
     if (!keepStatus) hideBox("radioStatusBox");
-    document.getElementById("radioGrid").innerHTML = '<div class="loading-msg" style="grid-column:1/-1;">טוען...</div>';
-    const res = await apiCall({ action: "radio_status" });
-    if (!isOk(res)) { document.getElementById("radioGrid").innerHTML = `<div style="grid-column:1/-1;color:var(--signal);">${escapeHtml(res.message)}</div>`; return; }
-    radioData = res;
     radioPicked = null;
     radioReturnMode = null;
     ["sign", "return"].forEach(k => resetRadioPhoto(k));
+    ["radioMissionOther", "radioNextMissionOther"].forEach(id => { const el = document.getElementById(id); el.value = ""; el.classList.add("hidden"); });
+    ["radioMission", "radioNextMission"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+    if (keepStatus || !swrGet({ action: "radio_status" })) document.getElementById("radioGrid").innerHTML = '<div class="loading-msg" style="grid-column:1/-1;">טוען...</div>';
+    await apiSWR({ action: "radio_status" }, res => { if (currentScreen === "radio") applyRadioData(res); }, { fresh: Boolean(keepStatus) });
+  }
+
+  function applyRadioData(res) {
+    if (!isOk(res)) { document.getElementById("radioGrid").innerHTML = `<div style="grid-column:1/-1;color:var(--signal);">${escapeHtml(res.message)}</div>`; return; }
+    radioData = res;
+    const keep = ["radioMission", "radioNextMission"].map(id => document.getElementById(id).value);
     const opts = res.missions.map(m => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("");
     document.getElementById("radioMission").innerHTML = `<option value="">-- בחר משימה --</option>` + opts;
     document.getElementById("radioNextMission").innerHTML = `<option value="">-- בחר משימה --</option>` + opts;
-    ["radioMissionOther", "radioNextMissionOther"].forEach(id => { const el = document.getElementById(id); el.value = ""; el.classList.add("hidden"); });
+    ["radioMission", "radioNextMission"].forEach((id, i) => { document.getElementById(id).value = keep[i]; });
     document.querySelectorAll(".radio-photo-lbl").forEach(el => {
       el.textContent = res.photoRequired ? "(חובה - המפל\"ג ביקש)" : "(רשות)";
       el.style.color = res.photoRequired ? "var(--signal)" : "var(--ink-muted)";

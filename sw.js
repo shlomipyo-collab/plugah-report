@@ -1,22 +1,38 @@
-// Service worker מינימלי: מאפשר התקנה כאפליקציה.
-// תמיד מנסה קודם רשת (כדי שכל עדכון יגיע מיד), ושומר עותק אחרון רק לגישה בלי קליטה.
+// Service worker: פתיחה מיידית מהעותק השמור, ועדכון ברקע.
+// אם הורדה גרסה חדשה של האפליקציה - הדף מקבל הודעה ומציע "רענון".
 // קריאות לשרת (script.google.com) לא עוברות כאן בכלל.
-const CACHE = "pluga-shell-v5";
+const CACHE = "pluga-shell-v6";
 self.addEventListener("install", () => self.skipWaiting());
-// עדכון: כל שינוי בקובץ הזה גורם לטלפונים להתקין את הגרסה החדשה ברענון הבא
 self.addEventListener("activate", e => e.waitUntil(
   caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())
 ));
+let updateReady = false; // אם הדף עוד לא האזין כשהעדכון זוהה - נודיע לו כשיאמר "ready"
+self.addEventListener("message", e => {
+  if (e.data && e.data.type === "ready" && updateReady && e.source) { updateReady = false; e.source.postMessage({ type: "app-updated" }); }
+});
+const tagOf = r => r && (r.headers.get("etag") || r.headers.get("last-modified") || "");
 self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
-  e.respondWith(
-    // no-cache: תמיד בודק מול השרת אם יש גרסה חדשה (בלי זה הדפדפן מחזיק עותק ישן עד 10 דקות)
-    fetch(req.url, { cache: "no-cache", credentials: "same-origin" }).then(res => {
-      if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
+  const isPage = req.mode === "navigate";
+  e.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    const key = isPage ? "./" : req;
+    const cached = await cache.match(key, { ignoreSearch: isPage });
+    const net = fetch(isPage ? new URL("./", self.registration.scope).href : req.url, { cache: "no-cache", credentials: "same-origin" }).then(async res => {
+      if (res && res.ok) {
+        await cache.put(key, res.clone());
+        if (isPage && cached && tagOf(cached) && tagOf(res) && tagOf(cached) !== tagOf(res)) {
+          updateReady = true;
+          const list = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+          list.forEach(c => c.postMessage({ type: "app-updated" }));
+        }
+      }
       return res;
-    }).catch(() => caches.match(req).then(r => r || caches.match("./")))
-  );
+    });
+    if (cached) { e.waitUntil(net.catch(() => {})); return cached; }
+    try { return await net; } catch (err) { return (await cache.match("./")) || Response.error(); }
+  })());
 });
 
 // ===== התראות פוש (Firebase Cloud Messaging, הודעות data) =====
