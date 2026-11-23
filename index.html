@@ -277,8 +277,8 @@
     .checkbox-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .checkbox-row input { width: 20px; height: 20px; margin: 0; }
     .btn-row { display: flex; gap: 8px; margin-top: 8px; }
-    .att-bulk { display: flex; gap: 8px; margin-bottom: 12px; }
-    .att-bulk button { flex: 1; }
+    .att-bulk { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .att-bulk button { flex: 1; padding: 9px 10px; font-size: 0.9rem; }
 
     /* שבצ"ק */
     .shv-mission-hero { background: linear-gradient(135deg, var(--olive-soft), var(--surface-sunken)); border: 2px solid var(--olive); border-radius: 12px; padding: 18px; margin-bottom: 14px; text-align: center; }
@@ -586,6 +586,7 @@
       <label>שם המדווח:</label>
       <input type="text" id="attReporterName">
       <div id="attBulkWrap" class="att-bulk hidden">
+        <button type="button" class="btn-mini" id="btnAttRestore" onclick="restoreYesterdayAttendance(this)">שחזר את הדיווח מאתמול</button>
         <button type="button" class="btn-mini" onclick="setAllAttendance(true)">סמן את כולם נוכחים</button>
       </div>
       <div id="attCounter" style="font-size:0.85rem;color:var(--olive);"></div>
@@ -3607,6 +3608,38 @@
       setAttRadio(idx, isPres);
       if (isPres) document.getElementById(`attSubP_${idx}`).value = "נוכחות מלאה";
     });
+  }
+
+  // ממלא את הטופס לפי מה שדווח ליום שלפני תאריך הדוח
+  async function restoreYesterdayAttendance(btn) {
+    const fw = normalizeFramework(document.getElementById("attFrameworkSelect").value);
+    const rDate = document.getElementById("attReportDate").value.trim();
+    const m = rDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (!fw || !m) { toast("נא לבחור מסגרת ותאריך", "err"); return; }
+    const prev = dateToEur(new Date(+m[3], +m[2] - 1, +m[1] - 1));
+    setBtnBusy(btn, true, "משחזר...");
+    const res = await apiCall({ action: "get_attendance_day", filterFramework: fw, date: prev });
+    setBtnBusy(btn, false);
+    if (!isOk(res)) { toast(res.message || "שגיאה", "err"); return; }
+    if (!res.found) { toast(`לא נמצא דיווח של ${fw} ל-${prev}`, "err"); return; }
+    let n = 0;
+    attendanceSoldiers.forEach((s, idx) => {
+      const st = res.statuses[s.personalNumber];
+      if (!st) return;
+      let isPres = st.mainStatus === "נוכח", sub = st.subStatus || "";
+      if (sub === "מגיע היום") sub = "נוכחות מלאה";             // הגיע אתמול = נמצא היום
+      else if (sub === "יוצא היום") { isPres = false; sub = "חופשה"; } // יצא אתמול = לא נמצא היום
+      setAttRadio(idx, isPres);
+      if (isPres) document.getElementById(`attSubP_${idx}`).value = ["נוכחות מלאה", "מגיע היום", "יוצא היום"].includes(sub) ? sub : "נוכחות מלאה";
+      else {
+        const a = (sub === "גימלים" || sub.includes("ג'")) ? "גימלים" : (["חופשה", "שוחרר", "אחר"].includes(sub) ? sub : "חופשה");
+        document.getElementById(`attSubA_${idx}`).value = a;
+        document.getElementById(`attNoteBox_${idx}`).classList.toggle("hidden", a !== "אחר");
+        document.getElementById(`attNote_${idx}`).value = a === "אחר" ? (st.notes || "") : "";
+      }
+      n++;
+    });
+    toast(`שוחזר הדיווח מ-${prev} (${n}/${attendanceSoldiers.length})`, "ok");
   }
 
   function updateAttCounter() {
