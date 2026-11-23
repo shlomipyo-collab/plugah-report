@@ -294,7 +294,7 @@
     .chip-badge { font-size: 0.72rem; padding: 2px 6px; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 2px; }
     .badge-cmdr { background: var(--olive); color: var(--on-olive); }
     .badge-arrive { background: var(--ok-soft); color: var(--ok); }
-    .badge-leave { background: var(--warn); color: var(--warn); }
+    .badge-leave { background: var(--warn-soft); color: var(--warn); }
     .badge-busy { background: var(--warn-soft); color: var(--warn); }
     .badge-fw { background: var(--surface-sunken); color: var(--ink); }
     .shv-shift-card { background: var(--surface-sunken); border: 1px solid var(--olive); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
@@ -2398,6 +2398,8 @@
   }
   function shvTabReachable(t, stage) {
     if (stage == null) return false;
+    // פיקוד עליון / שלומי: יכולים לעבור לשלב 3 גם לפני שכל המחלקות הגישו
+    if (t === 3 && stage >= 2 && (currentUser.permissions || {}).shavzakFinalApproval) return true;
     if (t === 1) return stage >= 1 && stage <= 3;
     if (t === 2) return stage >= 2;
     if (t === 3) return stage >= 3;
@@ -2790,7 +2792,8 @@
       const v = ST_VIEW[p.status] || ST_VIEW[ST.DRAFT];
       let actions = "";
       if (isOfficers && !shvState.isPendingMpApproval && !shvState.isOfficialApproved) {
-        if (p.status === ST.SUBMITTED) {
+        const force = (currentUser.permissions || {}).shavzakFinalApproval && [ST.OPEN, ST.DRAFT, ST.RETURNED].includes(p.status);
+        if (p.status === ST.SUBMITTED || force) {
           actions = `<button type="button" class="btn-mini" style="border-color:var(--ok);color:var(--ok);" data-fw="${escapeHtml(p.framework)}" onclick="approvePlatoon(this.dataset.fw)">✓ אשר</button>
                      <button type="button" class="btn-mini" style="border-color:var(--warn);color:var(--warn);" data-fw="${escapeHtml(p.framework)}" onclick="returnPlatoon(this.dataset.fw)">↩ החזר</button>`;
         } else if (p.status === ST.OK) {
@@ -3027,8 +3030,9 @@
     toast(res.message, "ok");
     await loadShavzakWorkspace();
   }
-  function mergeShvShift(rIdx) {
-    if (hasUnsavedShavzak()) { toast("יש שינויים שלא נשמרו - שמור טיוטה קודם", "err"); return; }
+  async function mergeShvShift(rIdx) {
+    // שומר טיוטה מאחורי הקלעים לפני האיחוד
+    if (hasUnsavedShavzak() && !(await savePlatoonShavzak(false, true))) return;
     const r = shvState.rows[rIdx];
     const prev = shvState.rows[shvPrevAdjacent(r)];
     confirmModal("איחוד משמרות", `לאחד את ${r.hoursLabel} עם ${prev.hoursLabel}? המשובצים במשמרת ${r.hoursLabel} יוסרו, והמשובצים במשמרת הקודמת יישארו לכל הזמן המאוחד.`, "אחד", async () => {
@@ -3071,7 +3075,9 @@
       }
       if (!shvState.isPendingMpApproval && !shvState.isOfficialApproved) {
         const ready = shvState.allPlatoonsApproved;
-        btns.push(`<button type="button" class="btn-action btn-warning" ${ready ? "" : "disabled"} title="${ready ? "" : "יש לאשר קודם את כל המחלקות"}" onclick="forwardToMpApproval()">העבר לאישור סופי${ready ? "" : " (ממתין לאישור כל המחלקות)"}</button>`);
+        const canForce = Boolean((currentUser.permissions || {}).shavzakFinalApproval);
+        const enabled = ready || canForce;
+        btns.push(`<button type="button" class="btn-action btn-warning" ${enabled ? "" : "disabled"} title="${ready ? "" : "יש לאשר קודם את כל המחלקות"}" onclick="forwardToMpApproval()">העבר לאישור סופי${ready ? "" : canForce ? " (לפני שכל המחלקות אושרו)" : " (ממתין לאישור כל המחלקות)"}</button>`);
       }
     } else {
       if (hasUnsavedShavzak() || shvMode === "edit") btns.push(`<button type="button" class="btn-action btn-primary" onclick="savePlatoonShavzak(false)">שמור תיקונים</button>`);
@@ -3315,11 +3321,16 @@
     };
   }
 
-  async function forwardToMpApproval() {
+  function forwardToMpApproval() {
+    if (shvState.allPlatoonsApproved) { doForwardToMpApproval(); return; }
+    const waiting = (shvState.platoonStatuses || []).filter(p => p.status !== ST.OK).map(p => p.framework);
+    confirmModal("העברה לאישור סופי", `עדיין לא אושרו: ${waiting.join(", ")}.\nלהעביר לאישור סופי בכל זאת?`, "העבר בכל זאת", doForwardToMpApproval);
+  }
+  async function doForwardToMpApproval() {
     const saved = await savePlatoonShavzak(false, true);
     if (!saved) return;
     showBox("shvSaveStatus", "מעביר לאישור סופי...", true);
-    const res = await apiCall({ action: "shavzak_forward_to_mp", targetDate: shvState.targetDate });
+    const res = await apiCall({ action: "shavzak_forward_to_mp", targetDate: shvState.targetDate, force: !shvState.allPlatoonsApproved });
     showBox("shvSaveStatus", res.message, isOk(res));
     if (isOk(res)) { shvTabPinned = null; await loadShavzakWorkspace(); toast(res.message, "ok"); }
   }
