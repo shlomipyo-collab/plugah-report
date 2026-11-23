@@ -2438,7 +2438,8 @@
       if (mine && mine.status === ST.SUBMITTED) btn = `<button type="button" class="btn-action btn-secondary" onclick="pickShvTab(2)">עריכה</button>`;
     } else if (stage === 4) {
       t = "ממתין לאישור מ\"פ/סמ\"פ";
-      if (p.shavzakOfficers) btn = `<button type="button" class="btn-action btn-secondary" onclick="pickShvTab(2)">עריכה</button>`;
+      const hasMine = (res.platoonStatuses || []).some(x => x.framework === currentUser.framework);
+      if (p.shavzakOfficers && (hasMine || p.shavzakFinalApproval)) btn = `<button type="button" class="btn-action btn-secondary" onclick="pickShvTab(2)">עריכה</button>`;
     } else if (stage === 5) {
       t = `שבצ"ק לתאריך ${shvShort(res.targetDate)} מוכן`;
       sub = "לבניית שבצ\"ק נוסף, יש לסיים דיווח כ\"א";
