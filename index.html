@@ -35,7 +35,7 @@
     body { font-family: var(--font-sans); font-size: 16px; line-height: 1.5; background: var(--bg); color: var(--ink); margin: 0 auto; padding: var(--space-4); max-width: 980px; -webkit-font-smoothing: antialiased; }
     .narrow-wrap { max-width: 560px; margin: 0 auto; }
     .m-appbar { display: flex; align-items: center; gap: var(--space-3); min-height: 56px; padding: 6px var(--space-4); margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) var(--space-4); background: var(--surface); border-bottom: 1px solid var(--line); }
-    .m-appbar img { height: 40px; width: 60px; object-fit: cover; border-radius: var(--radius-sm); flex: none; }
+    .m-appbar img { height: 44px; width: 44px; object-fit: cover; border-radius: var(--radius-sm); flex: none; }
     .m-appbar-title { font-family: var(--font-display); font-weight: 700; font-size: 18px; line-height: 22px; }
     .m-appbar-sub { font-size: 12px; line-height: 16px; color: var(--ink-muted); }
     .m-icon-btn { margin-inline-start: auto; width: 40px; height: 40px; border-radius: var(--radius-md); border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); display: grid; place-items: center; cursor: pointer; padding: 0; }
@@ -257,6 +257,11 @@
     .radio-btn.mine { border-color: var(--olive); background: var(--olive-soft); }
     .radio-btn.sel { outline: 3px solid var(--ok); outline-offset: 1px; }
     .radio-picked { background: var(--surface-sunken); border: 1px solid var(--line-strong); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 0.88rem; }
+    .photo-pick { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 10px 14px; margin: 4px 0 10px; border: 1.5px dashed var(--line-strong); border-radius: var(--radius-sm, 10px); background: var(--surface-sunken); color: var(--ink); font-weight: 600; cursor: pointer; }
+    .photo-pick:active, .photo-pick:hover { border-color: var(--olive); color: var(--olive); }
+    .photo-pick.has { border-style: solid; border-color: var(--ok); color: var(--ok); }
+    .photo-input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    .photo-input:focus-visible + * , .photo-pick:focus-within { outline: 2px solid var(--olive); }
     .radio-photo-prev { max-width: 100%; max-height: 220px; border-radius: 8px; border: 1px solid var(--line-strong); margin-bottom: 10px; display: block; }
     .radio-mine-item { background: var(--olive-soft); border: 1px solid var(--olive); border-radius: 9px; padding: 9px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
     .rr-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
@@ -393,7 +398,7 @@
   <div id="toast"></div>
 
   <header class="m-appbar">
-    <img src="https://drive.google.com/thumbnail?id=1Suw_VFwFdSaiBw1-zRJ8sBzTTINynRvm&sz=w600" alt="סמל מסייעת 8109">
+    <img src="icons/icon-192.png" alt="סמל מסייעת 8109">
     <div>
       <div class="m-appbar-title">מסייעת 8109</div>
       <div class="m-appbar-sub">ממשק ניהול פלוגה</div>
@@ -782,7 +787,8 @@
         <select id="radioMission" onchange="document.getElementById('radioMissionOther').classList.toggle('hidden', this.value!=='אחר')"></select>
         <input type="text" id="radioMissionOther" class="hidden" placeholder="פרט משימה...">
         <label>3. צילום המכשיר עם המספר <span class="radio-photo-lbl"></span></label>
-        <input type="file" id="radioPhotoSign" accept="image/*" capture="environment" onchange="onRadioPhoto(this, 'sign')">
+        <label class="photo-pick" for="radioPhotoSign"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span id="radioPhotoSignLbl">צלם את המכשיר</span></label>
+        <input type="file" id="radioPhotoSign" class="photo-input" accept="image/*" capture="environment" onchange="onRadioPhoto(this, 'sign')">
         <img id="radioPhotoSignPrev" class="radio-photo-prev hidden" alt="תצוגה מקדימה">
         <button type="button" id="btnRadioSign" class="btn-action btn-success" onclick="submitRadioSign(false)">חתום על הקשר</button>
       </div>
@@ -806,7 +812,8 @@
             <input type="text" id="radioNextMissionOther" class="hidden" placeholder="פרט משימה...">
           </div>
           <label>3. צילום המכשיר <span class="radio-photo-lbl"></span></label>
-          <input type="file" id="radioPhotoReturn" accept="image/*" capture="environment" onchange="onRadioPhoto(this, 'return')">
+          <label class="photo-pick" for="radioPhotoReturn"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span id="radioPhotoReturnLbl">צלם את המכשיר</span></label>
+        <input type="file" id="radioPhotoReturn" class="photo-input" accept="image/*" capture="environment" onchange="onRadioPhoto(this, 'return')">
           <img id="radioPhotoReturnPrev" class="radio-photo-prev hidden" alt="תצוגה מקדימה">
           <button type="button" id="btnRadioReturn" class="btn-action btn-primary" onclick="submitRadioReturn()">אשר החזרה / העברה</button>
         </div>
@@ -3684,7 +3691,7 @@
     const res = await apiCall({ action: "submit_attendance", framework: fw, reporterName: reporter, reportDate: rDate, records });
     setBtnBusy(btn, false);
     showBox("attStatusBox", res.message, isOk(res));
-    if (isOk(res)) { invalidateSharedDB(); toast("הדיווח נשלח ✓", "ok"); }
+    if (isOk(res)) invalidateSharedDB();
   }
 
   // ==========================================
@@ -3795,6 +3802,14 @@
     const prev = document.getElementById(kind === "sign" ? "radioPhotoSignPrev" : "radioPhotoReturnPrev");
     if (inp) inp.value = "";
     if (prev) { prev.src = ""; prev.classList.add("hidden"); }
+    setPhotoPickLabel(kind, false);
+  }
+  function setPhotoPickLabel(kind, has) {
+    const id = kind === "sign" ? "radioPhotoSign" : "radioPhotoReturn";
+    const lbl = document.getElementById(id + "Lbl");
+    if (!lbl) return;
+    lbl.textContent = has ? "התמונה נקלטה · לצלם שוב" : "צלם את המכשיר";
+    lbl.parentElement.classList.toggle("has", has);
   }
 
   // הקטנת התמונה בטלפון לפני שליחה (חוסך זמן העלאה ומקום)
@@ -3825,6 +3840,7 @@
       radioPhotos[kind] = await compressImage(file, 1280, 0.72);
       const prev = document.getElementById(kind === "sign" ? "radioPhotoSignPrev" : "radioPhotoReturnPrev");
       prev.src = radioPhotos[kind]; prev.classList.remove("hidden");
+      setPhotoPickLabel(kind, true);
     } catch (e) { toast(e.message, "err"); resetRadioPhoto(kind); }
   }
 
