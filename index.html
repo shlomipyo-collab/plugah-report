@@ -270,6 +270,17 @@
     .rr-hamal { background: var(--ok-soft); border: 1px solid var(--ok); color: var(--ok); border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
     .rr-move { border-bottom: 1px solid var(--line); padding: 7px 2px; font-size: 0.83rem; }
     .rr-move:last-child { border-bottom: none; }
+    .ln-dev { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .ln-dev.done { border-color: var(--ok); background: var(--ok-soft); }
+    .ln-dev.late { border-color: var(--signal); }
+    .ln-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .ln-head .chip { white-space: nowrap; }
+    .ln-serial { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; direction: ltr; }
+    .ln-sub { font-size: 0.8rem; color: var(--ink-muted); margin-top: 2px; }
+    .ln-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .ln-actions .btn-action { flex: 1 1 140px; margin: 0; }
+    .ln-window { font-size: 0.85rem; color: var(--ink-muted); margin: 4px 0 12px; }
+    .ln-sum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
     .unreported-box { background: var(--warn-soft); border: 1px solid var(--warn); color: var(--warn); border-radius: 8px; padding: 8px 10px; font-size: 0.8rem; margin-bottom: 10px; line-height: 1.5; }
     .radio-group { display: flex; gap: 8px; margin-bottom: 10px; }
     .radio-card { flex: 1; text-align: center; padding: 10px 4px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; font-size: 0.9rem; background: var(--surface-sunken); user-select: none; }
@@ -823,6 +834,61 @@
   </div>
 
   <!-- תמונת קשר -->
+  <!-- ליונטים: דיווח יומי -->
+  <div id="screenLionet" class="narrow-wrap hidden">
+    <div class="card">
+      <h2>ליונט</h2>
+      <div id="lnWindow" class="ln-window"></div>
+      <div id="lnMine" class="loading-msg">טוען...</div>
+      <div id="lnHamalWrap" class="hidden">
+        <div class="home-sec" style="margin-top:14px;">באחריות החמ"ל</div>
+        <div id="lnHamal"></div>
+      </div>
+      <input type="file" id="lnPhotoInput" class="photo-input" accept="image/*" capture="environment" onchange="onLionetPhoto(this)">
+      <div id="lnStatusBox" class="status-box"></div>
+    </div>
+  </div>
+
+  <!-- ליונטים: דוח משק"ש -->
+  <div id="screenLionetReport" class="narrow-wrap hidden">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+        <h2 style="margin:0;">דוח ליונטים</h2>
+        <button type="button" class="btn-mini" onclick="loadLionetReport(true)">רענן</button>
+      </div>
+      <div id="lnrBody" class="loading-msg">טוען...</div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <h2 style="margin:0;">מצבת ליונטים</h2>
+        <button type="button" class="btn-mini home" onclick="openLionetEdit('')">הוספת ליונט</button>
+      </div>
+      <div id="lnrDevices" style="margin-top:10px;"></div>
+    </div>
+    <div class="card">
+      <h2>הגדרות</h2>
+      <div id="lnrSettings"></div>
+    </div>
+  </div>
+
+  <div id="lnEditModal" class="modal-overlay hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+    <div class="modal-box" style="max-width:460px;">
+      <h3 style="margin:0 0 10px;color:var(--olive);" id="lnEditTitle">הוספת ליונט</h3>
+      <label>מספר סידורי:</label>
+      <input type="text" id="lnEditSerial" inputmode="numeric" maxlength="12" placeholder="לדוגמה 4411" style="direction:ltr;text-align:right;">
+      <label>מחזיק:</label>
+      <input type="text" placeholder="חיפוש שם..." oninput="filterSelectOptions('lnEditHolder', this.value)">
+      <select id="lnEditHolder"></select>
+      <label>הערה (לא חובה):</label>
+      <input type="text" id="lnEditNote" maxlength="120">
+      <div class="btn-row" style="margin-top:12px;">
+        <button type="button" id="btnLnSave" class="btn-action btn-success" onclick="saveLionetEdit(false)">שמירה</button>
+        <button type="button" class="btn-action btn-secondary" onclick="document.getElementById('lnEditModal').classList.add('hidden')">ביטול</button>
+      </div>
+      <button type="button" id="btnLnRemove" class="btn-action btn-danger hidden" style="margin-top:8px;" onclick="removeLionet()">הסרה מהמצבה</button>
+    </div>
+  </div>
+
   <div id="radioPhotoModal" class="modal-overlay hidden" onclick="if(event.target===this)this.classList.add('hidden')">
     <div class="modal-box" style="max-width:560px;">
       <h3 style="margin:0 0 10px;color:var(--olive);" id="radioPhotoTitle">תמונת מכשיר</h3>
@@ -1536,7 +1602,7 @@
 
   function hideAllScreens() {
     ["screenLogin", "screenHub", "screenHome", "screenPush", "screenShavzakView", "screenSignatures", "screenAttendance",
-     "screenMaflag", "screenReports", "screenShavzakBuilder", "screenAdmin", "screenRadio", "screenShavzakon", "screenReservePlan"]
+     "screenMaflag", "screenReports", "screenShavzakBuilder", "screenAdmin", "screenRadio", "screenShavzakon", "screenReservePlan", "screenLionet", "screenLionetReport"]
       .forEach(id => document.getElementById(id).classList.add("hidden"));
   }
 
@@ -1641,7 +1707,7 @@
     const p = (currentUser && currentUser.permissions) || {};
     const map = { home: !isPlainSoldier(), shavzak_view: true, radio: true, signatures: true, shavzakon: p.shavzakon || p.adminPanel,
       attendance: p.attendanceReport || p.adminPanel, reserve: p.reservePlan || p.adminPanel,
-      shavzak_build: canBuildShavzak() };
+      shavzak_build: canBuildShavzak(), lionet: canLionet(), lionet_report: p.commsReports || p.adminPanel, radio_report: p.commsReports || p.adminPanel };
     return Boolean(map[key]);
   }
   const OLD_SHV_KEYS = ["shavzak_platoon", "shavzak_officers", "shavzak_final"];
@@ -1751,7 +1817,13 @@
   function isPlainSoldier() {
     const p = (currentUser && currentUser.permissions) || {};
     return !(p.shavzakon || p.attendanceReport || p.shavzakBuild || p.shavzakPlatoon || p.shavzakOfficers || p.shavzakFinalApproval ||
-      p.maflagReturns || p.reportsCenter || p.adminPanel || p.reservePlan);
+      p.maflagReturns || p.reportsCenter || p.adminPanel || p.reservePlan || p.commsReports || p.hamal);
+  }
+  // ליונטים: מוצג למפקדים/חמ"ל כשהמודול מופעל; למשק"ש ולשלומי תמיד (כדי להכין את המצבה מראש)
+  function canLionet() {
+    const p = (currentUser && currentUser.permissions) || {};
+    const on = Boolean(currentUser && currentUser.features && currentUser.features.lionet);
+    return Boolean((p.lionet && on) || p.commsReports || p.adminPanel);
   }
   function homeKey() { return isPlainSoldier() ? "shavzak_view" : "home"; }
 
@@ -1824,6 +1896,10 @@
   }
 
   function renderHome(res) {
+    if (res.features && currentUser && JSON.stringify(res.features) !== JSON.stringify(currentUser.features || {})) {
+      currentUser.features = res.features; saveSession();
+      if (document.getElementById("tabBar")) renderTabBar();
+    }
     const box = document.getElementById("homeBody");
     const first = String(currentUser.name || "").split(" ")[0];
     const scopeLabel = res.scope === "ALL" ? "כל הפלוגה" : res.scope;
@@ -1879,7 +1955,11 @@
         stats.push({ cls: rep.length === fws.length ? "ok" : "warn", v: String(present), k: attLbl, s: `${rep.length}/${fws.length} מסגרות דיווחו`, go: p.reportsCenter ? "reports" : "attendance" });
       }
     }
-    if (res.radios) { // מפל"ג בלבד
+    if (res.lionets && res.lionets.total) { // משק"ש
+      const l = res.lionets, miss = l.total - l.reported;
+      stats.push({ cls: miss ? (l.late ? "bad" : "warn") : "ok", v: `${l.reported}/${l.total}`, k: "ליונטים", s: miss ? `${miss} טרם דווחו` : "כולם דווחו", go: "lionet_report" });
+    }
+    if (res.radios) { // משק"ש בלבד
       const r = res.radios;
       stats.push({ cls: r.overdue.length ? "bad" : "", v: String(r.out), k: "קשרים בחוץ", s: r.overdue.length ? `${r.overdue.length} מעל 12 שעות` : `מתוך ${r.total}`, go: "radio_report" });
     }
@@ -1925,6 +2005,8 @@
       attendance: svg('<circle cx="9" cy="8" r="3.2"></circle><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"></path><path d="M15.5 5.2a3 3 0 0 1 0 5.6M17 14.6c1.8.5 3 1.9 3.5 4.4"></path>'),
       maflag: svg('<path d="M21 8l-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path>'),
       radio_report: svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path>'),
+      lionet: svg('<rect x="6" y="2.5" width="12" height="19" rx="2.5"></rect><path d="M10 18.5h4"></path><path d="M9.5 10.5l2 2 3.5-3.5"></path>'),
+      lionet_report: svg('<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 9h4M7 13h4M7 17h4"></path><path d="M14 9l1.2 1.2L17.5 8M14 14.5h3.5"></path>'),
       reports: svg('<path d="M4 4h11l5 5v11H4z"></path><path d="M15 4v5h5M8 13h8M8 17h5"></path>'),
       shavzak_build: svg('<rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><path d="M17.5 14v7M14 17.5h7"></path>'),
       shavzak_platoon: svg('<rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><path d="M17.5 14v7M14 17.5h7"></path>'),
@@ -1974,7 +2056,9 @@
       { show: Boolean(perms.shavzakon || perms.adminPanel), icon: "", title: "שבצקון", desc: "תדריך למשימה", key: "shavzakon" },
       { show: Boolean(perms.attendanceReport), icon: "", title: "נוכחות", desc: perms.attendanceAllCompany ? "כל הפלוגה" : (perms.allowedAttendanceFrameworks || []).join(", "), key: "attendance" },
       { show: Boolean(perms.maflagReturns), icon: "", title: "זיכויים", desc: "ציוד ודוחות", key: "maflag" },
-      { show: Boolean(perms.maflagReturns || perms.adminPanel), icon: "", title: "דוח קשרים", desc: "מיקום ותנועות", key: "radio_report" },
+      { show: canLionet(), icon: "", title: "ליונט", desc: "דיווח יומי", key: "lionet" },
+      { show: Boolean(perms.commsReports || perms.adminPanel), icon: "", title: "דוח קשרים", desc: "מיקום ותנועות", key: "radio_report" },
+      { show: Boolean(perms.commsReports || perms.adminPanel), icon: "", title: "דוח ליונטים", desc: "דיווח יומי ומצבה", key: "lionet_report" },
       { show: Boolean(perms.reportsCenter), icon: "", title: "דוחות", desc: "נוכחות ונשקייה", key: "reports" },
       { show: canBuildShavzak(), icon: "", title: "בניית שבצ\"ק", desc: "חלוקה, שיבוץ ואישור", key: "shavzak_build" },
       { show: Boolean(perms.adminPanel), icon: "", title: "ניהול", desc: "חיילים ומשימות", key: "admin" },
@@ -2024,6 +2108,12 @@
     if (screenKey === "shavzak_view") {
       document.getElementById("screenShavzakView").classList.remove("hidden");
       await loadSoldierShavzakTab();
+    } else if (screenKey === "lionet") {
+      document.getElementById("screenLionet").classList.remove("hidden");
+      await loadLionetScreen();
+    } else if (screenKey === "lionet_report") {
+      document.getElementById("screenLionetReport").classList.remove("hidden");
+      await loadLionetReport();
     } else if (screenKey === "radio_report") {
       document.getElementById("screenMaflag").classList.remove("hidden");
       switchMafSubTab("radio");
@@ -3736,7 +3826,7 @@
     document.getElementById("radioNextMission").innerHTML = `<option value="">-- בחר משימה --</option>` + opts;
     ["radioMission", "radioNextMission"].forEach((id, i) => { document.getElementById(id).value = keep[i]; });
     document.querySelectorAll(".radio-photo-lbl").forEach(el => {
-      el.textContent = res.photoRequired ? "(חובה - המפל\"ג ביקש)" : "(רשות)";
+      el.textContent = res.photoRequired ? "(חובה - המשק\"ש ביקש)" : "(רשות)";
       el.style.color = res.photoRequired ? "var(--signal)" : "var(--ink-muted)";
     });
     fillSelect("radioNextSoldier", sortSoldiersByFw(res.soldiers).map(s => ({ value: s.key, label: `${s.name} (${s.framework})` })), "-- בחר חייל --");
@@ -3850,7 +3940,7 @@
     const note = document.getElementById("radioMissionOther").value.trim();
     if (!mission) { toast("בחר משימה", "err"); return; }
     if (mission === "אחר" && !note) { toast("פרט את המשימה", "err"); return; }
-    if (radioData.photoRequired && !radioPhotos.sign) { toast("המפל\"ג ביקש לצלם את המכשיר", "err"); return; }
+    if (radioData.photoRequired && !radioPhotos.sign) { toast("המשק\"ש ביקש לצלם את המכשיר", "err"); return; }
     const btn = document.getElementById("btnRadioSign");
     setBtnBusy(btn, true, radioPhotos.sign ? "שולח (כולל תמונה)..." : "חותם...");
     const res = await apiCall({ action: "radio_sign", device: radioPicked, mission, missionNote: note, photo: radioPhotos.sign, force: Boolean(force) }, 90000);
@@ -3880,7 +3970,7 @@
       if (!payload.mission) { toast("בחר משימה לחייל הבא", "err"); return; }
       if (payload.mission === "אחר" && !payload.missionNote) { toast("פרט את המשימה", "err"); return; }
     }
-    if (radioData.photoRequired && !radioPhotos.return) { toast("המפל\"ג ביקש לצלם את המכשיר", "err"); return; }
+    if (radioData.photoRequired && !radioPhotos.return) { toast("המשק\"ש ביקש לצלם את המכשיר", "err"); return; }
     const btn = document.getElementById("btnRadioReturn");
     setBtnBusy(btn, true, "שולח...");
     const res = await apiCall(payload, 90000);
@@ -3937,12 +4027,12 @@
     </div>`).join("") || '<div style="color:var(--ink-muted);text-align:center;padding:10px;">אין תנועות</div>';
   }
 
-  async function showRadioPhoto(id, title) {
+  async function showRadioPhoto(id, title, action) {
     document.getElementById("radioPhotoTitle").textContent = "" + title;
     const body = document.getElementById("radioPhotoBody");
     body.className = "loading-msg"; body.textContent = "טוען תמונה...";
     document.getElementById("radioPhotoModal").classList.remove("hidden");
-    const res = await apiCall({ action: "radio_photo", photoId: id });
+    const res = await apiCall({ action: action || "radio_photo", photoId: id });
     if (!isOk(res)) { body.textContent = "" + res.message; return; }
     body.className = "";
     body.innerHTML = `<img src="${res.dataUrl}" style="max-width:100%;border-radius:8px;" alt="תמונת מכשיר">`;
@@ -3972,15 +4062,234 @@
     window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(msg), "_blank");
   }
 
+
+  // ==========================================
+  // ליונטים
+  // ==========================================
+  let lnData = null;
+  let lnPhotoFor = null; // { serial, kind: "check"|"deposit" }
+  const lnPhotos = {};   // serial -> dataUrl
+
+  async function loadLionetScreen(fresh) {
+    if (fresh) hideBox("lnStatusBox");
+    if (fresh || !swrGet({ action: "lionet_status" })) document.getElementById("lnMine").className = "loading-msg", document.getElementById("lnMine").textContent = "טוען...";
+    await apiSWR({ action: "lionet_status" }, res => { if (currentScreen === "lionet") renderLionetScreen(res); }, { fresh: Boolean(fresh) });
+  }
+
+  function lnWhenText(ms) { return ms ? fmtTime(ms).slice(-5) : ""; }
+
+  function lnDeviceCard(d, ctx) {
+    const cfg = lnData.config;
+    const late = lnData.late && !d.reported;
+    const ph = lnPhotos[d.serial];
+    let status, sub;
+    if (ctx === "mine" && d.deposited) { status = `<span class="chip info">מופקד בחמ"ל</span>`; sub = `הופקד ${fmtTime(d.since)} · החמ"ל מדווח עליו עד שתחזור`; }
+    else if (d.reported) { status = `<span class="chip ok">דווח ${lnWhenText(d.lastReport)}</span>`; sub = d.reportedBy && d.reportedBy !== currentUser.name ? `ע"י ${escapeHtml(d.reportedBy)}` : ""; }
+    else if (!lnData.open) { status = `<span class="chip">נפתח ב-${escapeHtml(cfg.start)}</span>`; sub = ""; }
+    else { status = `<span class="chip ${late ? "bad" : "warn"}">${late ? "באיחור" : "טרם דווח"}</span>`; sub = `יש לדווח עד ${escapeHtml(cfg.deadline)}`; }
+    if (ctx === "hamal") sub = (d.hamalDevice ? "מכשיר החמ\"ל" : `של ${escapeHtml(d.holder.name)} (${escapeHtml(d.holder.framework)}) · הופקד ${fmtTime(d.since)}`) + (d.reported && d.reportedBy ? ` · דווח ע"י ${escapeHtml(d.reportedBy)}` : "");
+    const s = escapeHtml(d.serial);
+    let actions = "";
+    const canCheck = lnData.open && !d.reported && !(ctx === "mine" && d.deposited);
+    if (canCheck) {
+      actions += `<label class="photo-pick${ph ? " has" : ""}" style="flex:1 1 100%;margin:0;" onclick="pickLionetPhoto('${s}')"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>${ph ? "התמונה נקלטה · לצלם שוב" : "צלם את הליונט" + (cfg.photoRequired ? "" : " (רשות)")}</span></label>`;
+      if (ph) actions += `<img src="${ph}" class="radio-photo-prev" alt="תצוגה מקדימה" style="flex:1 1 100%;">`;
+      actions += `<button type="button" class="btn-action btn-success" data-s="${s}" onclick="lionetCheckIn(this)">${ctx === "hamal" ? "הליונט בחמ\"ל" : "הליונט אצלי"}</button>`;
+    }
+    if (ctx === "mine" && !d.deposited) actions += `<button type="button" class="btn-action btn-secondary" data-s="${s}" onclick="lionetDeposit(this)">יוצא הביתה · מפקיד בחמ"ל</button>`;
+    if (ctx === "mine" && d.deposited) actions += `<button type="button" class="btn-action btn-success" data-s="${s}" onclick="lionetReturn(this)">חזרתי · הליונט אצלי</button>`;
+    return `<div class="ln-dev${d.reported ? " done" : late && !(ctx === "mine" && d.deposited) ? " late" : ""}">
+      <div class="ln-head"><div><div class="ln-serial">${s}</div><div class="ln-sub">${sub}</div></div>${status}</div>
+      ${actions ? `<div class="ln-actions">${actions}</div>` : ""}</div>`;
+  }
+
+  function renderLionetScreen(res) {
+    const mineBox = document.getElementById("lnMine");
+    if (!isOk(res)) { mineBox.className = "loading-msg"; mineBox.textContent = res.message || "שגיאה"; return; }
+    lnData = res;
+    mineBox.className = "";
+    const cfg = res.config;
+    document.getElementById("lnWindow").textContent = (cfg.enabled ? "" : "המודול עדיין לא הופעל לכלל המפקדים. ") +
+      `דיווח יומי בין ${cfg.start} ל-${cfg.deadline}` + (cfg.photoRequired ? ", כולל צילום הליונט." : ".");
+    mineBox.innerHTML = res.mine.length ? res.mine.map(d => lnDeviceCard(d, "mine")).join("")
+      : res.isHamal ? "" : `<div class="item-box" style="text-align:center;color:var(--ink-muted);">אין ליונט שרשום עליך.</div>`;
+    document.getElementById("lnHamalWrap").classList.toggle("hidden", !res.isHamal);
+    document.getElementById("lnHamal").innerHTML = res.hamal.length ? res.hamal.map(d => lnDeviceCard(d, "hamal")).join("")
+      : `<div class="item-box" style="text-align:center;color:var(--ink-muted);">אין כרגע ליונטים באחריות החמ"ל.</div>`;
+  }
+
+  function pickLionetPhoto(serial) { lnPhotoFor = serial; const inp = document.getElementById("lnPhotoInput"); inp.value = ""; inp.click(); }
+  async function onLionetPhoto(input) {
+    const file = input.files && input.files[0];
+    if (!file || !lnPhotoFor) return;
+    try { lnPhotos[lnPhotoFor] = await compressImage(file, 1280, 0.72); renderLionetScreen(lnData); }
+    catch (e) { toast(e.message, "err"); }
+  }
+
+  async function lnAct(btn, payload, busy) {
+    setBtnBusy(btn, true, busy);
+    const res = await apiCall(payload, 90000);
+    setBtnBusy(btn, false);
+    showBox("lnStatusBox", res.message, isOk(res));
+    toast(res.message, isOk(res) ? "ok" : "err");
+    if (isOk(res)) { delete lnPhotos[payload.serial]; await loadLionetScreen(true); }
+  }
+  function lionetCheckIn(btn) {
+    const serial = btn.dataset.s;
+    if (lnData.config.photoRequired && !lnPhotos[serial]) { toast("יש לצלם את הליונט", "err"); return; }
+    lnAct(btn, { action: "lionet_check_in", serial, photo: lnPhotos[serial] || null }, lnPhotos[serial] ? "שולח (כולל תמונה)..." : "שולח...");
+  }
+  function lionetDeposit(btn) {
+    const serial = btn.dataset.s;
+    confirmModal("הפקדה בחמ\"ל", `להפקיד את ליונט ${serial} בחמ"ל?\nעד שתחזור, החמ"ל ידווח עליו כל יום.`, "הפקדתי", () => lnAct(btn, { action: "lionet_deposit", serial }, "שולח..."));
+  }
+  function lionetReturn(btn) { lnAct(btn, { action: "lionet_return", serial: btn.dataset.s }, "שולח..."); }
+
+  // --- דוח ליונטים (משק"ש) ---
+  let lnReport = null;
+  async function loadLionetReport(fresh) {
+    const body = document.getElementById("lnrBody");
+    if (fresh || !swrGet({ action: "lionet_report" })) { body.className = "loading-msg"; body.textContent = "טוען דוח ליונטים..."; }
+    await apiSWR({ action: "lionet_report" }, res => { if (currentScreen === "lionet_report") renderLionetReport(res); }, { fresh: Boolean(fresh) });
+  }
+
+  function lnWhere(d) { return d.hamalDevice ? "חמ\"ל" : escapeHtml(d.holder.name); }
+
+  function renderLionetReport(res) {
+    const body = document.getElementById("lnrBody");
+    if (!isOk(res)) { body.className = "loading-msg"; body.textContent = res.message || "שגיאה"; return; }
+    lnReport = res;
+    body.className = "";
+    const cfg = res.config, devs = res.devices;
+    const done = devs.filter(d => d.reported), missing = devs.filter(d => !d.reported), dep = devs.filter(d => d.deposited);
+    const camBtn = d => d.photoId ? `<button type="button" class="btn-mini" style="padding:0 8px;" data-id="${escapeHtml(d.photoId)}" data-t="ליונט ${escapeHtml(d.serial)}" onclick="showRadioPhoto(this.dataset.id, this.dataset.t, 'lionet_photo')" aria-label="תמונה"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>` : "";
+    let h = `<div class="ln-window">${cfg.enabled ? "" : "<strong style=\"color:var(--warn);\">המודול כבוי</strong> · "}דיווח בין ${escapeHtml(cfg.start)} ל-${escapeHtml(cfg.deadline)}</div>`;
+    if (!devs.length) { body.innerHTML = h + `<div class="item-box" style="text-align:center;">אין עדיין ליונטים במצבה. מוסיפים בכרטיס "מצבת ליונטים" למטה.</div>`; renderLionetDevices(); renderLionetSettings(); return; }
+    h += `<div class="ln-sum">
+      <div class="stat ok"><div class="st-v">${done.length}</div><div class="st-k">דווחו</div></div>
+      <div class="stat ${missing.length ? (res.late ? "bad" : "warn") : "ok"}"><div class="st-v">${missing.length}</div><div class="st-k">טרם דווחו</div></div>
+      <div class="stat"><div class="st-v">${dep.length}</div><div class="st-k">בחמ"ל</div></div></div>`;
+    const row = d => `<tr><td style="font-weight:800;direction:ltr;">${escapeHtml(d.serial)}</td>
+      <td>${lnWhere(d)}${d.holder ? `<br><span style="color:var(--ink-muted);font-size:0.75rem;">${escapeHtml(d.holder.framework)}</span>` : ""}${d.deposited ? `<br><span class="chip info">בחמ"ל</span>` : ""}</td>
+      <td>${d.reported ? `<span class="chip ok">${lnWhenText(d.lastReport)}</span>${d.reportedBy ? `<br><span style="font-size:0.75rem;color:var(--ink-muted);">${escapeHtml(d.reportedBy)}</span>` : ""}` : `<span class="chip ${res.late ? "bad" : "warn"}">${res.open ? (res.late ? "לא דווח" : "טרם") : "—"}</span>`}</td>
+      <td>${camBtn(d)}</td></tr>`;
+    const sorted = missing.concat(done);
+    h += `<div style="overflow-x:auto;"><table class="rr-table"><thead><tr><th>ליונט</th><th>אחראי</th><th>היום</th><th></th></tr></thead><tbody>${sorted.map(row).join("")}</tbody></table></div>`;
+    h += `<div class="btn-row" style="margin-top:10px;"><button type="button" class="btn-action btn-wa" onclick="shareLionetReport()">שלח לוואטסאפ</button></div>`;
+    h += `<div style="font-weight:bold;color:var(--olive);margin:16px 0 6px;">תנועות אחרונות</div>
+      <input type="text" placeholder="סינון לפי מספר / שם..." oninput="renderLionetMoves(this.value)" style="padding:8px;">
+      <div id="lnrMoves"></div>
+      <div style="font-size:0.75rem;color:var(--ink-muted);margin-top:6px;">היומן המלא נמצא בגיליון "יומן_ליונטים".</div>`;
+    body.innerHTML = h;
+    renderLionetMoves("");
+    renderLionetDevices();
+    renderLionetSettings();
+  }
+
+  function renderLionetMoves(filter) {
+    const f = cleanHebrewText(filter);
+    const list = lnReport.moves.filter(m => !f || m.serial === f || [m.holder, m.by].some(x => String(x || "").includes(f)));
+    document.getElementById("lnrMoves").innerHTML = list.slice(0, 80).map(m => `<div class="rr-move">
+      <div style="display:flex;justify-content:space-between;gap:6px;"><strong>${escapeHtml(m.serial)} · ${escapeHtml(m.action)}</strong><span style="color:var(--ink-muted);white-space:nowrap;">${fmtTime(m.ts)}</span></div>
+      <div>${escapeHtml(m.holder)}${m.by ? ` · ע"י ${escapeHtml(m.by)}` : ""}
+      ${m.photoId ? `<button type="button" class="btn-mini" style="padding:2px 7px;height:26px;" data-id="${escapeHtml(m.photoId)}" data-t="ליונט ${escapeHtml(m.serial)} ${fmtTime(m.ts)}" onclick="showRadioPhoto(this.dataset.id, this.dataset.t, 'lionet_photo')" aria-label="תמונה"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>` : ""}</div>
+    </div>`).join("") || '<div style="color:var(--ink-muted);text-align:center;padding:10px;">אין תנועות</div>';
+  }
+
+  function renderLionetDevices() {
+    const box = document.getElementById("lnrDevices");
+    const devs = (lnReport.devices || []).slice().sort((a, b) => String(a.serial).localeCompare(String(b.serial), "he", { numeric: true }));
+    box.innerHTML = devs.length ? devs.map(d => `<div class="radio-mine-item" style="background:var(--surface);border-color:var(--line);">
+        <div><strong style="direction:ltr;display:inline-block;">${escapeHtml(d.serial)}</strong> · ${lnWhere(d)}${d.holder ? ` <span style="color:var(--ink-muted);font-size:0.8rem;">(${escapeHtml(d.holder.framework)})</span>` : ""}
+        ${d.note ? `<div style="font-size:0.78rem;color:var(--ink-muted);">${escapeHtml(d.note)}</div>` : ""}</div>
+        <button type="button" class="btn-mini" data-s="${escapeHtml(d.serial)}" onclick="openLionetEdit(this.dataset.s)">עריכה</button></div>`).join("")
+      : `<div style="color:var(--ink-muted);text-align:center;">המצבה ריקה</div>`;
+  }
+
+  function openLionetEdit(serial) {
+    const d = serial ? lnReport.devices.find(x => x.serial === serial) : null;
+    document.getElementById("lnEditTitle").textContent = d ? `ליונט ${serial}` : "הוספת ליונט";
+    const se = document.getElementById("lnEditSerial");
+    se.value = d ? d.serial : ""; se.disabled = Boolean(d);
+    const items = [{ value: "hamal", label: "חמ\"ל (מכשיר החמ\"ל)" }].concat(sortSoldiersByFw(lnReport.soldiers).map(s => ({ value: s.key, label: `${s.name} (${s.framework})` })));
+    fillSelect("lnEditHolder", items, "-- בחר מחזיק --");
+    const sel = document.getElementById("lnEditHolder");
+    if (d) sel.value = d.hamalDevice ? "hamal" : ((lnReport.soldiers.find(s => s.name === d.holder.name && s.framework === d.holder.framework) || {}).key || "");
+    document.getElementById("lnEditNote").value = d ? (d.note || "") : "";
+    document.getElementById("btnLnRemove").classList.toggle("hidden", !d);
+    document.getElementById("lnEditModal").classList.remove("hidden");
+  }
+
+  async function saveLionetEdit(allowSecond) {
+    const serial = document.getElementById("lnEditSerial").value.trim();
+    const holderKey = document.getElementById("lnEditHolder").value;
+    if (!/^[0-9A-Za-z-]{2,12}$/.test(serial)) { toast("מספר סידורי לא תקין", "err"); return; }
+    if (!holderKey) { toast("בחר מחזיק", "err"); return; }
+    const btn = document.getElementById("btnLnSave");
+    setBtnBusy(btn, true, "שומר...");
+    const res = await apiCall({ action: "lionet_admin_save", serial, holderKey, note: document.getElementById("lnEditNote").value, allowSecond: Boolean(allowSecond) });
+    setBtnBusy(btn, false);
+    if (res.status === "confirm") { confirmModal("ליונט נוסף", res.message, "כן, לשייך", () => saveLionetEdit(true)); return; }
+    toast(res.message, isOk(res) ? "ok" : "err");
+    if (isOk(res)) { document.getElementById("lnEditModal").classList.add("hidden"); loadLionetReport(true); }
+  }
+
+  function removeLionet() {
+    const serial = document.getElementById("lnEditSerial").value.trim();
+    confirmModal("הסרה מהמצבה", `להסיר את ליונט ${serial} מהמצבה?\nההיסטוריה נשארת ביומן.`, "הסרה", async () => {
+      const res = await apiCall({ action: "lionet_admin_save", serial, remove: true });
+      toast(res.message, isOk(res) ? "ok" : "err");
+      if (isOk(res)) { document.getElementById("lnEditModal").classList.add("hidden"); loadLionetReport(true); }
+    });
+  }
+
+  function renderLionetSettings() {
+    const c = lnReport.config;
+    document.getElementById("lnrSettings").innerHTML = `
+      <div style="display:flex;gap:10px;">
+        <div style="flex:1;"><label>פתיחת הדיווח:</label><input type="time" id="lnCfgStart" value="${escapeHtml(c.start)}"></div>
+        <div style="flex:1;"><label>שעה אחרונה:</label><input type="time" id="lnCfgDeadline" value="${escapeHtml(c.deadline)}"></div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-weight:600;"><input type="checkbox" id="lnCfgPhoto" style="width:20px;height:20px;" ${c.photoRequired ? "checked" : ""}> צילום חובה בכל דיווח</label>
+      <div class="ln-sub" style="margin:6px 0;">רבע שעה לפני השעה האחרונה נשלחת התראה למי שלא דיווח, ולמשק"ש רשימה של כל מי שחסר.</div>
+      <button type="button" class="btn-action btn-primary" onclick="saveLionetSettings()">שמירת הגדרות</button>
+      ${lnReport.canEnable ? `<button type="button" class="btn-action ${c.enabled ? "btn-danger" : "btn-success"}" style="margin-top:8px;" onclick="toggleLionetEnabled(${!c.enabled})">${c.enabled ? "כיבוי המודול" : "הפעלת המודול לכל המפקדים"}</button>` : ""}`;
+  }
+  async function saveLionetSettings() {
+    const res = await apiCall({ action: "lionet_config_save", start: document.getElementById("lnCfgStart").value, deadline: document.getElementById("lnCfgDeadline").value, photoRequired: document.getElementById("lnCfgPhoto").checked });
+    toast(res.message, isOk(res) ? "ok" : "err");
+    if (isOk(res)) loadLionetReport(true);
+  }
+  function toggleLionetEnabled(on) {
+    confirmModal(on ? "הפעלת מודול הליונטים" : "כיבוי מודול הליונטים", on ? "המפקדים והחמ\"ל יראו את מסך הליונט ויקבלו תזכורות כל יום." : "המסך והתזכורות יוסתרו מהמפקדים.", on ? "הפעלה" : "כיבוי", async () => {
+      const res = await apiCall({ action: "lionet_config_save", enabled: on });
+      toast(on ? "המודול הופעל" : "המודול כובה", isOk(res) ? "ok" : "err");
+      if (isOk(res)) { if (currentUser) { currentUser.features = Object.assign({}, currentUser.features, { lionet: on }); saveSession(); } loadLionetReport(true); }
+    });
+  }
+
+  function shareLionetReport() {
+    const r = lnReport;
+    const missing = r.devices.filter(d => !d.reported);
+    const done = r.devices.filter(d => d.reported);
+    const who = d => d.hamalDevice ? "חמ\"ל" : d.holder.name + (d.deposited ? " (בחמ\"ל)" : "");
+    const msg = `*📱 דוח ליונטים - מסייעת 8109* (${fmtTime(Date.now())})\n\n✅ *דווחו (${done.length}/${r.devices.length})*\n` +
+      (done.length ? done.map(d => `• ${d.serial} - ${who(d)} - ${lnWhenText(d.lastReport)}`).join("\n") : "אין") +
+      `\n\n⚠️ *טרם דווחו (${missing.length}):*\n` + (missing.length ? missing.map(d => `• ${d.serial} - ${who(d)}`).join("\n") : "אין");
+    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(msg), "_blank");
+  }
+
   // ==========================================
   // טופס זיכויים (מפל"ג)
   // ==========================================
   function switchMafSubTab(tab) {
+    const canRadio = (() => { const p = (currentUser && currentUser.permissions) || {}; return Boolean(p.commsReports || p.adminPanel); })();
+    if (!canRadio && tab === "radio") tab = "card";
     document.getElementById("tabMafCardBtn").className = "btn-tab" + (tab === "card" ? " active" : "");
     document.getElementById("tabMafRepBtn").className = "btn-tab" + (tab === "rep" ? " active" : "");
     document.getElementById("mafCardSection").classList.toggle("hidden", tab !== "card");
     document.getElementById("mafRepSection").classList.toggle("hidden", tab !== "rep");
-    document.getElementById("tabMafRadioBtn").className = "btn-tab" + (tab === "radio" ? " active" : "");
+    document.getElementById("tabMafRadioBtn").className = "btn-tab" + (tab === "radio" ? " active" : "") + (canRadio ? "" : " hidden");
     document.getElementById("mafRadioSection").classList.toggle("hidden", tab !== "radio");
     if (tab === "radio") loadRadioReport();
   }
