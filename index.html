@@ -512,7 +512,7 @@
   <!-- מסך 3: שבצק - צפיה -->
   <div id="screenShavzakView" class="narrow-wrap hidden">
     <div class="card">
-      <h2>שבצק - צפיה</h2>
+      <h2>שבצ"ק</h2>
       <div id="soldierPushSlot"></div>
       <div id="soldierTodo"></div>
       <div id="soldierShvLoading" class="loading-msg">טוען משימות שבצ"ק...</div>
@@ -879,6 +879,7 @@
       <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">
         <h2 style="margin:0;" id="shvBuilderTitle">בניית שבצ"ק</h2>
         <span id="shvDateLine" class="shv-date-line"></span>
+        <button type="button" class="btn-mini" onclick="navTab('shavzak_view')">לצפייה בשבצ"ק</button>
         <button type="button" id="btnToggleSkeletonMode" class="hidden" onclick="toggleSkeletonEditMode()"></button>
       </div>
       <div id="shvSteps" class="shv-steps"></div>
@@ -3755,7 +3756,7 @@
       const x = d.devices[radioPicked - 1];
       info.classList.remove("hidden");
       info.innerHTML = x.atHamal ? `קשר ${x.device} נמצא בחמ"ל - פנוי.`
-        : x.mine ? `ℹ️ קשר ${x.device} כבר רשום עליך.`
+        : x.mine ? `קשר ${x.device} כבר רשום עליך.`
         : `קשר ${x.device} רשום על <strong>${escapeHtml(x.holder.name)}</strong> (${escapeHtml(x.holder.framework)}) - ${escapeHtml(missionText(x.mission, x.missionNote))}, מאז ${fmtTime(x.since)}.`;
     } else info.classList.add("hidden");
 
@@ -4201,7 +4202,7 @@
       if (vacs.length) excLines.push(`• חופשות (${vacs.length}): ${vacs.join(", ")}`);
       if (others.length) excLines.push(`• אחר (${others.length}): ${others.join(", ")}`);
       if (notRep.length) excLines.push(`• לא דווחו (${notRep.length}): ${notRep.join(", ")}`);
-      msg = `*דוח נוכחות ${targetFw === "ALL" ? "פלוגתי" : "- " + targetFw} - ${iso}*\n\n` +
+      msg = `*דוח נוכחות ${targetFw === "ALL" ? "פלוגתי" : "- " + targetFw} - ${isoToEur(iso)}*\n\n` +
         `📊 *תמונת מצב כללית:*\n` +
         `• סה"כ רשומים: ${tot}\n` +
         `• נוכחים בפועל: ${presS}+${presC} (סה"כ ${presS + presC})\n` +
