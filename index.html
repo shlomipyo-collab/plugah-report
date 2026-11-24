@@ -270,6 +270,71 @@
     .rr-hamal { background: var(--ok-soft); border: 1px solid var(--ok); color: var(--ok); border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
     .rr-move { border-bottom: 1px solid var(--line); padding: 7px 2px; font-size: 0.83rem; }
     .rr-move:last-child { border-bottom: none; }
+    /* ===== ניהול (שלומי) ===== */
+    .mk-title-row { display: flex; align-items: center; gap: 10px; margin: 4px 0 12px; min-height: 36px; }
+    .mk-h1 { font-family: var(--font-display); font-size: 22px; margin: 0; flex: 1; }
+    .mk-back { background: none; border: none; color: var(--olive); font-weight: 600; font-size: 15px; padding: 6px 2px; cursor: pointer; white-space: nowrap; }
+    .mk-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .mk-stats .stat { font: inherit; color: inherit; width: 100%; }
+    .mk-tile { font: inherit; color: inherit; width: 100%; }
+    .mk-tile .hub-icon svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .mk-quick { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .mk-seg { display: flex; background: var(--surface-sunken); border-radius: 10px; padding: 3px; margin-bottom: 10px; }
+    .mk-seg button { flex: 1; border: none; background: none; padding: 8px; border-radius: 8px; font-weight: 600; color: var(--ink-muted); cursor: pointer; }
+    .mk-seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-card); }
+    .mk-search { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 2px 0 6px; }
+    .mk-search input { margin: 0; }
+    .mk-chips { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: none; }
+    .mk-chips button { flex: none; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .mk-chips button.on { background: var(--olive); border-color: var(--olive); color: var(--on-olive); }
+    .mk-group { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--ink-muted); margin: 12px 2px 6px; display: flex; justify-content: space-between; }
+    .mk-row { display: flex; align-items: center; gap: 10px; width: 100%; text-align: right; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin-bottom: 6px; cursor: pointer; color: var(--ink); }
+    .mk-row.off { opacity: .55; }
+    .mk-avatar { flex: none; width: 38px; height: 38px; border-radius: 50%; background: var(--olive-soft); color: var(--olive); display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; }
+    .mk-head .mk-avatar { width: 52px; height: 52px; font-size: 20px; }
+    .mk-row .nm { font-weight: 600; }
+    .mk-row .sub { font-size: 12px; color: var(--ink-muted); }
+    .mk-row .end { margin-inline-start: auto; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; justify-content: flex-end; max-width: 45%; }
+    .mk-row .chev { color: var(--ink-muted); font-size: 18px; }
+    .mk-head { display: flex; gap: 12px; align-items: center; }
+    .mk-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; }
+    .mk-meta { font-size: 13px; color: var(--ink-muted); }
+    .mk-tabs { display: flex; gap: 4px; margin: 10px 0; border-bottom: 1px solid var(--line); }
+    .mk-tabs button { flex: 1; background: none; border: none; border-bottom: 2.5px solid transparent; padding: 9px 2px; font-weight: 600; color: var(--ink-muted); cursor: pointer; }
+    .mk-tabs button.on { color: var(--olive); border-bottom-color: var(--olive); }
+    .mk-sub { font-size: 12.5px; color: var(--ink-muted); line-height: 1.45; }
+    .mk-sw-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+    .mk-sw { position: relative; width: 46px; height: 26px; flex: none; margin: 0; }
+    .mk-sw input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .mk-sw span { position: absolute; inset: 0; background: var(--line); border: 1px solid var(--line-strong); border-radius: 999px; transition: .15s; cursor: pointer; }
+    .mk-sw span::after { content: ""; position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.3); transition: .15s; }
+    .mk-sw input:checked + span { border-color: var(--olive); }
+    .mk-sw input:checked + span { background: var(--olive); }
+    .mk-sw input:checked + span::after { right: 23px; }
+    .mk-role { display: flex; gap: 10px; align-items: flex-start; padding: 10px; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 6px; cursor: pointer; }
+    .mk-role.on { border-color: var(--olive); background: var(--olive-soft); }
+    .mk-role input { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: var(--olive); }
+    .mk-role b { display: block; }
+    .mk-role.locked { opacity: .6; cursor: default; }
+    .mk-gets { background: var(--surface-sunken); border-radius: 10px; padding: 10px 12px; margin: 10px 0; font-size: 13px; line-height: 1.7; }
+    .mk-pills { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 10px; }
+    .mk-pills button { flex: 1; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 8px; font-weight: 600; cursor: pointer; }
+    .mk-pills button.on { background: var(--olive); border-color: var(--olive); color: var(--on-olive); }
+    .mk-kv { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .mk-log { display: grid; grid-template-columns: 50px 1fr auto; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .mk-tools button { display: grid; grid-template-columns: 1fr auto; text-align: right; width: 100%; background: none; border: none; border-bottom: 1px solid var(--line); padding: 11px 2px; cursor: pointer; color: var(--ink); }
+    .mk-tools button:last-child { border-bottom: none; }
+    .mk-tools .mk-sub { grid-column: 1; }
+    .mk-tools i { grid-row: 1 / span 2; grid-column: 2; align-self: center; font-style: normal; color: var(--ink-muted); font-size: 18px; }
+    .mk-hint { background: var(--info-soft); color: var(--info); border-radius: 10px; padding: 8px 12px; font-size: 13px; margin-bottom: 8px; font-weight: 600; }
+    .mk-rolegrp { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
+    .mk-rolegrp h3 { margin: 0 0 2px; font-family: var(--font-display); font-size: 16px; display: flex; justify-content: space-between; }
+    .mk-namechip { display: inline-block; border: 1px solid var(--line-strong); border-radius: 999px; padding: 3px 10px; margin: 6px 0 0 4px; font-size: 13px; background: var(--surface-sunken); cursor: pointer; color: var(--ink); }
+    .mk-task { display: flex; justify-content: space-between; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 6px; }
+    .chip.mute { background: var(--surface-sunken); color: var(--ink-muted); }
+
+    #screenAdmin button.hub-tile, #screenAdmin .mk-row, #screenAdmin .mk-namechip { font: inherit; }
+
     .ln-dev { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
     .ln-dev.done { border-color: var(--ok); background: var(--ok-soft); }
     .ln-dev.late { border-color: var(--signal); }
@@ -1058,85 +1123,143 @@
 
   <!-- מסך 9: ממשק אדמין -->
   <div id="screenAdmin" class="narrow-wrap hidden">
-    <div class="card">
-      <h2>תיקון דיווח לחייל</h2>
-      <label>תאריך:</label><input type="date" id="uDate">
-      <label>חיפוש חייל:</label><input type="text" placeholder="סנן שם..." oninput="filterSelectOptions('uSoldier', this.value, onAdmSoldierSelect)">
-      <label>בחר חייל:</label><select id="uSoldier" onchange="onAdmSoldierSelect()"></select>
-      <label>סטטוס ראשי:</label>
-      <select id="uMainStatus" onchange="syncAdmSubOptions()">
-        <option value="נוכח">נוכח</option>
-        <option value="אינו נוכח">אינו נוכח</option>
-        <option value="לא פעיל">העבר ללא פעיל</option>
-      </select>
-      <label>סטטוס משני:</label><select id="uSubStatus"></select>
-      <label>הערה:</label><input type="text" id="uNotes">
-      <button type="button" class="btn-action btn-primary" onclick="submitAdmSingleUpdate(this)">עדכן חייל</button>
-      <div id="uStatus" class="status-box"></div>
-    </div>
-
-    <div class="card">
-      <h2>הוספת חייל חדש</h2>
-      <label>שם מלא: *</label><input type="text" id="aName" placeholder="ישראל ישראלי">
-      <label>מספר אישי: *</label><input type="text" id="aPn" placeholder="8123456" inputmode="numeric">
-      <label>מסגרת: *</label><select id="aFw"></select>
-      <label>הרשאה (ניתן להפריד בפסיק):</label>
-      <input type="text" id="aRole" value="חייל" placeholder="חייל / מפקד / קצין / מפל&quot;ג / פיקוד עליון / שלומי">
-      <div class="checkbox-row"><input type="checkbox" id="aActive" checked><label for="aActive">פעיל בשמ"פ?</label></div>
-      <button type="button" class="btn-action btn-success" onclick="submitAdmAddSoldier(this)">שמור והוסף</button>
-      <div id="aStatus" class="status-box"></div>
-    </div>
-
-    <div class="card">
-      <h2>העברת חייל בין מסגרות</h2>
-      <label>חיפוש חייל:</label><input type="text" placeholder="סנן..." oninput="filterSelectOptions('mSoldier', this.value)">
-      <label>חייל:</label><select id="mSoldier"></select>
-      <label>מסגרת יעד:</label><select id="mNewFw"></select>
-      <button type="button" class="btn-action btn-purple" onclick="submitAdmMoveSoldier(this)">העבר מסגרת</button>
-      <div id="mStatus" class="status-box"></div>
-    </div>
-
-    <div class="card" style="border-color:var(--info);">
-      <h2>ניהול משימות לשבצ"ק</h2>
-      <div style="font-size:0.82rem;color:var(--ink-muted);margin-bottom:10px;line-height:1.5;">
-        לכל משימה מסמנים באילו ימים היא פעילה. כך בונים שבצ"ק מותאם לשישי ולשבת: למשל "שמירה" עם 3 משמרות בימי חול, ו"שמירה" עם 4 משמרות רק בשישי-שבת (אפשר לשכפל משימה ולשנות).
+    <!-- ראשי -->
+    <div id="admHome" class="adm-view">
+      <div class="mk-title-row"><h1 class="mk-h1">ניהול</h1></div>
+      <div class="mk-stats" id="admStats"></div>
+      <div class="hub-grid" style="margin-top:14px;">
+        <button type="button" class="hub-tile mk-tile" onclick="admGo('people')"><div class="hub-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><path d="M15.5 5.2a3 3 0 0 1 0 5.6M17 14.6c1.8.5 3 1.9 3.5 4.4"/></svg></div><div class="hub-title">אנשים</div><div class="hub-desc">חיילים, הרשאות, סיסמאות</div></button>
+        <button type="button" class="hub-tile mk-tile" onclick="admGo('tasks')"><div class="hub-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M9 10h6M9 14h6M9 18h3"/></svg></div><div class="hub-title">משימות</div><div class="hub-desc">שבצ"ק ושבצקון</div></button>
+        <button type="button" class="hub-tile mk-tile" onclick="openScreen('push_admin')"><div class="hub-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div><div class="hub-title">התראות</div><div class="hub-desc">שליחה, תזמון ויומן</div></button>
+        <button type="button" class="hub-tile mk-tile" onclick="admGo('system')"><div class="hub-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></div><div class="hub-title">מערכת</div><div class="hub-desc">מודולים וכלים</div></button>
       </div>
-      <label>הצג משימות ליום:</label>
-      <select id="tasksDayFilter" onchange="renderAdminTasks()">
-        <option value="ALL">כל המשימות</option>
-        <option value="0">ראשון</option><option value="1">שני</option><option value="2">שלישי</option>
-        <option value="3">רביעי</option><option value="4">חמישי</option><option value="5">שישי</option><option value="6">שבת</option>
-      </select>
-      <div id="adminTasksList"><div class="loading-msg">טוען משימות...</div></div>
-      <div class="btn-row">
-        <button type="button" class="btn-add-line" style="margin:0;" onclick="addAdminTask(false)">+ משימה חדשה</button>
-        <button type="button" class="btn-add-line" style="margin:0;" onclick="addAdminTask(true)">+ יזומה</button>
+      <div class="home-sec">פעולות מהירות</div>
+      <div class="mk-quick">
+        <button type="button" class="btn-mini home" onclick="admOpenAdd()">הוספת חייל</button>
+        <button type="button" class="btn-mini" onclick="admGo('people','sec')">איפוס סיסמה</button>
+        <button type="button" class="btn-mini" onclick="admGo('people','att')">תיקון דיווח</button>
       </div>
-      <button type="button" class="btn-action btn-success" style="margin-top:10px;" onclick="saveAdminTasks(this)">שמור משימות</button>
-      <div id="tasksStatus" class="status-box"></div>
     </div>
 
-    <div class="card" style="border-color:var(--olive);">
-      <h2>שבצקון - משימות וציוד</h2>
-      <div style="font-size:0.82rem;color:var(--ink-muted);margin-bottom:10px;line-height:1.5;">
-        המשימות שמופיעות בשבצקון, ולכל משימה רשימת הציוד שהמפקד בודק בכלי או במתקן (פריט בכל שורה).
-        לפריט שצריך לספור, כותבים אחרי השם קו ישר וכמות - למשל <b>מחסניות | 12</b> - והמפקד ירשום כמה יש בפועל.
-        כשלמשימה יש את אותו שם כמו בשבצ"ק, המערכת מציעה אוטומטית את הצוות והשעות מהשבצ"ק המפורסם.
+    <!-- אנשים -->
+    <div id="admPeople" class="adm-view hidden">
+      <div class="mk-title-row">
+        <button type="button" class="mk-back" onclick="admGo('home')">‹ ניהול</button>
+        <h1 class="mk-h1">אנשים</h1>
+        <button type="button" class="btn-mini home" onclick="admOpenAdd()">+ חייל</button>
       </div>
-      <div id="adminSkList"><div class="loading-msg">טוען...</div></div>
-      <button type="button" class="btn-add-line" onclick="addAdminSkMission()">+ משימה חדשה</button>
-      <button type="button" class="btn-action btn-success" style="margin-top:10px;" onclick="saveAdminSkConfig(this)">שמור משימות וציוד</button>
-      <div id="skCfgStatus" class="status-box"></div>
+      <div class="mk-seg"><button type="button" id="admSegList" class="on" onclick="admPeopleMode('list')">רשימה</button><button type="button" id="admSegRoles" onclick="admPeopleMode('roles')">לפי הרשאה</button></div>
+      <div id="admPickHint" class="mk-hint hidden"></div>
+      <div id="admListWrap">
+        <div class="mk-search"><input type="text" id="admQ" placeholder="חיפוש שם או מ&quot;א..." oninput="admRenderPeople()"></div>
+        <div class="mk-chips" id="admFwChips"></div>
+        <div class="mk-chips" id="admStChips"></div>
+        <div id="admPeopleBody" class="loading-msg">טוען...</div>
+      </div>
+      <div id="admRolesBody" class="hidden"></div>
     </div>
 
-    <div class="card">
-      <h2>איפוס סיסמה</h2>
-      <label>חיפוש חייל:</label><input type="text" placeholder="סנן..." oninput="filterSelectOptions('pSoldier', this.value)">
-      <label>חייל:</label><select id="pSoldier"></select>
-      <button type="button" class="btn-action btn-warning" onclick="submitAdmResetPassword(this)">אפס סיסמה</button>
-      <div id="pStatus" class="status-box"></div>
+    <!-- כרטיס חייל -->
+    <div id="admSoldier" class="adm-view hidden">
+      <div class="mk-title-row"><button type="button" class="mk-back" onclick="admGo('people')">‹ אנשים</button></div>
+      <div class="card mk-head">
+        <div class="mk-avatar" id="admSAv"></div>
+        <div style="flex:1;min-width:0;"><div class="mk-name" id="admSName"></div><div class="mk-meta" id="admSMeta"></div><div id="admSChips" style="margin-top:6px;"></div></div>
+      </div>
+      <div class="mk-tabs" role="tablist">
+        <button type="button" data-t="details" class="on" onclick="admTab('details')">פרטים</button>
+        <button type="button" data-t="perms" onclick="admTab('perms')">הרשאות</button>
+        <button type="button" data-t="att" onclick="admTab('att')">נוכחות</button>
+        <button type="button" data-t="sec" onclick="admTab('sec')">אבטחה</button>
+      </div>
+      <div class="card mk-pane" id="admP-details">
+        <label>שם מלא</label><input type="text" id="admFName">
+        <label>מסגרת</label><select id="admFFw"></select>
+        <div class="mk-sw-row"><div><b>מפקד</b><div class="mk-sub">מסומן כמפקד בשבצ"ק, בנוכחות ובשבצקון</div></div><label class="mk-sw"><input type="checkbox" id="admFCmd"><span></span></label></div>
+        <div class="mk-sw-row"><div><b>פעיל בשמ"פ</b><div class="mk-sub">לא פעיל: לא מופיע בנוכחות ובשבצ"ק ולא יכול להיכנס</div></div><label class="mk-sw"><input type="checkbox" id="admFAct"><span></span></label></div>
+        <button type="button" class="btn-action btn-success" id="admBtnDetails" onclick="admSaveDetails(this)">שמירה</button>
+        <div class="mk-sub" style="margin-top:8px;">החלפת מסגרת או שם מעדכנת גם את גיליונות הנוכחות, המטריצה והיממים.</div>
+      </div>
+      <div class="card mk-pane hidden" id="admP-perms">
+        <div class="mk-sub" style="margin-bottom:8px;">אפשר לבחור כמה תפקידים. השינוי חל מיד בשרת; במסכים של החייל - מהכניסה הבאה שלו.</div>
+        <div id="admRoleList"></div>
+        <div class="mk-gets" id="admGets"></div>
+        <button type="button" class="btn-action btn-success" onclick="admSavePerms(this)">שמירת הרשאות</button>
+      </div>
+      <div class="card mk-pane hidden" id="admP-att">
+        <label>תאריך</label><input type="date" id="uDate">
+        <label>סטטוס ראשי</label>
+        <select id="uMainStatus" onchange="syncAdmSubOptions()">
+          <option value="נוכח">נוכח</option>
+          <option value="אינו נוכח">אינו נוכח</option>
+          <option value="לא פעיל">העבר ללא פעיל</option>
+        </select>
+        <label>סטטוס משני</label><select id="uSubStatus"></select>
+        <label>הערה</label><input type="text" id="uNotes" placeholder="לא חובה">
+        <button type="button" class="btn-action btn-primary" onclick="submitAdmSingleUpdate(this)">עדכון דיווח</button>
+        <div id="uStatus" class="status-box"></div>
+        <div class="home-sec" style="font-size:14px;">דיווחים אחרונים</div>
+        <div id="admRecent" class="mk-sub">טוען...</div>
+      </div>
+      <div class="card mk-pane hidden" id="admP-sec">
+        <div class="mk-kv"><span>סיסמה</span><b id="admSecPass"></b></div>
+        <div class="mk-kv"><span>מצב</span><b id="admSecLock"></b></div>
+        <div class="mk-kv"><span>מכשירים רשומים להתראות</span><b id="admSecDev">—</b></div>
+        <button type="button" class="btn-action btn-danger" onclick="submitAdmResetPassword(this)">איפוס סיסמה</button>
+        <div id="pStatus" class="status-box"></div>
+        <button type="button" class="btn-action btn-secondary hidden" id="admBtnUnlock" style="margin-top:8px;" onclick="admUnlock(this)">ביטול נעילה</button>
+      </div>
     </div>
 
+    <!-- משימות -->
+    <div id="admTasks" class="adm-view hidden">
+      <div class="mk-title-row"><button type="button" class="mk-back" onclick="admGo('home')">‹ ניהול</button><h1 class="mk-h1">משימות</h1></div>
+      <div class="mk-seg"><button type="button" id="admTsA" class="on" onclick="admTasksTab('a')">שבצ"ק</button><button type="button" id="admTsB" onclick="admTasksTab('b')">שבצקון</button></div>
+      <div id="admTasksA">
+      <div class="card" style="border-color:var(--info);">
+        <h2>ניהול משימות לשבצ"ק</h2>
+        <div style="font-size:0.82rem;color:var(--ink-muted);margin-bottom:10px;line-height:1.5;">
+          לכל משימה מסמנים באילו ימים היא פעילה. כך בונים שבצ"ק מותאם לשישי ולשבת: למשל "שמירה" עם 3 משמרות בימי חול, ו"שמירה" עם 4 משמרות רק בשישי-שבת (אפשר לשכפל משימה ולשנות).
+        </div>
+        <label>הצג משימות ליום:</label>
+        <select id="tasksDayFilter" onchange="renderAdminTasks()">
+          <option value="ALL">כל המשימות</option>
+          <option value="0">ראשון</option><option value="1">שני</option><option value="2">שלישי</option>
+          <option value="3">רביעי</option><option value="4">חמישי</option><option value="5">שישי</option><option value="6">שבת</option>
+        </select>
+        <div id="adminTasksList"><div class="loading-msg">טוען משימות...</div></div>
+        <div class="btn-row">
+          <button type="button" class="btn-add-line" style="margin:0;" onclick="addAdminTask(false)">+ משימה חדשה</button>
+          <button type="button" class="btn-add-line" style="margin:0;" onclick="addAdminTask(true)">+ יזומה</button>
+        </div>
+        <button type="button" class="btn-action btn-success" style="margin-top:10px;" onclick="saveAdminTasks(this)">שמור משימות</button>
+        <div id="tasksStatus" class="status-box"></div>
+      </div>
+      </div>
+      <div id="admTasksB" class="hidden">
+      <div class="card" style="border-color:var(--olive);">
+        <h2>שבצקון - משימות וציוד</h2>
+        <div style="font-size:0.82rem;color:var(--ink-muted);margin-bottom:10px;line-height:1.5;">
+          המשימות שמופיעות בשבצקון, ולכל משימה רשימת הציוד שהמפקד בודק בכלי או במתקן (פריט בכל שורה).
+          לפריט שצריך לספור, כותבים אחרי השם קו ישר וכמות - למשל <b>מחסניות | 12</b> - והמפקד ירשום כמה יש בפועל.
+          כשלמשימה יש את אותו שם כמו בשבצ"ק, המערכת מציעה אוטומטית את הצוות והשעות מהשבצ"ק המפורסם.
+        </div>
+        <div id="adminSkList"><div class="loading-msg">טוען...</div></div>
+        <button type="button" class="btn-add-line" onclick="addAdminSkMission()">+ משימה חדשה</button>
+        <button type="button" class="btn-action btn-success" style="margin-top:10px;" onclick="saveAdminSkConfig(this)">שמור משימות וציוד</button>
+        <div id="skCfgStatus" class="status-box"></div>
+      </div>
+      </div>
+    </div>
+
+    <!-- מערכת -->
+    <div id="admSystem" class="adm-view hidden">
+      <div class="mk-title-row"><button type="button" class="mk-back" onclick="admGo('home')">‹ ניהול</button><h1 class="mk-h1">מערכת</h1></div>
+      <div class="home-sec">מודולים</div>
+      <div class="card">
+        <div class="mk-sw-row" style="border:none;"><div><b>ליונטים</b><div class="mk-sub">דיווח יומי למפקדים ולחמ"ל ותזכורות. מצבה, שעות וצילום - בדוח הליונטים</div></div><label class="mk-sw"><input type="checkbox" id="admLnToggle" onchange="admToggleLionet(this)"><span></span></label></div>
+      </div>
+      <div class="home-sec">כלים</div>
     <div class="card" style="border-color:var(--olive);">
       <h2>בדיקת פערים (עבור ירוק בעיניים)</h2>
       <label>הדבק רשימת מספרים אישיים:</label>
@@ -1150,11 +1273,32 @@
         </div>
       </div>
     </div>
-
     <div class="card">
       <h2>סנכרון מבנה מטריצות</h2>
       <button type="button" class="btn-action btn-warning" onclick="submitAdmSync(this)">סנכרן מטריצות עכשיו</button>
       <div id="syncStatus" class="status-box"></div>
+    </div>
+      <div class="card">
+        <h2>ניקוי מטמון</h2>
+        <div class="mk-sub" style="margin-bottom:8px;">אחרי שינוי ידני בגיליון, כדי שהאפליקציה תראה אותו מיד.</div>
+        <button type="button" class="btn-action btn-secondary" onclick="adminAction(this, 'ccStatus', { action: 'admin_clear_cache' }, false)">נקה מטמון</button>
+        <div id="ccStatus" class="status-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="admAddModal" class="modal-overlay hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+    <div class="modal-box" style="max-width:460px;text-align:right;">
+      <h3 style="margin:0 0 8px;color:var(--olive);">הוספת חייל</h3>
+      <label>שם מלא *</label><input type="text" id="aName" placeholder="שם פרטי ומשפחה">
+      <label>מספר אישי *</label><input type="text" id="aPn" inputmode="numeric" placeholder="7 ספרות">
+      <label>מסגרת *</label><select id="aFw"></select>
+      <label>תפקיד</label><select id="aRole"></select>
+      <div class="mk-sw-row"><div><b>מפקד</b></div><label class="mk-sw"><input type="checkbox" id="aCmd"><span></span></label></div>
+      <div class="mk-sw-row"><div><b>פעיל בשמ"פ</b></div><label class="mk-sw"><input type="checkbox" id="aActive" checked><span></span></label></div>
+      <div class="mk-sub" style="margin:6px 0 10px;">את שאר ההרשאות אפשר להוסיף אחר כך מכרטיס החייל.</div>
+      <div class="btn-row"><button type="button" class="btn-action btn-success" onclick="submitAdmAddSoldier(this)">הוספה</button><button type="button" class="btn-action btn-secondary" onclick="document.getElementById('admAddModal').classList.add('hidden')">ביטול</button></div>
+      <div id="aStatus" class="status-box"></div>
     </div>
   </div>
 
@@ -1837,7 +1981,8 @@
       const shvKey = canBuildShavzak() ? "shavzak_build" : "shavzak_view";
       tabs.push({ key: shvKey, label: "שבצ\"ק", icon: HUB_ICONS.shavzak_view });
     }
-    tabs.push({ key: "radio", label: "קשרים", icon: HUB_ICONS.radio });
+    if (p.adminPanel) tabs.push({ key: "admin", label: "ניהול", icon: HUB_ICONS.admin || HUB_ICONS.radio });
+    else tabs.push({ key: "radio", label: "קשרים", icon: HUB_ICONS.radio });
     if (!plain) {
       if (p.reservePlan || p.adminPanel) tabs.push({ key: "reserve", label: "הערכות", icon: HUB_ICONS.reserve });
       else if (p.attendanceReport) tabs.push({ key: "attendance", label: "נוכחות", icon: HUB_ICONS.attendance });
@@ -4545,18 +4690,239 @@
   // ==========================================
   // ממשק אדמין
   // ==========================================
+  // מצב מסך הניהול
+  let admPeople = null, admRolesAll = [], admFws = [], admCur = null, admFwF = "הכל", admStF = "פעילים", admPick = null, admTasksLoaded = false;
+
   async function loadShlomiWorkspace() {
-    const [db, attRes] = await Promise.all([getSharedDB(true), apiCall({ action: "get_attendance_soldiers" })]);
-    if (!isOk(db)) { toast(db.message || "שגיאה בטעינה", "err"); return; }
-    attendanceSoldiers = isOk(attRes) ? (attRes.soldiers || []) : [];
+    admGo("home");
     document.getElementById("uDate").value = dateToIso(new Date());
-    const fws = db.canonicalFrameworks || ALL_FRAMEWORKS;
-    ["aFw", "mNewFw"].forEach(id => { document.getElementById(id).innerHTML = fws.map(fw => `<option value="${escapeHtml(fw)}">${escapeHtml(fw)}</option>`).join(""); });
-    const items = soldierSelectItems(db.masterSoldiers || []);
-    ["uSoldier", "mSoldier", "pSoldier"].forEach(id => fillSelect(id, items));
+    await admLoadPeople();
+    apiCall({ action: "get_attendance_soldiers" }).then(r => { attendanceSoldiers = isOk(r) ? (r.soldiers || []) : []; });
+  }
+
+  async function admLoadPeople() {
+    const res = await apiCall({ action: "admin_people" });
+    if (!isOk(res)) { toast(res.message || "שגיאה בטעינה", "err"); return; }
+    admPeople = res.people; admRolesAll = res.roles; admFws = res.frameworks;
+    const act = admPeople.filter(p => p.active);
+    const locked = admPeople.filter(p => p.locked).length;
+    const pw = act.filter(p => p.needsPass);
+    document.getElementById("admStats").innerHTML =
+      `<button type="button" class="stat" onclick="admGo('people')"><div class="st-v">${act.length}</div><div class="st-k">פעילים</div><div class="st-s">מתוך ${admPeople.length}</div></button>` +
+      `<button type="button" class="stat ${locked ? "warn" : ""}" onclick="admStF='נעולים';admGo('people')"><div class="st-v">${locked}</div><div class="st-k">נעולים</div><div class="st-s">ניסיונות שגויים</div></button>` +
+      `<button type="button" class="stat ${pw.some(p => !p.hasPass) ? "warn" : ""}" onclick="admStF='בלי סיסמה';admGo('people')"><div class="st-v">${pw.length}</div><div class="st-k">עם הרשאה</div><div class="st-s">${pw.filter(p => !p.hasPass).length} בלי סיסמה</div></button>`;
+    ["aFw", "admFFw"].forEach(id => { document.getElementById(id).innerHTML = admFws.map(fw => `<option value="${escapeHtml(fw)}">${escapeHtml(fw)}</option>`).join(""); });
+    document.getElementById("aRole").innerHTML = admRolesAll.map(r => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join("");
+    if (currentScreen === "admin" && !document.getElementById("admPeople").classList.contains("hidden")) admRenderPeople();
+    if (admCur) { const f = admPeople.find(p => p.pn === admCur.pn); if (f) { admCur = f; admFillHead(); } }
+  }
+
+  function admGo(v, pick) {
+    ["Home", "People", "Soldier", "Tasks", "System"].forEach(x => document.getElementById("adm" + x).classList.toggle("hidden", x.toLowerCase() !== v));
+    window.scrollTo(0, 0);
+    if (v === "people") {
+      if (pick !== undefined) admPick = pick || null;
+      const h = document.getElementById("admPickHint");
+      h.classList.toggle("hidden", !admPick);
+      h.textContent = admPick === "sec" ? "בחר חייל לאיפוס סיסמה" : admPick === "att" ? "בחר חייל לתיקון דיווח" : "";
+      admPeopleMode("list");
+    }
+    if (v === "home") admPick = null;
+    if (v === "tasks" && !admTasksLoaded) { admTasksLoaded = true; loadAdminTasks(); loadAdminSkConfig(); }
+    if (v === "system") document.getElementById("admLnToggle").checked = Boolean(currentUser.features && currentUser.features.lionet);
+  }
+
+  function admInitials(n) { return String(n || "").split(" ").filter(Boolean).map(x => x[0]).join("").slice(0, 2); }
+  function admRoleChips(p) { return p.roles.filter(r => r !== "חייל").map(r => `<span class="chip ${r === "שלומי" ? "warn" : "info"}">${escapeHtml(r)}</span>`).join(" "); }
+
+  function admChips(id, arr, val, onPick) {
+    const el = document.getElementById(id);
+    el.innerHTML = arr.map(x => `<button type="button" class="${x === val ? "on" : ""}" data-v="${escapeHtml(x)}">${escapeHtml(x)}</button>`).join("");
+    el.querySelectorAll("button").forEach(b => b.onclick = () => { onPick(b.dataset.v); admRenderPeople(); });
+  }
+
+  function admRenderPeople() {
+    const body = document.getElementById("admPeopleBody");
+    if (!admPeople) { body.className = "loading-msg"; body.textContent = "טוען..."; return; }
+    body.className = "";
+    admChips("admFwChips", ["הכל"].concat(admFws), admFwF, v => admFwF = v);
+    admChips("admStChips", ["פעילים", "לא פעילים", "נעולים", "בלי סיסמה", "הכל"], admStF, v => admStF = v);
+    const q = document.getElementById("admQ").value.trim();
+    const list = admPeople.filter(p => (admFwF === "הכל" || p.fw === admFwF) &&
+      (admStF === "הכל" || (admStF === "פעילים" && p.active) || (admStF === "לא פעילים" && !p.active) || (admStF === "נעולים" && p.locked) || (admStF === "בלי סיסמה" && p.needsPass && !p.hasPass)) &&
+      (!q || p.name.includes(q) || p.pn.includes(q)));
+    let h = "";
+    admFws.concat(["אחר"]).forEach(fw => {
+      const g = list.filter(p => fw === "אחר" ? !admFws.includes(p.fw) : p.fw === fw);
+      if (!g.length) return;
+      h += `<div class="mk-group"><span>${escapeHtml(fw)}</span><span>${g.length}</span></div>` + g.map(p => `<button type="button" class="mk-row${p.active ? "" : " off"}" data-pn="${escapeHtml(p.pn)}" onclick="admOpenSoldier(this.dataset.pn)">
+        <span class="mk-avatar">${escapeHtml(admInitials(p.name))}</span>
+        <span><span class="nm">${escapeHtml(p.name)}</span><br><span class="sub">${p.active ? "" : "לא פעיל · "}${p.needsPass && !p.hasPass ? "בלי סיסמה · " : ""}מ"א ${escapeHtml(p.pn)}</span></span>
+        <span class="end">${admRoleChips(p)}${p.locked ? ' <span class="chip bad">נעול</span>' : ""}</span><span class="chev">‹</span></button>`).join("");
+    });
+    body.innerHTML = h || '<div class="item-box" style="text-align:center;">לא נמצאו חיילים</div>';
+  }
+
+  function admPeopleMode(m) {
+    document.getElementById("admSegList").classList.toggle("on", m === "list");
+    document.getElementById("admSegRoles").classList.toggle("on", m === "roles");
+    document.getElementById("admListWrap").classList.toggle("hidden", m !== "list");
+    document.getElementById("admRolesBody").classList.toggle("hidden", m !== "roles");
+    if (m === "list") admRenderPeople(); else admRenderRoles();
+  }
+
+  const ADM_ROLE_DESC = { "חייל": "צפייה בשבצ\"ק, חתימות, קשרים", "מפקד": "נוכחות למסגרת שלו, שבצקון, שיבוץ במחלקה", "נאמן כ\"א": "נוכחות למסגרת, בניית שבצ\"ק",
+    "קצין": "חלוקה למחלקות, אישור קצינים, הערכות למילואים", "פיקוד עליון": "אישור מ\"פ ופרסום, דוחות, כל הפלוגה", "מפל\"ג": "זיכויים והחזרות ציוד",
+    "משק\"ש": "כל המפל\"ג + דוח קשרים ודוח ליונטים", "חמ\"ל": "דיווח ליונטים שהופקדו בחמ\"ל", "שלומי": "כל ההרשאות, כולל ניהול" };
+
+  function admRenderRoles() {
+    const box = document.getElementById("admRolesBody");
+    if (!admPeople) { box.innerHTML = '<div class="loading-msg">טוען...</div>'; return; }
+    box.innerHTML = admRolesAll.filter(r => r !== "חייל").map(r => {
+      const ppl = admPeople.filter(p => p.active && p.roles.includes(r));
+      return `<div class="mk-rolegrp"><h3><span>${escapeHtml(r)}</span><span class="chip mute">${ppl.length}</span></h3><div class="mk-sub">${escapeHtml(ADM_ROLE_DESC[r] || "")}</div>
+        ${ppl.map(p => `<button type="button" class="mk-namechip" data-pn="${escapeHtml(p.pn)}" onclick="admOpenSoldier(this.dataset.pn)">${escapeHtml(p.name)} <span class="mk-sub">${escapeHtml(p.fw)}</span></button>`).join("") || '<div class="mk-sub" style="margin-top:6px;">אף אחד</div>'}</div>`;
+    }).join("") + `<div class="mk-sub" style="text-align:center;margin:8px;">כל השאר: חייל (${admPeople.filter(p => p.active && p.roles.length === 1 && p.roles[0] === "חייל").length})</div>`;
+  }
+
+  function admFillHead() {
+    const p = admCur;
+    document.getElementById("admSAv").textContent = admInitials(p.name);
+    document.getElementById("admSName").textContent = p.name;
+    document.getElementById("admSMeta").textContent = `${p.fw} · מ"א ${p.pn}`;
+    document.getElementById("admSChips").innerHTML = (p.active ? '<span class="chip ok">פעיל</span> ' : '<span class="chip mute">לא פעיל</span> ') + admRoleChips(p) + (p.locked ? ' <span class="chip bad">נעול</span>' : "");
+    document.getElementById("admSecPass").textContent = !p.needsPass ? "לא נדרשת" : p.hasPass ? "מוגדרת" : "טרם הוגדרה";
+    document.getElementById("admSecLock").innerHTML = p.locked ? '<span class="chip bad">נעול</span>' : '<span class="chip ok">תקין</span>';
+    document.getElementById("admBtnUnlock").classList.toggle("hidden", !p.locked);
+  }
+
+  async function admOpenSoldier(pn) {
+    admCur = admPeople.find(p => p.pn === pn);
+    if (!admCur) return;
+    admCur = Object.assign({}, admCur, { roles: admCur.roles.slice() });
+    ["Home", "People", "Soldier", "Tasks", "System"].forEach(x => document.getElementById("adm" + x).classList.toggle("hidden", x !== "Soldier"));
+    window.scrollTo(0, 0);
+    admFillHead();
+    document.getElementById("admFName").value = admCur.name;
+    document.getElementById("admFFw").value = admCur.fw;
+    document.getElementById("admFCmd").checked = admCur.cmd;
+    document.getElementById("admFAct").checked = admCur.active;
+    admEditRoles = admCur.roles.slice();
+    admRenderRolePick();
+    ["uStatus", "pStatus"].forEach(hideBox);
     onAdmSoldierSelect();
-    loadAdminTasks();
-    loadAdminSkConfig();
+    admTab(admPick || "details");
+    admPick = null;
+    document.getElementById("admRecent").textContent = "טוען...";
+    document.getElementById("admSecDev").textContent = "—";
+    const det = await apiCall({ action: "admin_soldier", personalNumber: pn });
+    if (!admCur || admCur.pn !== pn) return;
+    if (isOk(det)) {
+      document.getElementById("admSecDev").textContent = String(det.devices);
+      document.getElementById("admRecent").innerHTML = det.reports.length ? det.reports.map(r => `<div class="mk-log"><span>${escapeHtml(String(r.date).slice(0, 5))}</span><span>${escapeHtml(r.main)}${r.sub ? " · " + escapeHtml(r.sub) : ""}${r.notes ? `<br><span class="mk-sub">${escapeHtml(r.notes)}</span>` : ""}</span><span class="mk-sub">${escapeHtml(r.by)}</span></div>`).join("") : "אין דיווחים אחרונים";
+    } else document.getElementById("admRecent").textContent = det.message || "";
+  }
+
+  function admTab(t) {
+    document.querySelectorAll("#admSoldier .mk-tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
+    ["details", "perms", "att", "sec"].forEach(x => document.getElementById("admP-" + x).classList.toggle("hidden", x !== t));
+  }
+
+  let admEditRoles = [];
+  function admRenderRolePick() {
+    const sel = new Set(admEditRoles);
+    document.getElementById("admRoleList").innerHTML = admRolesAll.map(r => `<label class="mk-role${sel.has(r) ? " on" : ""}">
+      <input type="checkbox" data-r="${escapeHtml(r)}" ${sel.has(r) ? "checked" : ""}>
+      <span><b>${escapeHtml(r)}</b><span class="mk-sub">${escapeHtml(ADM_ROLE_DESC[r] || "")}${r !== "חייל" ? " · דורש סיסמה" : ""}</span></span></label>`).join("");
+    document.querySelectorAll("#admRoleList input").forEach(i => i.onchange = () => {
+      const r = i.dataset.r;
+      let roles = admEditRoles.filter(x => x !== r);
+      if (i.checked) { if (r === "חייל") roles = ["חייל"]; else { roles = roles.filter(x => x !== "חייל"); roles.push(r); } }
+      if (!roles.length) roles = ["חייל"];
+      admEditRoles = roles; admRenderRolePick();
+    });
+    const has = r => sel.has(r) || sel.has("שלומי");
+    const g = ["צפייה בשבצ\"ק, חתימות, קשרים"];
+    if (has("מפקד") || has("נאמן כ\"א") || has("קצין") || has("פיקוד עליון")) g.push(`דיווח נוכחות: ${has("פיקוד עליון") ? "כל הפלוגה" : admCur.fw}`, "בניית שבצ\"ק");
+    if (has("מפקד") || has("קצין")) g.push("שבצקון");
+    if (has("קצין")) g.push("חלוקה למחלקות ואישור קצינים", "הערכות למילואים");
+    if (has("פיקוד עליון")) g.push("אישור מ\"פ ופרסום, דוחות");
+    if (has("מפל\"ג") || has("משק\"ש")) g.push("זיכויים והחזרות");
+    if (has("משק\"ש")) g.push("דוח קשרים ודוח ליונטים");
+    if (has("חמ\"ל")) g.push("דיווח ליונטים בחמ\"ל");
+    if (sel.has("שלומי")) g.push("ניהול והתראות");
+    const pw = admEditRoles.some(r => r !== "חייל");
+    document.getElementById("admGets").innerHTML = `<b>מה החייל יקבל:</b><br>${g.map(escapeHtml).join(" · ")}<br><b style="color:${pw ? "var(--warn)" : "var(--ok)"};">${pw ? (admCur.hasPass ? "כניסה עם סיסמה" : "יידרש להגדיר סיסמה בכניסה הבאה") : "כניסה עם מ\"א בלבד"}</b>`;
+  }
+
+  async function admSavePerms(btn) {
+    setBtnBusy(btn, true, "שומר...");
+    const res = await apiCall({ action: "admin_edit_soldier", personalNumber: admCur.pn, roles: admEditRoles });
+    setBtnBusy(btn, false);
+    toast(res.message, isOk(res) ? "ok" : "err");
+    if (isOk(res)) { invalidateSharedDB(); await admLoadPeople(); }
+  }
+
+  async function admSaveDetails(btn) {
+    const p = admCur;
+    const name = document.getElementById("admFName").value.trim();
+    const fw = document.getElementById("admFFw").value;
+    const cmd = document.getElementById("admFCmd").checked;
+    const act = document.getElementById("admFAct").checked;
+    if (!name) { toast("נא למלא שם", "err"); return; }
+    const run = async () => {
+      setBtnBusy(btn, true, "שומר...");
+      const msgs = [];
+      let ok = true;
+      if (fw !== p.fw) {
+        const r = await apiCall({ action: "admin_move_soldier", personalNumber: p.pn, newFramework: fw });
+        msgs.push(r.message); ok = ok && isOk(r);
+      }
+      if (ok) {
+        const r = await apiCall({ action: "admin_edit_soldier", personalNumber: p.pn, name, cmd, active: act });
+        if (!(r.message === "לא היו שינויים" && msgs.length)) msgs.push(r.message);
+        ok = isOk(r);
+      }
+      setBtnBusy(btn, false);
+      toast(msgs.join("\n"), ok ? "ok" : "err");
+      invalidateSharedDB();
+      await admLoadPeople();
+      if (admCur) { document.getElementById("admFName").value = admCur.name; document.getElementById("admFFw").value = admCur.fw; }
+    };
+    if (!act && p.active) confirmModal("העברה ללא פעיל", `להגדיר את ${p.name} כלא פעיל?\nהוא לא יופיע בנוכחות ובשבצ"ק ולא יוכל להיכנס.`, "כן, לא פעיל", run);
+    else run();
+  }
+
+  async function admUnlock(btn) {
+    setBtnBusy(btn, true, "...");
+    const res = await apiCall({ action: "admin_unlock", personalNumber: admCur.pn });
+    setBtnBusy(btn, false);
+    toast(res.message, isOk(res) ? "ok" : "err");
+    if (isOk(res)) await admLoadPeople();
+  }
+
+  function admOpenAdd() {
+    ["aName", "aPn"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("aRole").value = "חייל";
+    document.getElementById("aCmd").checked = false;
+    document.getElementById("aActive").checked = true;
+    hideBox("aStatus");
+    document.getElementById("admAddModal").classList.remove("hidden");
+  }
+
+  function admTasksTab(t) {
+    document.getElementById("admTsA").classList.toggle("on", t === "a"); document.getElementById("admTsB").classList.toggle("on", t === "b");
+    document.getElementById("admTasksA").classList.toggle("hidden", t !== "a"); document.getElementById("admTasksB").classList.toggle("hidden", t !== "b");
+  }
+
+  async function admToggleLionet(el) {
+    const on = el.checked;
+    el.checked = !on;
+    confirmModal(on ? "הפעלת מודול הליונטים" : "כיבוי מודול הליונטים", on ? "המפקדים והחמ\"ל יראו את מסך הליונט ויקבלו תזכורות כל יום." : "המסך והתזכורות יוסתרו מהמפקדים.", on ? "הפעלה" : "כיבוי", async () => {
+      const res = await apiCall({ action: "lionet_config_save", enabled: on });
+      toast(isOk(res) ? (on ? "המודול הופעל" : "המודול כובה") : res.message, isOk(res) ? "ok" : "err");
+      if (isOk(res)) { el.checked = on; currentUser.features = Object.assign({}, currentUser.features, { lionet: on }); saveSession(); }
+    });
   }
 
   function syncAdmSubOptions() {
@@ -4565,7 +4931,7 @@
   }
 
   function onAdmSoldierSelect() {
-    const pn = document.getElementById("uSoldier").value;
+    const pn = admCur ? admCur.pn : "";
     const found = attendanceSoldiers.find(s => s.personalNumber === pn);
     document.getElementById("uMainStatus").value = found ? (found.mainStatus || "נוכח") : "נוכח";
     syncAdmSubOptions();
@@ -4667,35 +5033,29 @@
     const res = await apiCall(payload);
     setBtnBusy(btn, false);
     showBox(boxId, res.message, isOk(res));
-    if (isOk(res)) { invalidateSharedDB(); if (reload) await loadShlomiWorkspace(); }
+    if (isOk(res)) { invalidateSharedDB(); if (reload) await admLoadPeople(); }
     return res;
   }
 
   function submitAdmSingleUpdate(btn) {
-    const pn = document.getElementById("uSoldier").value;
-    if (!pn) { toast("בחר חייל", "err"); return; }
-    adminAction(btn, "uStatus", { action: "admin_update_soldier", personalNumber: pn, reportDate: document.getElementById("uDate").value,
-      mainStatus: document.getElementById("uMainStatus").value, subStatus: document.getElementById("uSubStatus").value, notes: document.getElementById("uNotes").value.trim() }, false);
+    if (!admCur) return;
+    adminAction(btn, "uStatus", { action: "admin_update_soldier", personalNumber: admCur.pn, reportDate: document.getElementById("uDate").value,
+      mainStatus: document.getElementById("uMainStatus").value, subStatus: document.getElementById("uSubStatus").value, notes: document.getElementById("uNotes").value.trim() }, false)
+      .then(res => { if (isOk(res)) { admLoadPeople(); admOpenSoldierRefresh(); } });
   }
+  function admOpenSoldierRefresh() { if (admCur) setTimeout(() => { if (admCur) apiCall({ action: "admin_soldier", personalNumber: admCur.pn }).then(det => { if (isOk(det) && admCur) document.getElementById("admRecent").innerHTML = det.reports.map(r => `<div class="mk-log"><span>${escapeHtml(String(r.date).slice(0, 5))}</span><span>${escapeHtml(r.main)}${r.sub ? " · " + escapeHtml(r.sub) : ""}</span><span class="mk-sub">${escapeHtml(r.by)}</span></div>`).join(""); }); }, 300); }
 
   function submitAdmAddSoldier(btn) {
-    adminAction(btn, "aStatus", { action: "admin_add_soldier", name: document.getElementById("aName").value.trim(), personalNumber: document.getElementById("aPn").value.trim(),
-      framework: document.getElementById("aFw").value, role: document.getElementById("aRole").value.trim(), isActive: document.getElementById("aActive").checked }, true)
-      .then(res => { if (isOk(res)) { document.getElementById("aName").value = ""; document.getElementById("aPn").value = ""; } });
-  }
-
-  function submitAdmMoveSoldier(btn) {
-    const pn = document.getElementById("mSoldier").value;
-    if (!pn) { toast("בחר חייל", "err"); return; }
-    adminAction(btn, "mStatus", { action: "admin_move_soldier", personalNumber: pn, newFramework: document.getElementById("mNewFw").value }, true);
+    const name = document.getElementById("aName").value.trim(), pn = document.getElementById("aPn").value.trim();
+    if (!name || !pn) { toast("נא למלא שם ומ\"א", "err"); return; }
+    adminAction(btn, "aStatus", { action: "admin_add_soldier", name, personalNumber: pn, framework: document.getElementById("aFw").value,
+      role: document.getElementById("aRole").value, isCommander: document.getElementById("aCmd").checked, isActive: document.getElementById("aActive").checked }, false)
+      .then(async res => { if (isOk(res)) { document.getElementById("admAddModal").classList.add("hidden"); toast(res.message, "ok"); await admLoadPeople(); admGo("people"); admOpenSoldier(pn); } });
   }
 
   function submitAdmResetPassword(btn) {
-    const sel = document.getElementById("pSoldier");
-    const pn = sel.value;
-    if (!pn) { toast("בחר חייל", "err"); return; }
-    const name = sel.options[sel.selectedIndex].dataset.name || pn;
-    confirmModal("איפוס סיסמה", `לאפס את הסיסמה של ${name}?`, "אפס", () => adminAction(btn, "pStatus", { action: "admin_reset_password", personalNumber: pn }, false));
+    if (!admCur) return;
+    confirmModal("איפוס סיסמה", `לאפס את הסיסמה של ${admCur.name}?\nבכניסה הבאה הוא יגדיר סיסמה חדשה.`, "אפס", () => adminAction(btn, "pStatus", { action: "admin_reset_password", personalNumber: admCur.pn }, false).then(r => { if (isOk(r)) admLoadPeople(); }));
   }
 
   function submitAdmSync(btn) { adminAction(btn, "syncStatus", { action: "admin_sync" }, false); }
